@@ -1,9 +1,3 @@
-## plutovg
-plutovg is a standalone 2D graphics library in C.
-
-## example
-```c
-
 #include "plutovg.h"
 
 int main()
@@ -47,11 +41,3 @@ int main()
 
     return 0;
 }
-```
-
-output :
-
-![smiley.png](smiley.png)
-
-## support
-If you like what we do, [you can buy us a coffee](https://www.patreon.com/sammycage)
