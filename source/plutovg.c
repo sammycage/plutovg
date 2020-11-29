@@ -662,3 +662,22 @@ void plutovg_stroke_extents(plutovg_t* pluto, double* x, double* y, double* w, d
     *h = rle->h;
     plutovg_rle_destroy(rle);
 }
+
+void plutovg_clip_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h)
+{
+    plutovg_state_t* state = pluto->state;
+    if(state->clippath)
+    {
+        *x = state->clippath->x;
+        *y = state->clippath->y;
+        *w = state->clippath->w;
+        *h = state->clippath->h;
+    }
+    else
+    {
+        *x = pluto->clip.x;
+        *y = pluto->clip.y;
+        *w = pluto->clip.w;
+        *h = pluto->clip.h;
+    }
+}
