@@ -599,6 +599,12 @@ void plutovg_stroke_extents(plutovg_t* pluto, double* x, double* y, double* w, d
  */
 void plutovg_clip_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h);
 
+/**
+ * @brief Reset the current clip region to its original, unrestricted state.
+ * @param pluto - a pluto context
+ */
+void plutovg_reset_clip(plutovg_t* pluto);
+
 #ifdef __cplusplus
 }
 #endif

@@ -681,3 +681,9 @@ void plutovg_clip_extents(plutovg_t* pluto, double* x, double* y, double* w, dou
         *h = pluto->clip.h;
     }
 }
+
+void plutovg_reset_clip(plutovg_t* pluto)
+{
+    plutovg_rle_destroy(pluto->state->clippath);
+    pluto->state->clippath = NULL;
+}
