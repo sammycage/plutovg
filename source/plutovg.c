@@ -650,3 +650,15 @@ void plutovg_fill_extents(plutovg_t* pluto, double* x, double* y, double* w, dou
     *h = rle->h;
     plutovg_rle_destroy(rle);
 }
+
+void plutovg_stroke_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h)
+{
+    plutovg_state_t* state = pluto->state;
+    plutovg_rle_t* rle = plutovg_rasterize(pluto->path, &state->matrix, NULL, &state->stroke, plutovg_fill_rule_non_zero);
+
+    *x = rle->x;
+    *y = rle->y;
+    *w = rle->w;
+    *h = rle->h;
+    plutovg_rle_destroy(rle);
+}
