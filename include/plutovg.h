@@ -569,6 +569,16 @@ void plutovg_fill_preserve(plutovg_t* pluto);
 void plutovg_stroke_preserve(plutovg_t* pluto);
 void plutovg_clip_preserve(plutovg_t* pluto);
 
+/**
+ * @brief Computes a bounding box in user coordinates covering the area inside the current fill.
+ * @param pluto - a pluto context
+ * @param x - the x coordinate of the bounding box
+ * @param y - the y coordinate of the bounding box
+ * @param w - the width of the bounding box
+ * @param h - the height of the bounding box
+ */
+void plutovg_fill_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h);
+
 #ifdef __cplusplus
 }
 #endif

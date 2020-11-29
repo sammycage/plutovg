@@ -638,3 +638,15 @@ void plutovg_clip_preserve(plutovg_t* pluto)
         state->clippath = rle;
     }
 }
+
+void plutovg_fill_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h)
+{
+    plutovg_state_t* state = pluto->state;
+    plutovg_rle_t* rle = plutovg_rasterize(pluto->path, &state->matrix, NULL, NULL, state->winding);
+
+    *x = rle->x;
+    *y = rle->y;
+    *w = rle->w;
+    *h = rle->h;
+    plutovg_rle_destroy(rle);
+}
