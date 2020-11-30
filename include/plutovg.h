@@ -199,6 +199,10 @@ typedef struct {
     int codepoint;
     plutovg_path_t* path;
     double advance;
+    double x1;
+    double y1;
+    double x2;
+    double y2;
 } plutovg_glyph_t;
 
 typedef struct plutovg_font plutovg_font_t;
@@ -562,6 +566,7 @@ double plutovg_get_font_size(const plutovg_t* pluto);
 
 void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y);
 void plutovg_char(plutovg_t* pluto, int ch, double x, double y);
+void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double* h);
 
 void plutovg_fill(plutovg_t* pluto);
 void plutovg_stroke(plutovg_t* pluto);

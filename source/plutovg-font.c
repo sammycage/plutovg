@@ -23,7 +23,8 @@ plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata)
     stbtt_fontinfo info;
     if(!stbtt_InitFont(&info, data, 0))
     {
-        if(owndata) free(data);
+        if(owndata)
+            free(data);
         return NULL;
     }
 
@@ -122,8 +123,15 @@ const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoin
     stbtt_FreeShape(&font->info, v);
 
     int advance;
+    int x1, y1, x2, y2;
     stbtt_GetGlyphHMetrics(&font->info, index, &advance, NULL);
+    stbtt_GetGlyphBox(&font->info, index, &x1, &y1, &x2, &y2);
+
     glyph->advance = advance;
+    glyph->x1 = x1;
+    glyph->y1 = y1;
+    glyph->x2 = x2;
+    glyph->y2 = y2;
     return glyph;
 }
 

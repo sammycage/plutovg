@@ -569,6 +569,36 @@ void plutovg_char(plutovg_t* pluto, int ch, double x, double y)
     plutovg_path_add_path(pluto->path, glyph->path, &matrix);
 }
 
+void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double* h)
+{
+    *w = 0;
+    *h = 0;
+
+    plutovg_state_t* state = pluto->state;
+    if(state->font == NULL)
+        return;
+
+    const char* end = utf8 + strlen(utf8);
+    uint32_t codepoint = 0;
+    double scale = plutovg_font_get_scale(state->font, state->fontsize);
+    double x = 0;
+    while(utf8 < end)
+    {
+        if(!decode_utf8(&utf8, end, &codepoint))
+            return;
+
+        const plutovg_glyph_t* glyph = plutovg_font_get_glyph(state->font, (int)codepoint);
+        x += glyph->advance * scale;
+    }
+
+    double ascent = plutovg_font_get_ascent(state->font);
+    double descent = plutovg_font_get_descent(state->font);
+    double linegap = plutovg_font_get_line_gap(state->font);
+
+    *w = x;
+    *h = (ascent - descent + linegap) * scale;
+}
+
 void plutovg_fill(plutovg_t* pluto)
 {
     plutovg_fill_preserve(pluto);
