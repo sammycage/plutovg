@@ -537,7 +537,7 @@ void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y)
     const char* end = utf8 + strlen(utf8);
     uint32_t codepoint = 0;
     plutovg_matrix_t matrix;
-    double scale = plutovg_font_get_scale(state->font);
+    double scale = plutovg_font_get_scale(state->font, state->fontsize);
     while(utf8 < end)
     {
         if(!decode_utf8(&utf8, end, &codepoint))
@@ -545,12 +545,11 @@ void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y)
 
         plutovg_matrix_init_translate(&matrix, x, y);
         plutovg_matrix_scale(&matrix, scale, -scale);
-        plutovg_matrix_scale(&matrix, state->fontsize, state->fontsize);
 
         const plutovg_glyph_t* glyph = plutovg_font_get_glyph(state->font, (int)codepoint);
         plutovg_path_add_path(pluto->path, glyph->path, &matrix);
 
-        x += glyph->advance * scale * state->fontsize;
+        x += glyph->advance * scale;
     }
 }
 
@@ -561,11 +560,10 @@ void plutovg_char(plutovg_t* pluto, int ch, double x, double y)
         return;
 
     plutovg_matrix_t matrix;
-    double scale = plutovg_font_get_scale(state->font);
+    double scale = plutovg_font_get_scale(state->font, state->fontsize);
 
     plutovg_matrix_init_translate(&matrix, x, y);
     plutovg_matrix_scale(&matrix, scale, -scale);
-    plutovg_matrix_scale(&matrix, state->fontsize, state->fontsize);
 
     const plutovg_glyph_t* glyph = plutovg_font_get_glyph(state->font, ch);
     plutovg_path_add_path(pluto->path, glyph->path, &matrix);

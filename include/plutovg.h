@@ -209,7 +209,10 @@ plutovg_font_t* plutovg_font_reference(plutovg_font_t* font);
 void plutovg_font_destroy(plutovg_font_t* font);
 int plutovg_font_get_reference_count(const plutovg_font_t* font);
 const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoint);
-double plutovg_font_get_scale(const plutovg_font_t* font);
+double plutovg_font_get_scale(const plutovg_font_t* font, double size);
+double plutovg_font_get_ascent(const plutovg_font_t* font);
+double plutovg_font_get_descent(const plutovg_font_t* font);
+double plutovg_font_get_line_gap(const plutovg_font_t* font);
 
 typedef enum {
     plutovg_line_cap_butt,

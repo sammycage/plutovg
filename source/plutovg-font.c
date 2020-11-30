@@ -11,23 +11,29 @@ struct plutovg_font {
     int ref;
     unsigned char* data;
     int owndata;
+    int ascent;
+    int descent;
+    int linegap;
     stbtt_fontinfo info;
     plutovg_glyph_t cache[CACHE_SIZE];
 };
 
 plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata)
 {
+    stbtt_fontinfo info;
+    if(!stbtt_InitFont(&info, data, 0))
+    {
+        if(owndata) free(data);
+        return NULL;
+    }
+
     plutovg_font_t* font = malloc(sizeof(plutovg_font_t));
     font->ref = 1;
     font->data = data;
     font->owndata = owndata;
+    font->info = info;
+    stbtt_GetFontVMetrics(&font->info, &font->ascent, &font->descent, &font->linegap);
     memset(font->cache, 0, sizeof(font->cache));
-    if(!stbtt_InitFont(&font->info, data, 0))
-    {
-        plutovg_font_destroy(font);
-        return NULL;
-    }
-
     return font;
 }
 
@@ -79,11 +85,6 @@ int plutovg_font_get_reference_count(const plutovg_font_t* font)
     return font->ref;
 }
 
-double plutovg_font_get_scale(const plutovg_font_t* font)
-{
-    return (double)stbtt_ScaleForMappingEmToPixels(&font->info, 1.f);
-}
-
 const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoint)
 {
     plutovg_glyph_t* glyph = &font->cache[codepoint%CACHE_SIZE];
@@ -124,4 +125,24 @@ const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoin
     stbtt_GetGlyphHMetrics(&font->info, index, &advance, NULL);
     glyph->advance = advance;
     return glyph;
+}
+
+double plutovg_font_get_scale(const plutovg_font_t* font, double size)
+{
+    return (double)stbtt_ScaleForMappingEmToPixels(&font->info, (float)size);
+}
+
+double plutovg_font_get_ascent(const plutovg_font_t* font)
+{
+    return font->ascent;
+}
+
+double plutovg_font_get_descent(const plutovg_font_t* font)
+{
+    return font->descent;
+}
+
+double plutovg_font_get_line_gap(const plutovg_font_t* font)
+{
+    return font->linegap;
 }
