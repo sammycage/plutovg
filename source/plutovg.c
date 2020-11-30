@@ -591,12 +591,8 @@ void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double*
         x += glyph->advance * scale;
     }
 
-    double ascent = plutovg_font_get_ascent(state->font);
-    double descent = plutovg_font_get_descent(state->font);
-    double linegap = plutovg_font_get_line_gap(state->font);
-
     *w = x;
-    *h = (ascent - descent + linegap) * scale;
+    *h = plutovg_font_get_leading(state->font) * scale;
 }
 
 void plutovg_fill(plutovg_t* pluto)

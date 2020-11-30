@@ -217,6 +217,7 @@ double plutovg_font_get_scale(const plutovg_font_t* font, double size);
 double plutovg_font_get_ascent(const plutovg_font_t* font);
 double plutovg_font_get_descent(const plutovg_font_t* font);
 double plutovg_font_get_line_gap(const plutovg_font_t* font);
+double plutovg_font_get_leading(const plutovg_font_t* font);
 
 typedef enum {
     plutovg_line_cap_butt,

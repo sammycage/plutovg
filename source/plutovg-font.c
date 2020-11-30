@@ -154,3 +154,8 @@ double plutovg_font_get_line_gap(const plutovg_font_t* font)
 {
     return font->linegap;
 }
+
+double plutovg_font_get_leading(const plutovg_font_t* font)
+{
+    return (font->ascent - font->descent + font->linegap);
+}
