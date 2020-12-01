@@ -675,6 +675,9 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
 
 void plutovg_blend(plutovg_t* pluto, const plutovg_rle_t* rle)
 {
+    if(rle==NULL || rle->spans.size==0)
+        return;
+
     plutovg_paint_t* source = pluto->state->source;
     if(source->type==plutovg_paint_type_color)
     {

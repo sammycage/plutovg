@@ -53,6 +53,9 @@ plutovg_gradient_t* plutovg_gradient_create_radial(double cx, double cy, double 
 
 plutovg_gradient_t* plutovg_gradient_reference(plutovg_gradient_t* gradient)
 {
+    if(gradient==NULL)
+        return NULL;
+
     ++gradient->ref;
     return gradient;
 }
@@ -71,6 +74,9 @@ void plutovg_gradient_destroy(plutovg_gradient_t* gradient)
 
 int plutovg_gradient_get_reference_count(const plutovg_gradient_t* gradient)
 {
+    if(gradient==NULL)
+        return 0;
+
     return gradient->ref;
 }
 
@@ -150,20 +156,20 @@ plutovg_gradient_type_t plutovg_gradient_get_type(const plutovg_gradient_t* grad
 
 void plutovg_gradient_get_values_linear(const plutovg_gradient_t* gradient, double* x1, double* y1, double* x2, double* y2)
 {
-    *x1 = gradient->values[0];
-    *y1 = gradient->values[1];
-    *x2 = gradient->values[2];
-    *y2 = gradient->values[3];
+    if(x1) *x1 = gradient->values[0];
+    if(y1) *y1 = gradient->values[1];
+    if(x2) *x2 = gradient->values[2];
+    if(y2) *y2 = gradient->values[3];
 }
 
 void plutovg_gradient_get_values_radial(const plutovg_gradient_t* gradient, double* cx, double* cy, double* cr, double* fx, double* fy, double* fr)
 {
-    *cx = gradient->values[0];
-    *cy = gradient->values[1];
-    *cr = gradient->values[2];
-    *fx = gradient->values[3];
-    *fy = gradient->values[4];
-    *fr = gradient->values[5];
+    if(cx) *cx = gradient->values[0];
+    if(cy) *cy = gradient->values[1];
+    if(cr) *cr = gradient->values[2];
+    if(fx) *fx = gradient->values[3];
+    if(fy) *fy = gradient->values[4];
+    if(fr) *fr = gradient->values[5];
 }
 
 void plutovg_gradient_set_values_linear(plutovg_gradient_t* gradient, double x1, double y1, double x2, double y2)
@@ -207,6 +213,9 @@ plutovg_texture_t* plutovg_texture_create(plutovg_surface_t* surface)
 
 plutovg_texture_t* plutovg_texture_reference(plutovg_texture_t* texture)
 {
+    if(texture==NULL)
+        return NULL;
+
     ++texture->ref;
     return texture;
 }
@@ -225,6 +234,9 @@ void plutovg_texture_destroy(plutovg_texture_t* texture)
 
 int plutovg_texture_get_reference_count(const plutovg_texture_t* texture)
 {
+    if(texture==NULL)
+        return 0;
+
     return texture->ref;
 }
 
@@ -334,6 +346,9 @@ plutovg_paint_t* plutovg_paint_create_texture(plutovg_texture_t* texture)
 
 plutovg_paint_t* plutovg_paint_reference(plutovg_paint_t* paint)
 {
+    if(paint==NULL)
+        return NULL;
+
     ++paint->ref;
     return paint;
 }
@@ -357,6 +372,9 @@ void plutovg_paint_destroy(plutovg_paint_t* paint)
 
 int plutovg_paint_get_reference_count(const plutovg_paint_t* paint)
 {
+    if(paint==NULL)
+        return 0;
+
     return paint->ref;
 }
 

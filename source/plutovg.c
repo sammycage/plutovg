@@ -30,6 +30,9 @@ plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int widt
 
 plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface)
 {
+    if(surface==NULL)
+        return NULL;
+
     ++surface->ref;
     return surface;
 }
@@ -49,6 +52,9 @@ void plutovg_surface_destroy(plutovg_surface_t* surface)
 
 int plutovg_surface_get_reference_count(const plutovg_surface_t* surface)
 {
+    if(surface==NULL)
+        return 0;
+
     return surface->ref;
 }
 
@@ -171,6 +177,9 @@ plutovg_t* plutovg_create(plutovg_surface_t* surface)
 
 plutovg_t* plutovg_reference(plutovg_t* pluto)
 {
+    if(pluto==NULL)
+        return NULL;
+
     ++pluto->ref;
     return pluto;
 }
@@ -198,6 +207,9 @@ void plutovg_destroy(plutovg_t* pluto)
 
 int plutovg_get_reference_count(const plutovg_t* pluto)
 {
+    if(pluto==NULL)
+        return 0;
+
     return pluto->ref;
 }
 
@@ -571,8 +583,8 @@ void plutovg_char(plutovg_t* pluto, int ch, double x, double y)
 
 void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double* h)
 {
-    *w = 0;
-    *h = 0;
+    if(w) *w = 0;
+    if(h) *h = 0;
 
     plutovg_state_t* state = pluto->state;
     if(state->font == NULL)
@@ -591,8 +603,8 @@ void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double*
         x += glyph->advance * scale;
     }
 
-    *w = x;
-    *h = plutovg_font_get_leading(state->font) * scale;
+    if(w) *w = x;
+    if(h) *h = plutovg_font_get_leading(state->font) * scale;
 }
 
 void plutovg_fill(plutovg_t* pluto)
@@ -668,10 +680,10 @@ void plutovg_fill_extents(plutovg_t* pluto, double* x, double* y, double* w, dou
     plutovg_state_t* state = pluto->state;
     plutovg_rle_t* rle = plutovg_rasterize(pluto->path, &state->matrix, NULL, NULL, state->winding);
 
-    *x = rle->x;
-    *y = rle->y;
-    *w = rle->w;
-    *h = rle->h;
+    if(x) *x = rle->x;
+    if(y) *y = rle->y;
+    if(w) *w = rle->w;
+    if(h) *h = rle->h;
     plutovg_rle_destroy(rle);
 }
 
@@ -680,10 +692,10 @@ void plutovg_stroke_extents(plutovg_t* pluto, double* x, double* y, double* w, d
     plutovg_state_t* state = pluto->state;
     plutovg_rle_t* rle = plutovg_rasterize(pluto->path, &state->matrix, NULL, &state->stroke, plutovg_fill_rule_non_zero);
 
-    *x = rle->x;
-    *y = rle->y;
-    *w = rle->w;
-    *h = rle->h;
+    if(x) *x = rle->x;
+    if(y) *y = rle->y;
+    if(w) *w = rle->w;
+    if(h) *h = rle->h;
     plutovg_rle_destroy(rle);
 }
 
@@ -692,17 +704,17 @@ void plutovg_clip_extents(plutovg_t* pluto, double* x, double* y, double* w, dou
     plutovg_state_t* state = pluto->state;
     if(state->clippath)
     {
-        *x = state->clippath->x;
-        *y = state->clippath->y;
-        *w = state->clippath->w;
-        *h = state->clippath->h;
+        if(x) *x = state->clippath->x;
+        if(y) *y = state->clippath->y;
+        if(w) *w = state->clippath->w;
+        if(h) *h = state->clippath->h;
     }
     else
     {
-        *x = pluto->clip.x;
-        *y = pluto->clip.y;
-        *w = pluto->clip.w;
-        *h = pluto->clip.h;
+        if(x) *x = pluto->clip.x;
+        if(y) *y = pluto->clip.y;
+        if(w) *w = pluto->clip.w;
+        if(h) *h = pluto->clip.h;
     }
 }
 

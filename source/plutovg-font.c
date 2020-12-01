@@ -57,8 +57,10 @@ plutovg_font_t* plutovg_font_load_from_file(const char* filename)
 
 plutovg_font_t* plutovg_font_reference(plutovg_font_t* font)
 {
-    if(font)
-        ++font->ref;
+    if(font==NULL)
+        return NULL;
+
+    ++font->ref;
     return font;
 }
 
@@ -83,6 +85,9 @@ void plutovg_font_destroy(plutovg_font_t* font)
 
 int plutovg_font_get_reference_count(const plutovg_font_t* font)
 {
+    if(font==NULL)
+        return 0;
+
     return font->ref;
 }
 
@@ -162,8 +167,8 @@ double plutovg_font_get_leading(const plutovg_font_t* font)
 
 void plutovg_font_get_extents(const plutovg_font_t* font, double* x1, double* y1, double* x2, double* y2)
 {
-    *x1 = font->x1;
-    *y1 = font->y1;
-    *x2 = font->x2;
-    *y2 = font->y2;
+    if(x1) *x1 = font->x1;
+    if(y1) *y1 = font->y1;
+    if(x2) *x2 = font->x2;
+    if(y2) *y2 = font->y2;
 }

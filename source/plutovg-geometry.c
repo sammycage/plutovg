@@ -158,6 +158,9 @@ plutovg_path_t* plutovg_path_create(void)
 
 plutovg_path_t* plutovg_path_reference(plutovg_path_t* path)
 {
+    if(path==NULL)
+        return NULL;
+
     ++path->ref;
     return path;
 }
@@ -177,6 +180,9 @@ void plutovg_path_destroy(plutovg_path_t* path)
 
 int plutovg_path_get_reference_count(const plutovg_path_t* path)
 {
+    if(path==NULL)
+        return 0;
+
     return path->ref;
 }
 
@@ -518,14 +524,14 @@ void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix
 
 void plutovg_path_get_current_point(const plutovg_path_t* path, double* x, double* y)
 {
-    *x = 0.0;
-    *y = 0.0;
+    if(x) *x = 0.0;
+    if(y) *y = 0.0;
 
     if(path->points.size == 0)
         return;
 
-    *x = path->points.data[path->points.size - 1].x;
-    *y = path->points.data[path->points.size - 1].y;
+    if(x) *x = path->points.data[path->points.size - 1].x;
+    if(y) *y = path->points.data[path->points.size - 1].y;
 }
 
 int plutovg_path_get_element_count(const plutovg_path_t* path)
