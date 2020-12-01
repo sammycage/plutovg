@@ -11,9 +11,8 @@ struct plutovg_font {
     int ref;
     unsigned char* data;
     int owndata;
-    int ascent;
-    int descent;
-    int linegap;
+    int ascent, descent, linegap;
+    int x1, y1, x2, y2;
     stbtt_fontinfo info;
     plutovg_glyph_t cache[CACHE_SIZE];
 };
@@ -34,6 +33,7 @@ plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata)
     font->owndata = owndata;
     font->info = info;
     stbtt_GetFontVMetrics(&font->info, &font->ascent, &font->descent, &font->linegap);
+    stbtt_GetFontBoundingBox(&font->info, &font->x1, &font->y1, &font->x2, &font->y2);
     memset(font->cache, 0, sizeof(font->cache));
     return font;
 }
@@ -158,4 +158,12 @@ double plutovg_font_get_line_gap(const plutovg_font_t* font)
 double plutovg_font_get_leading(const plutovg_font_t* font)
 {
     return (font->ascent - font->descent + font->linegap);
+}
+
+void plutovg_font_get_extents(const plutovg_font_t* font, double* x1, double* y1, double* x2, double* y2)
+{
+    *x1 = font->x1;
+    *y1 = font->y1;
+    *x2 = font->x2;
+    *y2 = font->y2;
 }

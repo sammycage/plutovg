@@ -199,10 +199,7 @@ typedef struct {
     int codepoint;
     plutovg_path_t* path;
     double advance;
-    double x1;
-    double y1;
-    double x2;
-    double y2;
+    double x1, y1, x2, y2;
 } plutovg_glyph_t;
 
 typedef struct plutovg_font plutovg_font_t;
@@ -218,6 +215,7 @@ double plutovg_font_get_ascent(const plutovg_font_t* font);
 double plutovg_font_get_descent(const plutovg_font_t* font);
 double plutovg_font_get_line_gap(const plutovg_font_t* font);
 double plutovg_font_get_leading(const plutovg_font_t* font);
+void plutovg_font_get_extents(const plutovg_font_t* font, double* x1, double* y1, double* x2, double* y2);
 
 typedef enum {
     plutovg_line_cap_butt,
