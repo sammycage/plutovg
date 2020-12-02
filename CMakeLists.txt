@@ -4,7 +4,7 @@ set(CMAKE_C_STANDARD 11)
 
 project(plutovg C)
 
-add_library(plutovg)
+add_library(plutovg STATIC)
 
 add_subdirectory(include)
 add_subdirectory(source)
