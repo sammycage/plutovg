@@ -195,12 +195,12 @@ plutovg_color_t* plutovg_paint_get_color(const plutovg_paint_t* paint);
 plutovg_gradient_t* plutovg_paint_get_gradient(const plutovg_paint_t* paint);
 plutovg_texture_t* plutovg_paint_get_texture(const plutovg_paint_t* paint);
 
-typedef struct {
-    int codepoint;
-    plutovg_path_t* path;
-    double advance;
-    double x1, y1, x2, y2;
-} plutovg_glyph_t;
+typedef struct plutovg_glyph plutovg_glyph_t;
+
+int plutovg_glyph_get_codepoint(const plutovg_glyph_t* glyph);
+double plutovg_glyph_get_advance(const plutovg_glyph_t* glyph);
+void plutovg_glyph_get_extents(const plutovg_glyph_t* glyph, double* x1, double* y1, double* x2, double* y2);
+const plutovg_path_t* plutovg_glyph_get_path(const plutovg_glyph_t* glyph);
 
 typedef struct plutovg_font plutovg_font_t;
 

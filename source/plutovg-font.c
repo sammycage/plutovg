@@ -7,6 +7,36 @@
 
 #define CACHE_SIZE 256
 
+struct plutovg_glyph {
+    int codepoint;
+    int advance;
+    int x1, y1, x2, y2;
+    plutovg_path_t* path;
+};
+
+int plutovg_glyph_get_codepoint(const plutovg_glyph_t* glyph)
+{
+    return glyph->codepoint;
+}
+
+double plutovg_glyph_get_advance(const plutovg_glyph_t* glyph)
+{
+    return glyph->advance;
+}
+
+void plutovg_glyph_get_extents(const plutovg_glyph_t* glyph, double* x1, double* y1, double* x2, double* y2)
+{
+    if(x1) *x1 = glyph->x1;
+    if(y1) *y1 = glyph->y1;
+    if(x2) *x2 = glyph->x2;
+    if(y2) *y2 = glyph->y2;
+}
+
+const plutovg_path_t* plutovg_glyph_get_path(const plutovg_glyph_t* glyph)
+{
+    return glyph->path;
+}
+
 struct plutovg_font {
     int ref;
     unsigned char* data;
@@ -126,17 +156,8 @@ const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoin
     }
 
     stbtt_FreeShape(&font->info, v);
-
-    int advance;
-    int x1, y1, x2, y2;
-    stbtt_GetGlyphHMetrics(&font->info, index, &advance, NULL);
-    stbtt_GetGlyphBox(&font->info, index, &x1, &y1, &x2, &y2);
-
-    glyph->advance = advance;
-    glyph->x1 = x1;
-    glyph->y1 = y1;
-    glyph->x2 = x2;
-    glyph->y2 = y2;
+    stbtt_GetGlyphHMetrics(&font->info, index, &glyph->advance, NULL);
+    stbtt_GetGlyphBox(&font->info, index, &glyph->x1, &glyph->y1, &glyph->x2, &glyph->y2);
     return glyph;
 }
 
