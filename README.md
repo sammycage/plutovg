@@ -6,7 +6,7 @@ plutovg is a standalone 2D graphics library in C.
 
 #include "plutovg.h"
 
-int main()
+int main(void)
 {
     const int width = 150;
     const int height = 150;

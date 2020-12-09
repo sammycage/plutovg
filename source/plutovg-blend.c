@@ -394,7 +394,6 @@ static void blend_solid(plutovg_surface_t* surface, plutovg_operator_t op, const
     }
 }
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define BUFFER_SIZE 1024
 static void blend_linear_gradient(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_rle_t* rle, const gradient_data_t* gradient)
 {
@@ -470,7 +469,6 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
     }
 }
 
-#define CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : (hi) < (v) ? (hi) : (v))
 #define FIXED_SCALE (1 << 16)
 static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_rle_t* rle, const texture_data_t* texture)
 {
@@ -675,29 +673,23 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
 
 void plutovg_blend(plutovg_t* pluto, const plutovg_rle_t* rle)
 {
-    if(rle==NULL || rle->spans.size==0)
+    if(rle==NULL || rle->spans.size==0 || pluto->state->opacity==0.0)
         return;
 
     plutovg_paint_t* source = pluto->state->source;
     if(source->type==plutovg_paint_type_color)
-    {
-        const plutovg_color_t* color = plutovg_paint_get_color(source);
-        plutovg_blend_color(pluto, rle, color);
-    }
+        plutovg_blend_color(pluto, rle, source->color);
     else if(source->type==plutovg_paint_type_gradient)
-    {
-        const plutovg_gradient_t* gradient = plutovg_paint_get_gradient(source);
-        plutovg_blend_gradient(pluto, rle, gradient);
-    }
+        plutovg_blend_gradient(pluto, rle, source->gradient);
     else
-    {
-        const plutovg_texture_t* texture = plutovg_paint_get_texture(source);
-        plutovg_blend_texture(pluto, rle, texture);
-    }
+        plutovg_blend_texture(pluto, rle, source->texture);
 }
 
 void plutovg_blend_color(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_color_t* color)
 {
+    if(color==NULL || color->a==0.0)
+        return;
+
     plutovg_state_t* state = pluto->state;
     uint32_t solid = premultiply_color(color, state->opacity);
     blend_solid(pluto->surface, state->op, rle, solid);
@@ -705,6 +697,9 @@ void plutovg_blend_color(plutovg_t* pluto, const plutovg_rle_t* rle, const pluto
 
 void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_gradient_t* gradient)
 {
+    if(gradient==NULL || gradient->stops.size==0)
+        return;
+
     plutovg_state_t* state = pluto->state;
     gradient_data_t data;
     if(gradient->type==plutovg_gradient_type_linear)
@@ -766,7 +761,7 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
         curr_color = next_color;
     }
 
-    for(;pos < COLOR_TABLE_SIZE;++pos)
+    for(;pos < COLOR_TABLE_SIZE;pos++)
         data.colortable[pos] = curr_color;
 
     data.spread = gradient->spread;
@@ -782,6 +777,9 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
 
 void plutovg_blend_texture(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_texture_t* texture)
 {
+    if(texture==NULL || texture->opacity==0.0)
+        return;
+
     plutovg_state_t* state = pluto->state;
     texture_data_t data;
     data.data = texture->surface->data;

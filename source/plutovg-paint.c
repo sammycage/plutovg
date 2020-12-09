@@ -7,10 +7,10 @@ void plutovg_color_init_rgb(plutovg_color_t* color, double r, double g, double b
 
 void plutovg_color_init_rgba(plutovg_color_t* color, double r, double g, double b, double a)
 {
-    color->r = r;
-    color->g = g;
-    color->b = b;
-    color->a = a;
+    color->r = CLAMP(r, 0, 1.0);
+    color->g = CLAMP(g, 0, 1.0);
+    color->b = CLAMP(b, 0, 1.0);
+    color->a = CLAMP(a, 0, 1.0);
 }
 
 plutovg_gradient_t* plutovg_gradient_create_linear(double x1, double y1, double x2, double y2)
@@ -107,6 +107,9 @@ void plutovg_gradient_add_stop_rgb(plutovg_gradient_t* gradient, double offset, 
 
 void plutovg_gradient_add_stop_rgba(plutovg_gradient_t* gradient, double offset, double r, double g, double b, double a)
 {
+    if(offset < 0.0) offset = 0.0;
+    if(offset > 1.0) offset = 1.0;
+
     plutovg_array_ensure(gradient->stops, 1);
     plutovg_gradient_stop_t* stops = gradient->stops.data;
     int nstops = gradient->stops.size;
@@ -120,13 +123,10 @@ void plutovg_gradient_add_stop_rgba(plutovg_gradient_t* gradient, double offset,
         }
     }
 
-    stops[i].offset = offset;
-    stops[i].color.r = r;
-    stops[i].color.g = g;
-    stops[i].color.b = b;
-    stops[i].color.a = a;
-
-    gradient->stops.size++;
+    plutovg_gradient_stop_t* stop = &stops[i];
+    stop->offset = offset;
+    plutovg_color_init_rgba(&stop->color, r, g, b, a);
+    gradient->stops.size += 1;
 }
 
 void plutovg_gradient_add_stop(plutovg_gradient_t* gradient, const plutovg_gradient_stop_t* stop)

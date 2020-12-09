@@ -267,8 +267,6 @@ void plutovg_rle_destroy(plutovg_rle_t* rle)
     free(rle);
 }
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define DIV255(x) (((x) + ((x) >> 8) + 0x80) >> 8)
 plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rle_t* b)
 {
