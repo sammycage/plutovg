@@ -7,10 +7,10 @@ void plutovg_color_init_rgb(plutovg_color_t* color, double r, double g, double b
 
 void plutovg_color_init_rgba(plutovg_color_t* color, double r, double g, double b, double a)
 {
-    color->r = CLAMP(r, 0, 1.0);
-    color->g = CLAMP(g, 0, 1.0);
-    color->b = CLAMP(b, 0, 1.0);
-    color->a = CLAMP(a, 0, 1.0);
+    color->r = CLAMP(r, 0.0, 1.0);
+    color->g = CLAMP(g, 0.0, 1.0);
+    color->b = CLAMP(b, 0.0, 1.0);
+    color->a = CLAMP(a, 0.0, 1.0);
 }
 
 plutovg_gradient_t* plutovg_gradient_create_linear(double x1, double y1, double x2, double y2)
@@ -192,7 +192,7 @@ void plutovg_gradient_set_values_radial(plutovg_gradient_t* gradient, double cx,
 
 void plutovg_gradient_set_opacity(plutovg_gradient_t* gradient, double opacity)
 {
-    gradient->opacity = opacity;
+    gradient->opacity = CLAMP(opacity, 0.0, 1.0);
 }
 
 double plutovg_gradient_get_opacity(const plutovg_gradient_t* gradient)
@@ -274,7 +274,7 @@ plutovg_surface_t* plutovg_texture_get_surface(const plutovg_texture_t* texture)
 
 void plutovg_texture_set_opacity(plutovg_texture_t* texture, double opacity)
 {
-    texture->opacity = opacity;
+    texture->opacity = CLAMP(opacity, 0.0, 1.0);
 }
 
 double plutovg_texture_get_opacity(const plutovg_texture_t* texture)
