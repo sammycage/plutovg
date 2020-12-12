@@ -109,6 +109,8 @@ typedef struct {
 
 void plutovg_color_init_rgb(plutovg_color_t* color, double r, double g, double b);
 void plutovg_color_init_rgba(plutovg_color_t* color, double r, double g, double b, double a);
+void plutovg_color_init_rgb8(plutovg_color_t* color, unsigned char r, unsigned char g, unsigned char b);
+void plutovg_color_init_rgba8(plutovg_color_t* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 typedef enum {
     plutovg_spread_method_pad,
@@ -139,6 +141,7 @@ void plutovg_gradient_set_matrix(plutovg_gradient_t* gradient, const plutovg_mat
 void plutovg_gradient_get_matrix(const plutovg_gradient_t* gradient, plutovg_matrix_t* matrix);
 void plutovg_gradient_add_stop_rgb(plutovg_gradient_t* gradient, double offset, double r, double g, double b);
 void plutovg_gradient_add_stop_rgba(plutovg_gradient_t* gradient, double offset, double r, double g, double b, double a);
+void plutovg_gradient_add_stop_color(plutovg_gradient_t* gradient, double offset, const plutovg_color_t* color);
 void plutovg_gradient_add_stop(plutovg_gradient_t* gradient, const plutovg_gradient_stop_t* stop);
 void plutovg_gradient_clear_stops(plutovg_gradient_t* gradient);
 int plutovg_gradient_get_stop_count(const plutovg_gradient_t* gradient);
@@ -455,6 +458,10 @@ plutovg_line_join_t plutovg_get_line_join(const plutovg_t* pluto);
 */
 double plutovg_get_miter_limit(const plutovg_t* pluto);
 
+double plutovg_get_dash_offset(plutovg_t* pluto);
+double* plutovg_get_dash_data(plutovg_t* pluto);
+int plutovg_get_dash_count(plutovg_t* pluto);
+
 /**
  * @brief Adds a translation transformation to the current matrix.
  * @param pluto - a pluto context
@@ -556,6 +563,8 @@ void plutovg_arc(plutovg_t* path, double cx, double cy, double r, double a0, dou
 void plutovg_add_path(plutovg_t* pluto, const plutovg_path_t* path);
 void plutovg_new_path(plutovg_t* pluto);
 void plutovg_close_path(plutovg_t* pluto);
+
+void plutovg_get_current_point(const plutovg_t* pluto, double* x, double* y);
 plutovg_path_t* plutovg_get_path(const plutovg_t* pluto);
 
 void plutovg_set_font(plutovg_t* pluto, plutovg_font_t* font);

@@ -359,6 +359,24 @@ double plutovg_get_miter_limit(const plutovg_t* pluto)
     return pluto->state->stroke.miterlimit;
 }
 
+double plutovg_get_dash_offset(plutovg_t* pluto)
+{
+    plutovg_stroke_data_t* stroke = &pluto->state->stroke;
+    return stroke->dash ? stroke->dash->offset : 0.0;
+}
+
+double* plutovg_get_dash_data(plutovg_t* pluto)
+{
+    plutovg_stroke_data_t* stroke = &pluto->state->stroke;
+    return stroke->dash ? stroke->dash->data : NULL;
+}
+
+int plutovg_get_dash_count(plutovg_t* pluto)
+{
+    plutovg_stroke_data_t* stroke = &pluto->state->stroke;
+    return stroke->dash ? stroke->dash->size : 0;
+}
+
 void plutovg_translate(plutovg_t* pluto, double x, double y)
 {
     plutovg_matrix_translate(&pluto->state->matrix, x, y);
@@ -472,6 +490,11 @@ void plutovg_new_path(plutovg_t* pluto)
 void plutovg_close_path(plutovg_t* pluto)
 {
     plutovg_path_close(pluto->path);
+}
+
+void plutovg_get_current_point(const plutovg_t* pluto, double* x, double* y)
+{
+    plutovg_path_get_current_point(pluto->path, x, y);
 }
 
 plutovg_path_t* plutovg_get_path(const plutovg_t* pluto)

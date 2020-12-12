@@ -13,6 +13,16 @@ void plutovg_color_init_rgba(plutovg_color_t* color, double r, double g, double 
     color->a = CLAMP(a, 0.0, 1.0);
 }
 
+void plutovg_color_init_rgb8(plutovg_color_t* color, unsigned char r, unsigned char g, unsigned char b)
+{
+    plutovg_color_init_rgba8(color, r, g, b, 255);
+}
+
+void plutovg_color_init_rgba8(plutovg_color_t* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    plutovg_color_init_rgba(color, r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+}
+
 plutovg_gradient_t* plutovg_gradient_create_linear(double x1, double y1, double x2, double y2)
 {
     plutovg_gradient_t* gradient = malloc(sizeof(plutovg_gradient_t));
@@ -127,6 +137,11 @@ void plutovg_gradient_add_stop_rgba(plutovg_gradient_t* gradient, double offset,
     stop->offset = offset;
     plutovg_color_init_rgba(&stop->color, r, g, b, a);
     gradient->stops.size += 1;
+}
+
+void plutovg_gradient_add_stop_color(plutovg_gradient_t* gradient, double offset, const plutovg_color_t* color)
+{
+    plutovg_gradient_add_stop_rgba(gradient, offset, color->r, color->g, color->b, color->a);
 }
 
 void plutovg_gradient_add_stop(plutovg_gradient_t* gradient, const plutovg_gradient_stop_t* stop)
