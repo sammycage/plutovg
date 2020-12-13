@@ -177,7 +177,6 @@ void plutovg_rle_destroy(plutovg_rle_t* rle)
     free(rle);
 }
 
-#define SQRT2 1.41421356237309504880
 void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip, const plutovg_stroke_data_t* stroke, plutovg_fill_rule_t winding)
 {
     SW_FT_Raster_Params params;
@@ -391,7 +390,6 @@ plutovg_rle_t* plutovg_rle_clone(const plutovg_rle_t* rle)
     plutovg_rle_t* result = malloc(sizeof(plutovg_rle_t));
     plutovg_array_init(result->spans);
     plutovg_array_ensure(result->spans, rle->spans.size);
-
     memcpy(result->spans.data, rle->spans.data, (size_t)rle->spans.size * sizeof(plutovg_span_t));
     result->spans.size = rle->spans.size;
     result->x = rle->x;

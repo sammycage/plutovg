@@ -192,13 +192,12 @@ void plutovg_path_move_to(plutovg_path_t* path, double x, double y)
     plutovg_array_ensure(path->points, 1);
 
     path->elements.data[path->elements.size] = plutovg_path_element_move_to;
-    plutovg_point_t* points = path->points.data + path->points.size;
-    points[0].x = x;
-    points[0].y = y;
-
     path->elements.size += 1;
-    path->points.size += 1;
     path->contours += 1;
+
+    path->points.data[path->points.size].x = x;
+    path->points.data[path->points.size].y = y;
+    path->points.size += 1;
 
     path->start.x = x;
     path->start.y = y;
@@ -210,11 +209,10 @@ void plutovg_path_line_to(plutovg_path_t* path, double x, double y)
     plutovg_array_ensure(path->points, 1);
 
     path->elements.data[path->elements.size] = plutovg_path_element_line_to;
-    plutovg_point_t* points = path->points.data + path->points.size;
-    points[0].x = x;
-    points[0].y = y;
-
     path->elements.size += 1;
+
+    path->points.data[path->points.size].x = x;
+    path->points.data[path->points.size].y = y;
     path->points.size += 1;
 }
 
@@ -236,16 +234,19 @@ void plutovg_path_cubic_to(plutovg_path_t* path, double x1, double y1, double x2
     plutovg_array_ensure(path->points, 3);
 
     path->elements.data[path->elements.size] = plutovg_path_element_cubic_to;
-    plutovg_point_t* points = path->points.data + path->points.size;
-    points[0].x = x1;
-    points[0].y = y1;
-    points[1].x = x2;
-    points[1].y = y2;
-    points[2].x = x3;
-    points[2].y = y3;
-
     path->elements.size += 1;
-    path->points.size += 3;
+
+    path->points.data[path->points.size].x = x1;
+    path->points.data[path->points.size].y = y1;
+    path->points.size += 1;
+
+    path->points.data[path->points.size].x = x2;
+    path->points.data[path->points.size].y = y2;
+    path->points.size += 1;
+
+    path->points.data[path->points.size].x = x3;
+    path->points.data[path->points.size].y = y3;
+    path->points.size += 1;
 }
 
 void plutovg_path_arc_to(plutovg_path_t* path, double x1, double y1, double x2, double y2, double radius)
@@ -284,11 +285,11 @@ void plutovg_path_arc_to(plutovg_path_t* path, double x1, double y1, double x2, 
     double x4 = x1 - bnx * d;
     double y4 = y1 - bny * d;
 
-    int ccw = (dir < 0.0);
+    int ccw = dir < 0.0;
     double cx = x3 + any * radius * (ccw ? 1 : -1);
     double cy = y3 - anx * radius * (ccw ? 1 : -1);
-    double a0 = atan2((y3 - cy), (x3 - cx));
-    double a1 = atan2((y4 - cy), (x4 - cx));
+    double a0 = atan2(y3 - cy, x3 - cx);
+    double a1 = atan2(y4 - cy, x4 - cx);
 
     plutovg_path_line_to(path, x3, y3);
     plutovg_path_add_arc(path, cx, cy, radius, a0, a1, ccw);
@@ -306,11 +307,10 @@ void plutovg_path_close(plutovg_path_t* path)
     plutovg_array_ensure(path->points, 1);
 
     path->elements.data[path->elements.size] = plutovg_path_element_close;
-    plutovg_point_t* points = path->points.data + path->points.size;
-    points[0].x = path->start.x;
-    points[0].y = path->start.y;
-
     path->elements.size += 1;
+
+    path->points.data[path->points.size].x = path->start.x;
+    path->points.data[path->points.size].y = path->start.y;
     path->points.size += 1;
 }
 
@@ -367,7 +367,6 @@ void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, d
     plutovg_path_close(path);
 }
 
-#define KAPPA 0.5522847498
 void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry)
 {
     double right = x + w;
@@ -416,37 +415,33 @@ void plutovg_path_add_circle(plutovg_path_t* path, double cx, double cy, double 
     plutovg_path_add_ellipse(path, cx, cy, r, r);
 }
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 void plutovg_path_add_arc(plutovg_path_t* path, double cx, double cy, double r, double a0, double a1, int ccw)
 {
-    const double pi = 3.14159265358979323846;
-
     double da = a1 - a0;
     if(ccw == 0)
     {
-        if(fabs(da) >= pi*2)
+        if(fabs(da) >= PI*2)
         {
-            da = pi*2;
+            da = PI*2;
         }
         else
         {
-            while(da < 0.0) da += pi*2;
+            while(da < 0.0) da += PI*2;
         }
     }
     else
     {
-        if(fabs(da) >= pi*2)
+        if(fabs(da) >= PI*2)
         {
-            da = -pi*2;
+            da = -PI*2;
         }
         else
         {
-            while(da > 0.0) da -= pi*2;
+            while(da > 0.0) da -= PI*2;
         }
     }
 
-    int ndivs = MAX(1, MIN((int)(fabs(da) / (pi*0.5) + 0.5), 5));
+    int ndivs = MAX(1, MIN((int)(fabs(da) / (PI*0.5) + 0.5), 5));
     double hda = (da / (double)ndivs) / 2.0;
     double kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
     if(ccw == 1)

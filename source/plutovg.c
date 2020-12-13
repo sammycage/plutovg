@@ -729,20 +729,10 @@ void plutovg_stroke_extents(plutovg_t* pluto, double* x, double* y, double* w, d
 void plutovg_clip_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h)
 {
     plutovg_state_t* state = pluto->state;
-    if(state->clippath)
-    {
-        if(x) *x = state->clippath->x;
-        if(y) *y = state->clippath->y;
-        if(w) *w = state->clippath->w;
-        if(h) *h = state->clippath->h;
-    }
-    else
-    {
-        if(x) *x = pluto->clip.x;
-        if(y) *y = pluto->clip.y;
-        if(w) *w = pluto->clip.w;
-        if(h) *h = pluto->clip.h;
-    }
+    if(x) *x = state->clippath ? state->clippath->x : pluto->clip.x;
+    if(y) *y = state->clippath ? state->clippath->y : pluto->clip.y;
+    if(w) *w = state->clippath ? state->clippath->w : pluto->clip.w;
+    if(h) *h = state->clippath ? state->clippath->h : pluto->clip.h;
 }
 
 void plutovg_reset_clip(plutovg_t* pluto)
