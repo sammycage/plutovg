@@ -1,7 +1,14 @@
-## plutovg
-plutovg is a standalone 2D graphics library in C.
+# PlutoVG
+PlutoVG is a standalone 2D vector graphics library in C.
 
-## example
+## Features
+- Path Filling, Stroking and Dashing
+- Soild, Gradient and Texture Paints
+- Clipping and Compositing
+- Transformations
+- Font and Text Rendering
+
+## Example
 ```c
 
 #include "plutovg.h"
@@ -53,5 +60,18 @@ output :
 
 ![smiley.png](smiley.png)
 
-## support
+## Build
+Install [cmake](https://cmake.org/download/) if not already installed
+
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+## Projects using PlutoVG
+- [LunaSVG](https://github.com/sammycage/lunasvg)
+
+## Support
 If you like what we do, [you can buy us a coffee](https://www.patreon.com/sammycage)
