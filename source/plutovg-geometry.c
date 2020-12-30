@@ -369,13 +369,11 @@ void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, d
 
 void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry)
 {
+    rx = MIN(rx, w * 0.5);
+    ry = MIN(ry, h * 0.5);
+
     double right = x + w;
     double bottom = y + h;
-
-    rx = 2 * rx;
-    ry = 2 * ry;
-    if(rx > w) rx = w;
-    if(ry > h) ry = h;
 
     double cpx = rx * KAPPA;
     double cpy = ry * KAPPA;
