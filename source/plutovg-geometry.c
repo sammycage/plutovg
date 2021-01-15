@@ -39,6 +39,17 @@ void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, double radians)
     plutovg_matrix_init(matrix, c, s, -s, c, 0.0, 0.0);
 }
 
+void plutovg_matrix_init_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y)
+{
+    double c = cos(radians);
+    double s = sin(radians);
+
+    double cx = x * (1 - c) + y * s;
+    double cy = y * (1 - c) - x * s;
+
+    plutovg_matrix_init(matrix, c, s, -s, c, cx, cy);
+}
+
 void plutovg_matrix_translate(plutovg_matrix_t* matrix, double x, double y)
 {
     plutovg_matrix_t m;
@@ -64,6 +75,13 @@ void plutovg_matrix_rotate(plutovg_matrix_t* matrix, double radians)
 {
     plutovg_matrix_t m;
     plutovg_matrix_init_rotate(&m, radians);
+    plutovg_matrix_multiply(matrix, &m, matrix);
+}
+
+void plutovg_matrix_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y)
+{
+    plutovg_matrix_t m;
+    plutovg_matrix_init_rotate_translate(&m, radians, x, y);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 

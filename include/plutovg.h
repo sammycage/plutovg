@@ -45,10 +45,12 @@ void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, double x, double y)
 void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, double x, double y);
 void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, double x, double y);
 void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, double radians);
+void plutovg_matrix_init_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y);
 void plutovg_matrix_translate(plutovg_matrix_t* matrix, double x, double y);
 void plutovg_matrix_scale(plutovg_matrix_t* matrix, double x, double y);
 void plutovg_matrix_shear(plutovg_matrix_t* matrix, double x, double y);
 void plutovg_matrix_rotate(plutovg_matrix_t* matrix, double radians);
+void plutovg_matrix_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y);
 void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg_matrix_t* a, const plutovg_matrix_t* b);
 int plutovg_matrix_invert(plutovg_matrix_t* matrix);
 void plutovg_matrix_map(const plutovg_matrix_t* matrix, double x, double y, double* _x, double* _y);
