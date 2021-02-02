@@ -213,8 +213,9 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
         p3.y = p2.y - p1.y;
 
         double scale = sqrt(p3.x*p3.x + p3.y*p3.y) / 2.0;
+        double radius = stroke->width / 2.0;
 
-        ftWidth = (SW_FT_Fixed)(stroke->width * scale * 0.5 * (1 << 6));
+        ftWidth = (SW_FT_Fixed)(radius * scale * (1 << 6));
         ftMiterLimit = (SW_FT_Fixed)(stroke->miterlimit * (1 << 16));
 
         switch(stroke->cap)
