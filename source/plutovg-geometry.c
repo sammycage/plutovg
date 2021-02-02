@@ -686,9 +686,6 @@ plutovg_path_t* plutovg_path_clone_flat(const plutovg_path_t* path)
             points += 1;
             break;
         case plutovg_path_element_line_to:
-            plutovg_path_line_to(result, points[0].x, points[0].y);
-            points += 1;
-            break;
         case plutovg_path_element_close:
             plutovg_path_line_to(result, points[0].x, points[0].y);
             points += 1;
