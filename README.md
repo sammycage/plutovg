@@ -75,4 +75,4 @@ make
 - [PlutoSVG](https://github.com/sammycage/plutosvg)
 
 ## Support
-If you like what we do, [you can buy us a coffee](https://www.patreon.com/sammycage)
+If you like what we do, [you can buy us a coffee](https://www.buymeacoffee.com/sammycage)
