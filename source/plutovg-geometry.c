@@ -148,7 +148,7 @@ void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_
     double r = p[0].x;
     double b = p[0].y;
 
-    for(int i = 0;i < 4;i++)
+    for(int i = 1;i < 4;i++)
     {
         if(p[i].x < l) l = p[i].x;
         if(p[i].x > r) r = p[i].x;
@@ -269,8 +269,7 @@ void plutovg_path_cubic_to(plutovg_path_t* path, double x1, double y1, double x2
 
 void plutovg_path_arc_to(plutovg_path_t* path, double x1, double y1, double x2, double y2, double radius)
 {
-    double x0;
-    double y0;
+    double x0, y0;
     plutovg_path_get_current_point(path, &x0, &y0);
     if((x0 == x1 && y0 == y1) || (x1 == x2 && y1 == y2) || radius == 0.0)
     {

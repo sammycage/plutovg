@@ -460,9 +460,9 @@ plutovg_line_join_t plutovg_get_line_join(const plutovg_t* pluto);
 */
 double plutovg_get_miter_limit(const plutovg_t* pluto);
 
-double plutovg_get_dash_offset(plutovg_t* pluto);
-double* plutovg_get_dash_data(plutovg_t* pluto);
-int plutovg_get_dash_count(plutovg_t* pluto);
+double plutovg_get_dash_offset(const plutovg_t* pluto);
+double* plutovg_get_dash_data(const plutovg_t* pluto);
+int plutovg_get_dash_count(const plutovg_t* pluto);
 
 /**
  * @brief Adds a translation transformation to the current matrix.

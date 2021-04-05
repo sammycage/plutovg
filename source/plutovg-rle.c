@@ -196,7 +196,6 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
 
     if(stroke)
     {
-        SW_FT_Outline* outline = stroke->dash ? sw_ft_outline_convert_dash(path, matrix, stroke->dash) : sw_ft_outline_convert(path, matrix);
         SW_FT_Stroker_LineCap ftCap;
         SW_FT_Stroker_LineJoin ftJoin;
         SW_FT_Fixed ftWidth;
@@ -204,15 +203,14 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
 
         plutovg_point_t p1 = {0, 0};
         plutovg_point_t p2 = {SQRT2, SQRT2};
-        plutovg_point_t p3;
 
         plutovg_matrix_map_point(matrix, &p1, &p1);
         plutovg_matrix_map_point(matrix, &p2, &p2);
 
-        p3.x = p2.x - p1.x;
-        p3.y = p2.y - p1.y;
+        double dx = p2.x - p1.x;
+        double dy = p2.y - p1.y;
 
-        double scale = sqrt(p3.x*p3.x + p3.y*p3.y) / 2.0;
+        double scale = sqrt(dx*dx + dy*dy) / 2.0;
         double radius = stroke->width / 2.0;
 
         ftWidth = (SW_FT_Fixed)(radius * scale * (1 << 6));
@@ -244,6 +242,7 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
             break;
         }
 
+        SW_FT_Outline* outline = stroke->dash ? sw_ft_outline_convert_dash(path, matrix, stroke->dash) : sw_ft_outline_convert(path, matrix);
         SW_FT_Stroker stroker;
         SW_FT_Stroker_New(&stroker);
         SW_FT_Stroker_Set(stroker, ftWidth, ftCap, ftJoin, ftMiterLimit);
@@ -276,10 +275,9 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
 #define DIV255(x) (((x) + ((x) >> 8) + 0x80) >> 8)
 plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rle_t* b)
 {
-    int count = MAX(a->spans.size, b->spans.size);
     plutovg_rle_t* result = malloc(sizeof(plutovg_rle_t));
     plutovg_array_init(result->spans);
-    plutovg_array_ensure(result->spans, count);
+    plutovg_array_ensure(result->spans, MAX(a->spans.size, b->spans.size));
 
     plutovg_span_t* a_spans = a->spans.data;
     plutovg_span_t* a_end = a_spans + a->spans.size;
@@ -287,7 +285,7 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
     plutovg_span_t* b_spans = b->spans.data;
     plutovg_span_t* b_end = b_spans + b->spans.size;
 
-    while(count && a_spans < a_end && b_spans < b_end)
+    while(a_spans < a_end && b_spans < b_end)
     {
         if(b_spans->y > a_spans->y)
         {
@@ -311,7 +309,8 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
             ++b_spans;
             continue;
         }
-        else if(ax1 < bx1 && ax2 < bx1)
+
+        if(ax1 < bx1 && ax2 < bx1)
         {
             ++a_spans;
             continue;
@@ -326,8 +325,7 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
             span->len = (unsigned short)len;
             span->y = a_spans->y;
             span->coverage = DIV255(a_spans->coverage * b_spans->coverage);
-            ++result->spans.size;
-            --count;
+            result->spans.size += 1;
         }
 
         if(ax2 < bx2)

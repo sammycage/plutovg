@@ -671,20 +671,6 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
     }
 }
 
-void plutovg_blend(plutovg_t* pluto, const plutovg_rle_t* rle)
-{
-    if(rle==NULL || rle->spans.size==0 || pluto->state->opacity==0.0)
-        return;
-
-    plutovg_paint_t* source = pluto->state->source;
-    if(source->type==plutovg_paint_type_color)
-        plutovg_blend_color(pluto, rle, source->color);
-    else if(source->type==plutovg_paint_type_gradient)
-        plutovg_blend_gradient(pluto, rle, source->gradient);
-    else
-        plutovg_blend_texture(pluto, rle, source->texture);
-}
-
 void plutovg_blend_color(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_color_t* color)
 {
     if(color==NULL || color->a==0.0)
@@ -719,7 +705,7 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
         data.radial.fr = gradient->values[5];
     }
 
-    int dist, idist, pos = 0;
+    uint32_t dist, idist, pos = 0;
     int i;
     int nstop = gradient->stops.size;
     const plutovg_gradient_stop_t *curr, *next, *start;
@@ -751,9 +737,9 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
         while(fpos < next->offset && pos < COLOR_TABLE_SIZE)
         {
             t = (fpos - curr->offset) * delta;
-            dist = (int)(255 * t);
+            dist = (uint32_t)(255 * t);
             idist = 255 - dist;
-            data.colortable[pos] = interpolate_pixel(curr_color, (uint32_t)idist, next_color, (uint32_t)dist);
+            data.colortable[pos] = interpolate_pixel(curr_color, idist, next_color, dist);
             ++pos;
             fpos += incr;
         }
@@ -808,4 +794,18 @@ void plutovg_blend_texture(plutovg_t* pluto, const plutovg_rle_t* rle, const plu
         else
             blend_transformed_tiled_argb(pluto->surface, state->op, rle, &data);
     }
+}
+
+void plutovg_blend(plutovg_t* pluto, const plutovg_rle_t* rle)
+{
+  if(rle==NULL || rle->spans.size==0 || pluto->state->opacity==0.0)
+    return;
+
+  plutovg_paint_t* source = pluto->state->source;
+  if(source->type==plutovg_paint_type_color)
+    plutovg_blend_color(pluto, rle, source->color);
+  else if(source->type==plutovg_paint_type_gradient)
+    plutovg_blend_gradient(pluto, rle, source->gradient);
+  else
+    plutovg_blend_texture(pluto, rle, source->texture);
 }

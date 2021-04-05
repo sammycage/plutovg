@@ -359,19 +359,19 @@ double plutovg_get_miter_limit(const plutovg_t* pluto)
     return pluto->state->stroke.miterlimit;
 }
 
-double plutovg_get_dash_offset(plutovg_t* pluto)
+double plutovg_get_dash_offset(const plutovg_t* pluto)
 {
     plutovg_stroke_data_t* stroke = &pluto->state->stroke;
     return stroke->dash ? stroke->dash->offset : 0.0;
 }
 
-double* plutovg_get_dash_data(plutovg_t* pluto)
+double* plutovg_get_dash_data(const plutovg_t* pluto)
 {
     plutovg_stroke_data_t* stroke = &pluto->state->stroke;
     return stroke->dash ? stroke->dash->data : NULL;
 }
 
-int plutovg_get_dash_count(plutovg_t* pluto)
+int plutovg_get_dash_count(const plutovg_t* pluto)
 {
     plutovg_stroke_data_t* stroke = &pluto->state->stroke;
     return stroke->dash ? stroke->dash->size : 0;
