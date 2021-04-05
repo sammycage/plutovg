@@ -798,14 +798,14 @@ void plutovg_blend_texture(plutovg_t* pluto, const plutovg_rle_t* rle, const plu
 
 void plutovg_blend(plutovg_t* pluto, const plutovg_rle_t* rle)
 {
-  if(rle==NULL || rle->spans.size==0 || pluto->state->opacity==0.0)
-    return;
+    if(rle==NULL || rle->spans.size==0 || pluto->state->opacity==0.0)
+        return;
 
-  plutovg_paint_t* source = pluto->state->source;
-  if(source->type==plutovg_paint_type_color)
-    plutovg_blend_color(pluto, rle, source->color);
-  else if(source->type==plutovg_paint_type_gradient)
-    plutovg_blend_gradient(pluto, rle, source->gradient);
-  else
-    plutovg_blend_texture(pluto, rle, source->texture);
+    plutovg_paint_t* source = pluto->state->source;
+    if(source->type==plutovg_paint_type_color)
+        plutovg_blend_color(pluto, rle, source->color);
+    else if(source->type==plutovg_paint_type_gradient)
+        plutovg_blend_gradient(pluto, rle, source->gradient);
+    else
+        plutovg_blend_texture(pluto, rle, source->texture);
 }
