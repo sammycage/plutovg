@@ -184,7 +184,6 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
 
     double rx = gradient->matrix.m01 * (y + 0.5) + gradient->matrix.m02 + gradient->matrix.m00 * (x + 0.5);
     double ry = gradient->matrix.m11 * (y + 0.5) + gradient->matrix.m12 + gradient->matrix.m10 * (x + 0.5);
-    uint32_t* end = buffer + length;
     rx -= gradient->radial.fx;
     ry -= gradient->radial.fy;
 
@@ -214,6 +213,7 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
     double delta_det = (b_delta_b + delta_bb + 4 * v->a * (rx_plus_ry + delta_rxrxryry)) * inv_a;
     double delta_delta_det = (delta_b_delta_b + 4 * v->a * delta_rx_plus_ry) * inv_a;
 
+    const uint32_t* end = buffer + length;
     if(v->extended)
     {
         while(buffer < end)
