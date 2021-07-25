@@ -4,7 +4,7 @@
 
 plutovg_dash_t* plutovg_dash_create(double offset, const double* data, int size)
 {
-    if(data==NULL || size==0)
+    if(data == NULL || size == 0)
         return NULL;
 
     plutovg_dash_t* dash = malloc(sizeof(plutovg_dash_t));
@@ -17,7 +17,7 @@ plutovg_dash_t* plutovg_dash_create(double offset, const double* data, int size)
 
 plutovg_dash_t* plutovg_dash_clone(const plutovg_dash_t* dash)
 {
-    if(dash==NULL)
+    if(dash == NULL)
         return NULL;
 
     return plutovg_dash_create(dash->offset, dash->data, dash->size);
@@ -25,7 +25,7 @@ plutovg_dash_t* plutovg_dash_clone(const plutovg_dash_t* dash)
 
 void plutovg_dash_destroy(plutovg_dash_t* dash)
 {
-    if(dash==NULL)
+    if(dash == NULL)
         return;
 
     free(dash->data);
@@ -47,7 +47,8 @@ plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path
     {
         toggle = !toggle;
         phase -= dash->data[offset];
-        if(++offset==dash->size) offset = 0;
+        offset += 1;
+        if(offset == dash->size) offset = 0;
     }
 
     plutovg_path_element_t* elements = flat->elements.data;
@@ -68,7 +69,7 @@ plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path
         ++elements;
         ++points;
 
-        while(elements < end && *elements==plutovg_path_element_line_to)
+        while(elements < end && *elements == plutovg_path_element_line_to)
         {
             double dx = points->x - x0;
             double dy = points->y - y0;
@@ -88,7 +89,8 @@ plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path
 
                 itoggle = !itoggle;
                 iphase = 0;
-                if(++ioffset==dash->size) ioffset = 0;
+                ioffset += 1;
+                if(ioffset == dash->size) ioffset = 0;
             }
 
             iphase += dist0 - dist1;

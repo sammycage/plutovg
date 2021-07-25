@@ -71,7 +71,7 @@ plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata)
 plutovg_font_t* plutovg_font_load_from_file(const char* filename)
 {
     FILE* fp = fopen(filename, "rb");
-    if(fp==NULL)
+    if(fp == NULL)
         return NULL;
 
     fseek(fp, 0, SEEK_END);
@@ -87,7 +87,7 @@ plutovg_font_t* plutovg_font_load_from_file(const char* filename)
 
 plutovg_font_t* plutovg_font_reference(plutovg_font_t* font)
 {
-    if(font==NULL)
+    if(font == NULL)
         return NULL;
 
     ++font->ref;
@@ -96,10 +96,10 @@ plutovg_font_t* plutovg_font_reference(plutovg_font_t* font)
 
 void plutovg_font_destroy(plutovg_font_t* font)
 {
-    if(font==NULL)
+    if(font == NULL)
         return;
 
-    if(--font->ref==0)
+    if(--font->ref == 0)
     {
         for(int i = 0;i < CACHE_SIZE;i++)
         {
@@ -115,7 +115,7 @@ void plutovg_font_destroy(plutovg_font_t* font)
 
 int plutovg_font_get_reference_count(const plutovg_font_t* font)
 {
-    if(font==NULL)
+    if(font == NULL)
         return 0;
 
     return font->ref;
@@ -124,11 +124,11 @@ int plutovg_font_get_reference_count(const plutovg_font_t* font)
 const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoint)
 {
     plutovg_glyph_t* glyph = &font->cache[codepoint%CACHE_SIZE];
-    if(glyph->codepoint==codepoint)
+    if(glyph->codepoint == codepoint)
         return glyph;
 
     glyph->codepoint = codepoint;
-    if(glyph->path==NULL)
+    if(glyph->path == NULL)
         glyph->path = plutovg_path_create();
     else
         plutovg_path_clear(glyph->path);
@@ -138,8 +138,7 @@ const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoin
     int num_vertices = stbtt_GetGlyphShape(&font->info, index, &v);
     for(int i = 0;i < num_vertices;i++)
     {
-        switch(v[i].type)
-        {
+        switch(v[i].type) {
         case STBTT_vmove:
             plutovg_path_move_to(glyph->path, v[i].x, v[i].y);
             break;

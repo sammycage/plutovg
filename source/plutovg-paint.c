@@ -32,12 +32,7 @@ plutovg_gradient_t* plutovg_gradient_create_linear(double x1, double y1, double 
     gradient->opacity = 1.0;
     plutovg_array_init(gradient->stops);
     plutovg_matrix_init_identity(&gradient->matrix);
-
-    gradient->values[0] = x1;
-    gradient->values[1] = y1;
-    gradient->values[2] = x2;
-    gradient->values[3] = y2;
-
+    plutovg_gradient_set_values_linear(gradient, x1, y1, x2, y2);
     return gradient;
 }
 
@@ -50,20 +45,13 @@ plutovg_gradient_t* plutovg_gradient_create_radial(double cx, double cy, double 
     gradient->opacity = 1.0;
     plutovg_array_init(gradient->stops);
     plutovg_matrix_init_identity(&gradient->matrix);
-
-    gradient->values[0] = cx;
-    gradient->values[1] = cy;
-    gradient->values[2] = cr;
-    gradient->values[3] = fx;
-    gradient->values[4] = fy;
-    gradient->values[5] = fr;
-
+    plutovg_gradient_set_values_radial(gradient, cx, cy, cr, fx, fy, fr);
     return gradient;
 }
 
 plutovg_gradient_t* plutovg_gradient_reference(plutovg_gradient_t* gradient)
 {
-    if(gradient==NULL)
+    if(gradient == NULL)
         return NULL;
 
     ++gradient->ref;
@@ -72,10 +60,10 @@ plutovg_gradient_t* plutovg_gradient_reference(plutovg_gradient_t* gradient)
 
 void plutovg_gradient_destroy(plutovg_gradient_t* gradient)
 {
-    if(gradient==NULL)
+    if(gradient == NULL)
         return;
 
-    if(--gradient->ref==0)
+    if(--gradient->ref == 0)
     {
         free(gradient->stops.data);
         free(gradient);
@@ -84,7 +72,7 @@ void plutovg_gradient_destroy(plutovg_gradient_t* gradient)
 
 int plutovg_gradient_get_reference_count(const plutovg_gradient_t* gradient)
 {
-    if(gradient==NULL)
+    if(gradient == NULL)
         return 0;
 
     return gradient->ref;
@@ -102,12 +90,12 @@ plutovg_spread_method_t plutovg_gradient_get_spread(const plutovg_gradient_t* gr
 
 void plutovg_gradient_set_matrix(plutovg_gradient_t* gradient, const plutovg_matrix_t* matrix)
 {
-    memcpy(&gradient->matrix, matrix, sizeof(plutovg_matrix_t));
+    gradient->matrix = *matrix;
 }
 
 void plutovg_gradient_get_matrix(const plutovg_gradient_t* gradient, plutovg_matrix_t *matrix)
 {
-    memcpy(matrix, &gradient->matrix, sizeof(plutovg_matrix_t));
+    *matrix = gradient->matrix;
 }
 
 void plutovg_gradient_add_stop_rgb(plutovg_gradient_t* gradient, double offset, double r, double g, double b)
@@ -228,7 +216,7 @@ plutovg_texture_t* plutovg_texture_create(plutovg_surface_t* surface)
 
 plutovg_texture_t* plutovg_texture_reference(plutovg_texture_t* texture)
 {
-    if(texture==NULL)
+    if(texture == NULL)
         return NULL;
 
     ++texture->ref;
@@ -237,10 +225,10 @@ plutovg_texture_t* plutovg_texture_reference(plutovg_texture_t* texture)
 
 void plutovg_texture_destroy(plutovg_texture_t* texture)
 {
-    if(texture==NULL)
+    if(texture == NULL)
         return;
 
-    if(--texture->ref==0)
+    if(--texture->ref == 0)
     {
         plutovg_surface_destroy(texture->surface);
         free(texture);
@@ -249,7 +237,7 @@ void plutovg_texture_destroy(plutovg_texture_t* texture)
 
 int plutovg_texture_get_reference_count(const plutovg_texture_t* texture)
 {
-    if(texture==NULL)
+    if(texture == NULL)
         return 0;
 
     return texture->ref;
@@ -267,12 +255,12 @@ plutovg_texture_type_t plutovg_texture_get_type(const plutovg_texture_t* texture
 
 void plutovg_texture_set_matrix(plutovg_texture_t* texture, const plutovg_matrix_t* matrix)
 {
-    memcpy(&texture->matrix, matrix, sizeof(plutovg_matrix_t));
+    texture->matrix = *matrix;
 }
 
 void plutovg_texture_get_matrix(const plutovg_texture_t* texture, plutovg_matrix_t* matrix)
 {
-    memcpy(matrix, &texture->matrix, sizeof(plutovg_matrix_t));
+    *matrix = texture->matrix;
 }
 
 void plutovg_texture_set_surface(plutovg_texture_t* texture, plutovg_surface_t* surface)
@@ -361,7 +349,7 @@ plutovg_paint_t* plutovg_paint_create_texture(plutovg_texture_t* texture)
 
 plutovg_paint_t* plutovg_paint_reference(plutovg_paint_t* paint)
 {
-    if(paint==NULL)
+    if(paint == NULL)
         return NULL;
 
     ++paint->ref;
@@ -370,16 +358,16 @@ plutovg_paint_t* plutovg_paint_reference(plutovg_paint_t* paint)
 
 void plutovg_paint_destroy(plutovg_paint_t* paint)
 {
-    if(paint==NULL)
+    if(paint == NULL)
         return;
 
-    if(--paint->ref==0)
+    if(--paint->ref == 0)
     {
-        if(paint->type==plutovg_paint_type_color)
+        if(paint->type == plutovg_paint_type_color)
             free(paint->color);
-        if(paint->type==plutovg_paint_type_gradient)
+        if(paint->type == plutovg_paint_type_gradient)
             plutovg_gradient_destroy(paint->gradient);
-        if(paint->type==plutovg_paint_type_texture)
+        if(paint->type == plutovg_paint_type_texture)
             plutovg_texture_destroy(paint->texture);
         free(paint);
     }
@@ -387,7 +375,7 @@ void plutovg_paint_destroy(plutovg_paint_t* paint)
 
 int plutovg_paint_get_reference_count(const plutovg_paint_t* paint)
 {
-    if(paint==NULL)
+    if(paint == NULL)
         return 0;
 
     return paint->ref;
@@ -400,15 +388,15 @@ plutovg_paint_type_t plutovg_paint_get_type(const plutovg_paint_t* paint)
 
 plutovg_color_t* plutovg_paint_get_color(const plutovg_paint_t* paint)
 {
-    return paint->type==plutovg_paint_type_color?paint->color:NULL;
+    return paint->type == plutovg_paint_type_color ? paint->color : NULL;
 }
 
 plutovg_gradient_t* plutovg_paint_get_gradient(const plutovg_paint_t* paint)
 {
-    return paint->type==plutovg_paint_type_gradient?paint->gradient:NULL;
+    return paint->type == plutovg_paint_type_gradient ? paint->gradient : NULL;
 }
 
 plutovg_texture_t* plutovg_paint_get_texture(const plutovg_paint_t* paint)
 {
-    return paint->type==plutovg_paint_type_texture?paint->texture:NULL;
+    return paint->type == plutovg_paint_type_texture ? paint->texture : NULL;
 }

@@ -2,6 +2,22 @@
 
 #include <math.h>
 
+void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, double h)
+{
+    rect->x = x;
+    rect->y = y;
+    rect->w = w;
+    rect->h = h;
+}
+
+void plutovg_rect_init_zero(plutovg_rect_t* rect)
+{
+    rect->x = 0.0;
+    rect->y = 0.0;
+    rect->w = 0.0;
+    rect->h = 0.0;
+}
+
 void plutovg_matrix_init(plutovg_matrix_t* matrix, double m00, double m10, double m01, double m11, double m02, double m12)
 {
     matrix->m00 = m00; matrix->m10 = m10;
@@ -176,7 +192,7 @@ plutovg_path_t* plutovg_path_create(void)
 
 plutovg_path_t* plutovg_path_reference(plutovg_path_t* path)
 {
-    if(path==NULL)
+    if(path == NULL)
         return NULL;
 
     ++path->ref;
@@ -185,10 +201,10 @@ plutovg_path_t* plutovg_path_reference(plutovg_path_t* path)
 
 void plutovg_path_destroy(plutovg_path_t* path)
 {
-    if(path==NULL)
+    if(path == NULL)
         return;
 
-    if(--path->ref==0)
+    if(--path->ref == 0)
     {
         free(path->elements.data);
         free(path->points.data);
@@ -198,7 +214,7 @@ void plutovg_path_destroy(plutovg_path_t* path)
 
 int plutovg_path_get_reference_count(const plutovg_path_t* path)
 {
-    if(path==NULL)
+    if(path == NULL)
         return 0;
 
     return path->ref;
@@ -671,15 +687,12 @@ static void flatten(plutovg_path_t* path, const plutovg_point_t* p0, const pluto
 plutovg_path_t* plutovg_path_clone_flat(const plutovg_path_t* path)
 {
     plutovg_path_t* result = plutovg_path_create();
-
     plutovg_array_ensure(result->elements, path->elements.size);
     plutovg_array_ensure(result->points, path->points.size);
-
     plutovg_point_t* points = path->points.data;
     for(int i = 0;i < path->elements.size;i++)
     {
-        switch(path->elements.data[i])
-        {
+        switch(path->elements.data[i]) {
         case plutovg_path_element_move_to:
             plutovg_path_move_to(result, points[0].x, points[0].y);
             points += 1;

@@ -8,8 +8,7 @@ plutovg_surface_t* plutovg_surface_create(int width, int height)
     plutovg_surface_t* surface = malloc(sizeof(plutovg_surface_t));
     surface->ref = 1;
     surface->owndata = 1;
-    surface->data = malloc((size_t)(width * height * 4));
-    memset(surface->data, 0, (size_t)(width * height * 4));
+    surface->data = calloc(1, (size_t)(width * height * 4));
     surface->width = width;
     surface->height = height;
     surface->stride = width * 4;
@@ -30,7 +29,7 @@ plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int widt
 
 plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface)
 {
-    if(surface==NULL)
+    if(surface == NULL)
         return NULL;
 
     ++surface->ref;
@@ -39,10 +38,10 @@ plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface)
 
 void plutovg_surface_destroy(plutovg_surface_t* surface)
 {
-    if(surface==NULL)
+    if(surface == NULL)
         return;
 
-    if(--surface->ref==0)
+    if(--surface->ref == 0)
     {
         if(surface->owndata)
             free(surface->data);
@@ -52,7 +51,7 @@ void plutovg_surface_destroy(plutovg_surface_t* surface)
 
 int plutovg_surface_get_reference_count(const plutovg_surface_t* surface)
 {
-    if(surface==NULL)
+    if(surface == NULL)
         return 0;
 
     return surface->ref;
@@ -92,18 +91,17 @@ void plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* 
         for(int x = 0;x < width;x++)
         {
             uint32_t a = src[x] >> 24;
-            if(a != 0)
-            {
-                uint32_t r = (((src[x] >> 16) & 0xff) * 255) / a;
-                uint32_t g = (((src[x] >> 8) & 0xff) * 255) / a;
-                uint32_t b = (((src[x] >> 0) & 0xff) * 255) / a;
-
-                dst[x] = (a << 24) | (b << 16) | (g << 8) | r;
-            }
-            else
+            if(a == 0)
             {
                 dst[x] = 0;
+                continue;
             }
+
+            uint32_t r = (((src[x] >> 16) & 0xff) * 255) / a;
+            uint32_t g = (((src[x] >> 8) & 0xff) * 255) / a;
+            uint32_t b = (((src[x] >> 0) & 0xff) * 255) / a;
+
+            dst[x] = (a << 24) | (b << 16) | (g << 8) | r;
         }
     }
 
@@ -169,16 +167,13 @@ plutovg_t* plutovg_create(plutovg_surface_t* surface)
     pluto->path = plutovg_path_create();
     pluto->rle = plutovg_rle_create();
     pluto->clippath = NULL;
-    pluto->clip.x = 0.0;
-    pluto->clip.y = 0.0;
-    pluto->clip.w = surface->width;
-    pluto->clip.h = surface->height;
+    plutovg_rect_init(&pluto->clip, 0, 0, surface->width, surface->height);
     return pluto;
 }
 
 plutovg_t* plutovg_reference(plutovg_t* pluto)
 {
-    if(pluto==NULL)
+    if(pluto == NULL)
         return NULL;
 
     ++pluto->ref;
@@ -187,10 +182,10 @@ plutovg_t* plutovg_reference(plutovg_t* pluto)
 
 void plutovg_destroy(plutovg_t* pluto)
 {
-    if(pluto==NULL)
+    if(pluto == NULL)
         return;
 
-    if(--pluto->ref==0)
+    if(--pluto->ref == 0)
     {
         while(pluto->state)
         {
@@ -209,7 +204,7 @@ void plutovg_destroy(plutovg_t* pluto)
 
 int plutovg_get_reference_count(const plutovg_t* pluto)
 {
-    if(pluto==NULL)
+    if(pluto == NULL)
         return 0;
 
     return pluto->ref;
@@ -399,7 +394,7 @@ void plutovg_transform(plutovg_t* pluto, const plutovg_matrix_t* matrix)
 
 void plutovg_set_matrix(plutovg_t* pluto, const plutovg_matrix_t* matrix)
 {
-    memcpy(&pluto->state->matrix, matrix, sizeof(plutovg_matrix_t));
+    pluto->state->matrix = *matrix;
 }
 
 void plutovg_identity_matrix(plutovg_t* pluto)
@@ -409,7 +404,7 @@ void plutovg_identity_matrix(plutovg_t* pluto)
 
 void plutovg_get_matrix(const plutovg_t* pluto, plutovg_matrix_t* matrix)
 {
-    memcpy(matrix, &pluto->state->matrix, sizeof(plutovg_matrix_t));
+    *matrix = pluto->state->matrix;
 }
 
 void plutovg_move_to(plutovg_t* pluto, double x, double y)
@@ -526,8 +521,7 @@ double plutovg_get_font_size(const plutovg_t* pluto)
 
 static inline int decode_utf8(const char** begin, const char* end, uint32_t* codepoint)
 {
-    static const int trailing[256] =
-    {
+    static const int trailing[256] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -538,8 +532,7 @@ static inline int decode_utf8(const char** begin, const char* end, uint32_t* cod
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
     };
 
-    static const uint32_t offsets[6] =
-    {
+    static const uint32_t offsets[6] = {
         0x00000000, 0x00003080, 0x000E2080, 0x03C82080, 0xFA082080, 0x82082080
     };
 
@@ -549,8 +542,7 @@ static inline int decode_utf8(const char** begin, const char* end, uint32_t* cod
         return 0;
 
     uint32_t output = 0;
-    switch(trailing_bytes)
-    {
+    switch(trailing_bytes) {
     case 5: output += (uint8_t)(*ptr++); output <<= 6;
     case 4: output += (uint8_t)(*ptr++); output <<= 6;
     case 3: output += (uint8_t)(*ptr++); output <<= 6;

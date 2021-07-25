@@ -101,8 +101,7 @@ static SW_FT_Outline* sw_ft_outline_convert(const plutovg_path_t* path, const pl
     plutovg_point_t p[3];
     for(int i = 0;i < path->elements.size;i++)
     {
-        switch(elements[i])
-        {
+        switch(elements[i]) {
         case plutovg_path_element_move_to:
             plutovg_matrix_map_point(matrix, &points[0], &p[0]);
             sw_ft_outline_move_to(outline, p[0].x, p[0].y);
@@ -170,7 +169,7 @@ plutovg_rle_t* plutovg_rle_create(void)
 
 void plutovg_rle_destroy(plutovg_rle_t* rle)
 {
-    if(rle==NULL)
+    if(rle == NULL)
         return;
 
     free(rle->spans.data);
@@ -216,8 +215,7 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
         ftWidth = (SW_FT_Fixed)(radius * scale * (1 << 6));
         ftMiterLimit = (SW_FT_Fixed)(stroke->miterlimit * (1 << 16));
 
-        switch(stroke->cap)
-        {
+        switch(stroke->cap) {
         case plutovg_line_cap_square:
             ftCap = SW_FT_STROKER_LINECAP_SQUARE;
             break;
@@ -229,8 +227,7 @@ void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const
             break;
         }
 
-        switch(stroke->join)
-        {
+        switch(stroke->join) {
         case plutovg_line_join_bevel:
             ftJoin = SW_FT_STROKER_LINEJOIN_BEVEL;
             break;
@@ -338,7 +335,7 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
         }
     }
 
-    if(result->spans.size==0)
+    if(result->spans.size == 0)
     {
         result->x = 0;
         result->y = 0;
@@ -367,7 +364,7 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
 
 void plutovg_rle_clip_path(plutovg_rle_t* rle, const plutovg_rle_t* clip)
 {
-    if(rle==NULL || clip==NULL)
+    if(rle == NULL || clip == NULL)
         return;
 
     plutovg_rle_t* result = plutovg_rle_intersection(rle, clip);
@@ -383,7 +380,7 @@ void plutovg_rle_clip_path(plutovg_rle_t* rle, const plutovg_rle_t* clip)
 
 plutovg_rle_t* plutovg_rle_clone(const plutovg_rle_t* rle)
 {
-    if(rle==NULL)
+    if(rle == NULL)
         return NULL;
 
     plutovg_rle_t* result = malloc(sizeof(plutovg_rle_t));
