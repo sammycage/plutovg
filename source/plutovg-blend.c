@@ -81,8 +81,8 @@ static inline uint32_t BYTE_MUL(uint32_t x, uint32_t a)
 
 static inline void memfill32(uint32_t* dest, uint32_t value, int length)
 {
-    for(int i = 0 ;i < length;i++)
-        *dest++ = value;
+    for(int i = 0;i < length;i++)
+        dest[i] = value;
 }
 
 static inline int gradient_clamp(const gradient_data_t* gradient, int ipos)
