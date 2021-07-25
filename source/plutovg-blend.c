@@ -245,7 +245,6 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
     }
 }
 
-#define ALPHA(c) ((c) >> 24)
 static void composition_solid_source(uint32_t* dest, int length, uint32_t color, uint32_t const_alpha)
 {
     if(const_alpha == 255)
@@ -264,14 +263,14 @@ static void composition_solid_source(uint32_t* dest, int length, uint32_t color,
 static void composition_solid_source_over(uint32_t* dest, int length, uint32_t color, uint32_t const_alpha)
 {
     if(const_alpha != 255) color = BYTE_MUL(color, const_alpha);
-    uint32_t ialpha = 255 - ALPHA(color);
+    uint32_t ialpha = 255 - plutovg_alpha(color);
     for(int i = 0;i < length;i++)
         dest[i] = color + BYTE_MUL(dest[i], ialpha);
 }
 
 static void composition_solid_destination_in(uint32_t* dest, int length, uint32_t color, uint32_t const_alpha)
 {
-    uint32_t a = ALPHA(color);
+    uint32_t a = plutovg_alpha(color);
     if(const_alpha != 255) a = BYTE_MUL(a, const_alpha) + 255 - const_alpha;
     for(int i = 0;i < length;i++)
         dest[i] = BYTE_MUL(dest[i], a);
@@ -279,7 +278,7 @@ static void composition_solid_destination_in(uint32_t* dest, int length, uint32_
 
 static void composition_solid_destination_out(uint32_t* dest, int length, uint32_t color, uint32_t const_alpha)
 {
-    uint32_t a = ALPHA(~color);
+    uint32_t a = plutovg_alpha(~color);
     if(const_alpha != 255) a = BYTE_MUL(a, const_alpha) + 255 - const_alpha;
     for(int i = 0; i < length;i++)
         dest[i] = BYTE_MUL(dest[i], a);
@@ -311,7 +310,7 @@ static void composition_source_over(uint32_t* dest, int length, const uint32_t* 
                 dest[i] = s;
             else if(s != 0)
             {
-                sia = ALPHA(~s);
+                sia = plutovg_alpha(~s);
                 dest[i] = s + BYTE_MUL(dest[i], sia);
             }
         }
@@ -321,7 +320,7 @@ static void composition_source_over(uint32_t* dest, int length, const uint32_t* 
         for(int i = 0;i < length;i++)
         {
             s = BYTE_MUL(src[i], const_alpha);
-            sia = ALPHA(~s);
+            sia = plutovg_alpha(~s);
             dest[i] = s + BYTE_MUL(dest[i], sia);
         }
     }
@@ -332,7 +331,7 @@ static void composition_destination_in(uint32_t* dest, int length, const uint32_
     if(const_alpha == 255)
     {
         for(int i = 0; i < length;i++)
-            dest[i] = BYTE_MUL(dest[i], ALPHA(src[i]));
+            dest[i] = BYTE_MUL(dest[i], plutovg_alpha(src[i]));
     }
     else
     {
@@ -340,7 +339,7 @@ static void composition_destination_in(uint32_t* dest, int length, const uint32_
         uint32_t a;
         for(int i = 0;i < length;i++)
         {
-            a = BYTE_MUL(ALPHA(src[i]), const_alpha) + cia;
+            a = BYTE_MUL(plutovg_alpha(src[i]), const_alpha) + cia;
             dest[i] = BYTE_MUL(dest[i], a);
         }
     }
@@ -351,7 +350,7 @@ static void composition_destination_out(uint32_t* dest, int length, const uint32
     if(const_alpha == 255)
     {
         for(int i = 0;i < length;i++)
-            dest[i] = BYTE_MUL(dest[i], ALPHA(~src[i]));
+            dest[i] = BYTE_MUL(dest[i], plutovg_alpha(~src[i]));
     }
     else
     {
@@ -359,7 +358,7 @@ static void composition_destination_out(uint32_t* dest, int length, const uint32
         uint32_t sia;
         for(int i = 0;i < length;i++)
         {
-            sia = BYTE_MUL(ALPHA(~src[i]), const_alpha) + cia;
+            sia = BYTE_MUL(plutovg_alpha(~src[i]), const_alpha) + cia;
             dest[i] = BYTE_MUL(dest[i], sia);
         }
     }
@@ -680,7 +679,7 @@ void plutovg_blend_color(plutovg_t* pluto, const plutovg_rle_t* rle, const pluto
     plutovg_state_t* state = pluto->state;
     uint32_t solid = premultiply_color(color, state->opacity);
 
-    uint32_t alpha = solid >> 24;
+    uint32_t alpha = plutovg_alpha(solid);
     if(alpha == 255 && state->op == plutovg_operator_src_over)
         blend_solid(pluto->surface, plutovg_operator_src, rle, solid);
     else
@@ -724,7 +723,6 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
     curr_color = premultiply_color(&curr->color, opacity);
     incr = 1.0 / COLOR_TABLE_SIZE;
     fpos = 1.5 * incr;
-
     data.colortable[pos++] = curr_color;
 
     while(fpos <= curr->offset)
