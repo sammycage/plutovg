@@ -59,9 +59,10 @@ static inline uint32_t premultiply_color(const plutovg_color_t* color, double op
 static inline uint32_t interpolate_pixel(uint32_t x, uint32_t a, uint32_t y, uint32_t b)
 {
     uint32_t t = (x & 0xff00ff) * a + (y & 0xff00ff) * b;
-    t >>= 8;
+    t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
     t &= 0xff00ff;
     x = ((x >> 8) & 0xff00ff) * a + ((y >> 8) & 0xff00ff) * b;
+    x = (x + ((x >> 8) & 0xff00ff) + 0x800080);
     x &= 0xff00ff00;
     x |= t;
     return x;
