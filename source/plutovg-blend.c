@@ -187,31 +187,31 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
     rx -= gradient->radial.fx;
     ry -= gradient->radial.fy;
 
-    double inv_a = 1 / (2 * v->a);
-    const double delta_rx = gradient->matrix.m00;
-    const double delta_ry = gradient->matrix.m10;
+    double inv_a = 1.0 / (2.0 * v->a);
+    double delta_rx = gradient->matrix.m00;
+    double delta_ry = gradient->matrix.m10;
 
     double b = 2 * (v->dr * gradient->radial.fr + rx * v->dx + ry * v->dy);
     double delta_b = 2 * (delta_rx * v->dx + delta_ry * v->dy);
-    const double b_delta_b = 2 * b * delta_b;
-    const double delta_b_delta_b = 2 * delta_b * delta_b;
+    double b_delta_b = 2 * b * delta_b;
+    double delta_b_delta_b = 2 * delta_b * delta_b;
 
-    const double bb = b * b;
-    const double delta_bb = delta_b * delta_b;
+    double bb = b * b;
+    double delta_bb = delta_b * delta_b;
 
     b *= inv_a;
     delta_b *= inv_a;
 
-    const double rxrxryry = rx * rx + ry * ry;
-    const double delta_rxrxryry = delta_rx * delta_rx + delta_ry * delta_ry;
-    const double rx_plus_ry = 2 * (rx * delta_rx + ry * delta_ry);
-    const double delta_rx_plus_ry = 2 * delta_rxrxryry;
+    double rxrxryry = rx * rx + ry * ry;
+    double delta_rxrxryry = delta_rx * delta_rx + delta_ry * delta_ry;
+    double rx_plus_ry = 2 * (rx * delta_rx + ry * delta_ry);
+    double delta_rx_plus_ry = 2 * delta_rxrxryry;
 
     inv_a *= inv_a;
 
     double det = (bb - 4 * v->a * (v->sqrfr - rxrxryry)) * inv_a;
     double delta_det = (b_delta_b + delta_bb + 4 * v->a * (rx_plus_ry + delta_rxrxryry)) * inv_a;
-    const double delta_delta_det = (delta_b_delta_b + 4 * v->a * delta_rx_plus_ry) * inv_a;
+    double delta_delta_det = (delta_b_delta_b + 4 * v->a * delta_rx_plus_ry) * inv_a;
 
     if(v->extended)
     {
@@ -440,13 +440,10 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
     radial_gradient_values_t v;
     v.dx = gradient->radial.cx - gradient->radial.fx;
     v.dy = gradient->radial.cy - gradient->radial.fy;
-
     v.dr = gradient->radial.cr - gradient->radial.fr;
     v.sqrfr = gradient->radial.fr * gradient->radial.fr;
-
     v.a = v.dr * v.dr - v.dx * v.dx - v.dy * v.dy;
-    v.inv2a = 1 / (2 * v.a);
-
+    v.inv2a = 1.0 / (2.0 * v.a);
     v.extended = gradient->radial.fr != 0.0 || v.a <= 0.0;
 
     int count = rle->spans.size;
