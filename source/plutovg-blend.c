@@ -56,6 +56,29 @@ static inline uint32_t premultiply_color(const plutovg_color_t* color, double op
     return (alpha << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
+static inline uint32_t combine_opacity(const plutovg_color_t* color, double opacity)
+{
+    uint32_t a = (uint8_t)(color->a * opacity * 255);
+    uint32_t r = (uint8_t)(color->r * 255);
+    uint32_t g = (uint8_t)(color->g * 255);
+    uint32_t b = (uint8_t)(color->b * 255);
+
+    return (a << 24) | (r << 16) | (g << 8) | (b);
+}
+
+static inline uint32_t premultiply_pixel(uint32_t color)
+{
+    uint32_t a = plutovg_alpha(color);
+    uint32_t r = plutovg_red(color);
+    uint32_t g = plutovg_green(color);
+    uint32_t b = plutovg_blue(color);
+
+    uint32_t pr = (r * a) / 255;
+    uint32_t pg = (g * a) / 255;
+    uint32_t pb = (b * a) / 255;
+    return (a << 24) | (pr << 16) | (pg << 8) | (pb);
+}
+
 static inline uint32_t interpolate_pixel(uint32_t x, uint32_t a, uint32_t y, uint32_t b)
 {
     uint32_t t = (x & 0xff00ff) * a + (y & 0xff00ff) * b;
@@ -693,7 +716,7 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
 
     plutovg_state_t* state = pluto->state;
     gradient_data_t data;
-    if(gradient->type==plutovg_gradient_type_linear)
+    if(gradient->type == plutovg_gradient_type_linear)
     {
         data.linear.x1 = gradient->values[0];
         data.linear.y1 = gradient->values[1];
@@ -710,20 +733,19 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
         data.radial.fr = gradient->values[5];
     }
 
-    uint32_t dist, idist, pos = 0;
-    int i;
-    int nstop = gradient->stops.size;
-    const plutovg_gradient_stop_t *curr, *next, *start;
-    uint32_t curr_color, next_color;
+    int i, pos = 0, nstop = gradient->stops.size;
+    const plutovg_gradient_stop_t *curr, *next, *start, *last;
+    uint32_t curr_color, next_color, last_color;
+    uint32_t dist, idist;
     double delta, t, incr, fpos;
     double opacity = state->opacity * gradient->opacity;
 
     start = gradient->stops.data;
     curr = start;
-    curr_color = premultiply_color(&curr->color, opacity);
+    curr_color = combine_opacity(&curr->color, opacity);
     incr = 1.0 / COLOR_TABLE_SIZE;
     fpos = 1.5 * incr;
-    data.colortable[pos++] = curr_color;
+    data.colortable[pos++] = premultiply_pixel(curr_color);
 
     while(fpos <= curr->offset)
     {
@@ -737,13 +759,13 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
         curr = (start + i);
         next = (start + i + 1);
         delta = 1.0 / (next->offset - curr->offset);
-        next_color = premultiply_color(&next->color, opacity);
+        next_color = combine_opacity(&next->color, opacity);
         while(fpos < next->offset && pos < COLOR_TABLE_SIZE)
         {
             t = (fpos - curr->offset) * delta;
             dist = (uint32_t)(255 * t);
             idist = 255 - dist;
-            data.colortable[pos] = interpolate_pixel(curr_color, idist, next_color, dist);
+            data.colortable[pos] = premultiply_pixel(interpolate_pixel(curr_color, idist, next_color, dist));
             ++pos;
             fpos += incr;
         }
@@ -751,15 +773,17 @@ void plutovg_blend_gradient(plutovg_t* pluto, const plutovg_rle_t* rle, const pl
         curr_color = next_color;
     }
 
-    for(;pos < COLOR_TABLE_SIZE;pos++)
-        data.colortable[pos] = curr_color;
+    last = start + nstop - 1;
+    last_color = premultiply_color(&last->color, opacity);
+    for(;pos < COLOR_TABLE_SIZE;++pos)
+        data.colortable[pos] = last_color;
 
     data.spread = gradient->spread;
     data.matrix = gradient->matrix;
     plutovg_matrix_multiply(&data.matrix, &data.matrix, &state->matrix);
     plutovg_matrix_invert(&data.matrix);
 
-    if(gradient->type==plutovg_gradient_type_linear)
+    if(gradient->type == plutovg_gradient_type_linear)
         blend_linear_gradient(pluto->surface, state->op, rle, &data);
     else
         blend_radial_gradient(pluto->surface, state->op, rle, &data);
