@@ -562,7 +562,7 @@ plutovg_path_t* plutovg_font_get_textn_path(const plutovg_font_t* font, const ch
         double advance = plutovg_font_get_char_advance(font, cp);
         plutovg_path_add_path(result, path, &matrix);
         plutovg_path_destroy(path);
-        plutovg_matrix_translate(&matrix, 0, advance);
+        plutovg_matrix_translate(&matrix, advance, 0);
     }
 
     return result;
