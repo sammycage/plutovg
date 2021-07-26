@@ -171,7 +171,7 @@ const char* plutovg_font_face_get_family(const plutovg_font_face_t* face)
 
 static inline plutovg_glyph_t* find_glyph(const plutovg_font_face_t* face, int codepoint)
 {
-    plutovg_glyph_t* glyph = &face->cache[codepoint%CACHE_SIZE];
+    plutovg_glyph_t* glyph = (void*)(&face->cache[codepoint%CACHE_SIZE]);
     if(glyph->codepoint == codepoint)
         return glyph;
 
