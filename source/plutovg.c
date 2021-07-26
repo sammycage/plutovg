@@ -92,10 +92,7 @@ void plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* 
         {
             uint32_t a = src[x] >> 24;
             if(a == 0)
-            {
-                dst[x] = 0;
                 continue;
-            }
 
             uint32_t r = (((src[x] >> 16) & 0xff) * 255) / a;
             uint32_t g = (((src[x] >> 8) & 0xff) * 255) / a;
@@ -123,7 +120,6 @@ plutovg_state_t* plutovg_state_create(void)
     state->stroke.join = plutovg_line_join_miter;
     state->stroke.dash = NULL;
     state->op = plutovg_operator_src_over;
-    state->fontsize = 12.0;
     state->opacity = 1.0;
     state->next = NULL;
     return state;
@@ -133,7 +129,7 @@ plutovg_state_t* plutovg_state_clone(const plutovg_state_t* state)
 {
     plutovg_state_t* newstate = malloc(sizeof(plutovg_state_t));
     newstate->clippath = plutovg_rle_clone(state->clippath);
-    newstate->font = plutovg_font_reference(state->font);
+    newstate->font = plutovg_font_reference(state->font); /** FIXME: clone!!?**/
     newstate->source = plutovg_paint_reference(state->source); /** FIXME: clone!!?**/
     newstate->matrix = state->matrix;
     newstate->winding = state->winding;
@@ -143,7 +139,6 @@ plutovg_state_t* plutovg_state_clone(const plutovg_state_t* state)
     newstate->stroke.join = state->stroke.join;
     newstate->stroke.dash = plutovg_dash_clone(state->stroke.dash);
     newstate->op = state->op;
-    newstate->fontsize = state->fontsize;
     newstate->opacity = state->opacity;
     newstate->next = NULL;
     return newstate;
@@ -506,7 +501,11 @@ void plutovg_set_font(plutovg_t* pluto, plutovg_font_t* font)
 
 void plutovg_set_font_size(plutovg_t* pluto, double size)
 {
-    pluto->state->fontsize = size;
+    plutovg_state_t* state = pluto->state;
+    if(state->font == NULL)
+        return;
+
+    plutovg_font_set_size(state->font, size);
 }
 
 plutovg_font_t* plutovg_get_font(const plutovg_t* pluto)
@@ -516,71 +515,11 @@ plutovg_font_t* plutovg_get_font(const plutovg_t* pluto)
 
 double plutovg_get_font_size(const plutovg_t* pluto)
 {
-    return pluto->state->fontsize;
-}
-
-static inline int decode_utf8(const char** begin, const char* end, uint32_t* codepoint)
-{
-    static const int trailing[256] = {
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-    };
-
-    static const uint32_t offsets[6] = {
-        0x00000000, 0x00003080, 0x000E2080, 0x03C82080, 0xFA082080, 0x82082080
-    };
-
-    const char* ptr = *begin;
-    int trailing_bytes = trailing[(uint8_t)(*ptr)];
-    if(ptr + trailing_bytes >= end)
-        return 0;
-
-    uint32_t output = 0;
-    switch(trailing_bytes) {
-    case 5: output += (uint8_t)(*ptr++); output <<= 6;
-    case 4: output += (uint8_t)(*ptr++); output <<= 6;
-    case 3: output += (uint8_t)(*ptr++); output <<= 6;
-    case 2: output += (uint8_t)(*ptr++); output <<= 6;
-    case 1: output += (uint8_t)(*ptr++); output <<= 6;
-    case 0: output += (uint8_t)(*ptr++);
-    }
-
-    output -= offsets[trailing_bytes];
-    *begin = ptr;
-    *codepoint = output;
-    return 1;
-}
-
-void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y)
-{
     plutovg_state_t* state = pluto->state;
     if(state->font == NULL)
-        return;
+        return 0.0;
 
-    const char* end = utf8 + strlen(utf8);
-    uint32_t codepoint = 0;
-    double scale = plutovg_font_get_scale(state->font, state->fontsize);
-    plutovg_matrix_t matrix;
-    while(utf8 < end)
-    {
-        if(!decode_utf8(&utf8, end, &codepoint))
-            return;
-
-        plutovg_matrix_init_translate(&matrix, x, y);
-        plutovg_matrix_scale(&matrix, scale, -scale);
-
-        const plutovg_glyph_t* glyph = plutovg_font_get_glyph(state->font, (int)codepoint);
-        const plutovg_path_t* path = plutovg_glyph_get_path(glyph);
-        plutovg_path_add_path(pluto->path, path, &matrix);
-
-        x += plutovg_glyph_get_advance(glyph) * scale;
-    }
+    return plutovg_font_get_size(state->font);
 }
 
 void plutovg_char(plutovg_t* pluto, int ch, double x, double y)
@@ -589,41 +528,29 @@ void plutovg_char(plutovg_t* pluto, int ch, double x, double y)
     if(state->font == NULL)
         return;
 
-    double scale = plutovg_font_get_scale(state->font, state->fontsize);
-
     plutovg_matrix_t matrix;
     plutovg_matrix_init_translate(&matrix, x, y);
-    plutovg_matrix_scale(&matrix, scale, -scale);
-
-    const plutovg_glyph_t* glyph = plutovg_font_get_glyph(state->font, ch);
-    const plutovg_path_t* path = plutovg_glyph_get_path(glyph);
+    plutovg_path_t* path = plutovg_font_get_char_path(state->font, ch);
     plutovg_path_add_path(pluto->path, path, &matrix);
+    plutovg_path_destroy(path);
 }
 
-void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double* h)
+void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y)
 {
-    if(w) *w = 0;
-    if(h) *h = 0;
+    plutovg_textn(pluto, utf8, strlen(utf8), x, y);
+}
 
+void plutovg_textn(plutovg_t* pluto, const char* utf8, int size, double x, double y)
+{
     plutovg_state_t* state = pluto->state;
     if(state->font == NULL)
         return;
 
-    const char* end = utf8 + strlen(utf8);
-    uint32_t codepoint = 0;
-    double scale = plutovg_font_get_scale(state->font, state->fontsize);
-    double x = 0;
-    while(utf8 < end)
-    {
-        if(!decode_utf8(&utf8, end, &codepoint))
-            return;
-
-        const plutovg_glyph_t* glyph = plutovg_font_get_glyph(state->font, (int)codepoint);
-        x += plutovg_glyph_get_advance(glyph) * scale;
-    }
-
-    if(w) *w = x;
-    if(h) *h = plutovg_font_get_leading(state->font) * scale;
+    plutovg_matrix_t matrix;
+    plutovg_matrix_init_translate(&matrix, x, y);
+    plutovg_path_t* path = plutovg_font_get_textn_path(state->font, utf8, size);
+    plutovg_path_add_path(pluto->path, path, &matrix);
+    plutovg_path_destroy(path);
 }
 
 void plutovg_fill(plutovg_t* pluto)

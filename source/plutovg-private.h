@@ -107,7 +107,6 @@ typedef struct plutovg_state {
     plutovg_fill_rule_t winding;
     plutovg_stroke_data_t stroke;
     plutovg_operator_t op;
-    double fontsize;
     double opacity;
     struct plutovg_state* next;
 } plutovg_state_t;

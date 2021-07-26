@@ -203,27 +203,73 @@ plutovg_color_t* plutovg_paint_get_color(const plutovg_paint_t* paint);
 plutovg_gradient_t* plutovg_paint_get_gradient(const plutovg_paint_t* paint);
 plutovg_texture_t* plutovg_paint_get_texture(const plutovg_paint_t* paint);
 
-typedef struct plutovg_glyph plutovg_glyph_t;
+typedef enum {
+    plutovg_font_style_normal,
+    plutovg_font_style_italic,
+    plutovg_font_style_bold,
+    plutovg_font_style_italic_bold
+} plutovg_font_style_t;
 
-int plutovg_glyph_get_codepoint(const plutovg_glyph_t* glyph);
-double plutovg_glyph_get_advance(const plutovg_glyph_t* glyph);
-void plutovg_glyph_get_extents(const plutovg_glyph_t* glyph, double* x1, double* y1, double* x2, double* y2);
-const plutovg_path_t* plutovg_glyph_get_path(const plutovg_glyph_t* glyph);
+typedef struct plutovg_font_data_t plutovg_font_data_t;
+
+plutovg_font_data_t* plutovg_font_data_load_from_memory(unsigned char* data, int owndata);
+plutovg_font_data_t* plutovg_font_data_load_from_file(const char* filename);
+plutovg_font_data_t* plutovg_font_data_reference(plutovg_font_data_t* data);
+void plutovg_font_data_destroy(plutovg_font_data_t* data);
+int plutovg_font_data_get_reference_count(const plutovg_font_data_t* data);
+int plutovg_font_data_face_count(const plutovg_font_data_t* data);
+
+typedef struct plutovg_font_face plutovg_font_face_t;
+
+plutovg_font_face_t* plutovg_font_face_load_from_memory(unsigned char* data, int owndata);
+plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename);
+plutovg_font_face_t* plutovg_font_face_load_from_data(plutovg_font_data_t* data, int index);
+plutovg_font_face_t* plutovg_font_face_reference(plutovg_font_face_t* face);
+void plutovg_font_face_destroy(plutovg_font_face_t* face);
+int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face);
+plutovg_font_style_t plutovg_font_face_get_style(const plutovg_font_face_t* face);
+const char* plutovg_font_face_get_family(const plutovg_font_face_t* face);
+plutovg_path_t* plutovg_font_face_get_char_path(const plutovg_font_face_t* face, int ch);
+void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch, double* x, double* y, double* w, double* h);
+double plutovg_font_face_get_char_advance(const plutovg_font_face_t* face, int ch);
+void plutovg_font_face_get_matrix(const plutovg_font_face_t* face, double size, plutovg_matrix_t* matrix);
+double plutovg_font_face_get_scale(const plutovg_font_face_t* face, double size);
+double plutovg_font_face_get_ascent(const plutovg_font_face_t* face);
+double plutovg_font_face_get_descent(const plutovg_font_face_t* face);
+double plutovg_font_face_get_line_gap(const plutovg_font_face_t* face);
+double plutovg_font_face_get_leading(const plutovg_font_face_t* face);
+double plutovg_font_face_get_kerning(const plutovg_font_face_t* face, int ch1, int ch2);
+void plutovg_font_face_get_extents(const plutovg_font_face_t* face, double* x, double* y, double* w, double* h);
 
 typedef struct plutovg_font plutovg_font_t;
 
-plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata);
-plutovg_font_t* plutovg_font_load_from_file(const char* filename);
+plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata, double size);
+plutovg_font_t* plutovg_font_load_from_file(const char* filename, double size);
+plutovg_font_t* plutovg_font_load_from_data(plutovg_font_data_t* data, int index, double size);
+plutovg_font_t* plutovg_font_load_from_face(plutovg_font_face_t* face, double size);
 plutovg_font_t* plutovg_font_reference(plutovg_font_t* font);
 void plutovg_font_destroy(plutovg_font_t* font);
 int plutovg_font_get_reference_count(const plutovg_font_t* font);
-const plutovg_glyph_t* plutovg_font_get_glyph(plutovg_font_t* font, int codepoint);
-double plutovg_font_get_scale(const plutovg_font_t* font, double size);
+plutovg_font_face_t* plutovg_font_get_face(const plutovg_font_t* font);
+plutovg_font_style_t plutovg_font_get_style(const plutovg_font_t* font);
+const char* plutovg_font_get_family(const plutovg_font_t* font);
+void plutovg_font_set_size(plutovg_font_t* font, double size);
+double plutovg_font_get_size(const plutovg_font_t* font);
+double plutovg_font_get_scale(const plutovg_font_t* font);
 double plutovg_font_get_ascent(const plutovg_font_t* font);
 double plutovg_font_get_descent(const plutovg_font_t* font);
 double plutovg_font_get_line_gap(const plutovg_font_t* font);
 double plutovg_font_get_leading(const plutovg_font_t* font);
-void plutovg_font_get_extents(const plutovg_font_t* font, double* x1, double* y1, double* x2, double* y2);
+double plutovg_font_get_kerning(const plutovg_font_t* font, int ch1, int ch2);
+double plutovg_font_get_char_advance(const plutovg_font_t* font, int ch);
+double plutovg_font_get_text_advance(const plutovg_font_t* font, const char* utf8);
+double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* utf8, int size);
+void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, double* x, double* y, double* w, double* h);
+void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8, double* x, double* y, double* w, double* h);
+void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, double* x, double* y, double* w, double* h);
+plutovg_path_t* plutovg_font_get_char_path(const plutovg_font_t* font, int ch);
+plutovg_path_t* plutovg_font_get_text_path(const plutovg_font_t* font, const char* utf8);
+plutovg_path_t* plutovg_font_get_textn_path(const plutovg_font_t* font, const char* utf8, int size);
 
 typedef enum {
     plutovg_line_cap_butt,
@@ -577,9 +623,9 @@ void plutovg_set_font_size(plutovg_t* pluto, double size);
 plutovg_font_t* plutovg_get_font(const plutovg_t* pluto);
 double plutovg_get_font_size(const plutovg_t* pluto);
 
-void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y);
 void plutovg_char(plutovg_t* pluto, int ch, double x, double y);
-void plutovg_text_extents(plutovg_t* pluto, const char* utf8, double* w, double* h);
+void plutovg_text(plutovg_t* pluto, const char* utf8, double x, double y);
+void plutovg_textn(plutovg_t* pluto, const char* utf8, int size, double x, double y);
 
 void plutovg_fill(plutovg_t* pluto);
 void plutovg_stroke(plutovg_t* pluto);
