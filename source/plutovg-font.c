@@ -209,23 +209,12 @@ static inline plutovg_glyph_t* find_glyph(const plutovg_font_face_t* face, int c
 plutovg_path_t* plutovg_font_face_get_char_path(const plutovg_font_face_t* face, int ch)
 {
     plutovg_glyph_t* glyph = find_glyph(face, ch);
-    if(glyph == NULL)
-        return NULL;
-
     return plutovg_path_reference(glyph->path);
 }
 
 void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch, double* x, double* y, double* w, double* h)
 {
-    if(x) *x = 0;
-    if(y) *y = 0;
-    if(w) *w = 0;
-    if(h) *h = 0;
-
     plutovg_glyph_t* glyph = find_glyph(face, ch);
-    if(glyph == NULL)
-        return;
-
     if(x) *x = glyph->x1;
     if(y) *y = glyph->y1;
     if(w) *w = glyph->x2 - glyph->x1;
@@ -235,9 +224,6 @@ void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch,
 double plutovg_font_face_get_char_advance(const plutovg_font_face_t* face, int ch)
 {
     plutovg_glyph_t* glyph = find_glyph(face, ch);
-    if(glyph == NULL)
-        return 0;
-
     return glyph->advance;
 }
 
