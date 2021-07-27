@@ -127,28 +127,28 @@ void plutovg_rect_init_invalid(plutovg_rect_t* rect);
  * @param rect
  * @return
  */
-int plutovg_rect_empty(plutovg_rect_t* rect);
+int plutovg_rect_empty(const plutovg_rect_t* rect);
 
 /**
  * @brief plutovg_rect_invalid
  * @param rect
  * @return
  */
-int plutovg_rect_invalid(plutovg_rect_t* rect);
+int plutovg_rect_invalid(const plutovg_rect_t* rect);
 
 /**
  * @brief plutovg_rect_unite
  * @param rect
  * @param source
  */
-void plutovg_rect_unite(plutovg_rect_t* rect, plutovg_rect_t* source);
+void plutovg_rect_unite(plutovg_rect_t* rect, const plutovg_rect_t* source);
 
 /**
  * @brief plutovg_rect_intersect
  * @param rect
  * @param source
  */
-void plutovg_rect_intersect(plutovg_rect_t* rect, plutovg_rect_t* source);
+void plutovg_rect_intersect(plutovg_rect_t* rect, const plutovg_rect_t* source);
 
 typedef struct plutovg_matrix plutovg_matrix_t;
 

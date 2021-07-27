@@ -20,17 +20,17 @@ void plutovg_rect_init_invalid(plutovg_rect_t* rect)
     plutovg_rect_init(rect, 0, 0, -1, -1);
 }
 
-int plutovg_rect_empty(plutovg_rect_t* rect)
+int plutovg_rect_empty(const plutovg_rect_t* rect)
 {
     return rect->w <= 0.0 || rect->h <= 0.0;
 }
 
-int plutovg_rect_invalid(plutovg_rect_t* rect)
+int plutovg_rect_invalid(const plutovg_rect_t* rect)
 {
     return rect->w < 0.0 || rect->h < 0.0;
 }
 
-void plutovg_rect_unite(plutovg_rect_t* rect, plutovg_rect_t* source)
+void plutovg_rect_unite(plutovg_rect_t* rect, const plutovg_rect_t* source)
 {
     if(plutovg_rect_invalid(source))
         return;
@@ -49,7 +49,7 @@ void plutovg_rect_unite(plutovg_rect_t* rect, plutovg_rect_t* source)
     plutovg_rect_init(rect, l, t, r - l, b - t);
 }
 
-void plutovg_rect_intersect(plutovg_rect_t* rect, plutovg_rect_t* source)
+void plutovg_rect_intersect(plutovg_rect_t* rect, const plutovg_rect_t* source)
 {
    if(plutovg_rect_invalid(source))
         return;
