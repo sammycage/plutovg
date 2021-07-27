@@ -354,7 +354,7 @@ double plutovg_get_dash_offset(const plutovg_t* pluto)
     return stroke->dash ? stroke->dash->offset : 0.0;
 }
 
-double* plutovg_get_dash_data(const plutovg_t* pluto)
+const double* plutovg_get_dash_data(const plutovg_t* pluto)
 {
     plutovg_stroke_data_t* stroke = &pluto->state->stroke;
     return stroke->dash ? stroke->dash->data : NULL;
