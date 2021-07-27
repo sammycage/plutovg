@@ -235,7 +235,7 @@ int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face);
 plutovg_font_style_t plutovg_font_face_get_style(const plutovg_font_face_t* face);
 const char* plutovg_font_face_get_family(const plutovg_font_face_t* face);
 plutovg_path_t* plutovg_font_face_get_char_path(const plutovg_font_face_t* face, int ch);
-void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch, double* x, double* y, double* w, double* h);
+void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch, plutovg_rect_t* rect);
 double plutovg_font_face_get_char_advance(const plutovg_font_face_t* face, int ch);
 void plutovg_font_face_get_matrix(const plutovg_font_face_t* face, double size, plutovg_matrix_t* matrix);
 double plutovg_font_face_get_scale(const plutovg_font_face_t* face, double size);
@@ -244,7 +244,7 @@ double plutovg_font_face_get_descent(const plutovg_font_face_t* face);
 double plutovg_font_face_get_line_gap(const plutovg_font_face_t* face);
 double plutovg_font_face_get_leading(const plutovg_font_face_t* face);
 double plutovg_font_face_get_kerning(const plutovg_font_face_t* face, int ch1, int ch2);
-void plutovg_font_face_get_extents(const plutovg_font_face_t* face, double* x, double* y, double* w, double* h);
+void plutovg_font_face_get_extents(const plutovg_font_face_t* face, plutovg_rect_t* rect);
 
 typedef struct plutovg_font plutovg_font_t;
 
@@ -269,10 +269,10 @@ double plutovg_font_get_kerning(const plutovg_font_t* font, int ch1, int ch2);
 double plutovg_font_get_char_advance(const plutovg_font_t* font, int ch);
 double plutovg_font_get_text_advance(const plutovg_font_t* font, const char* utf8);
 double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* utf8, int size);
-void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, double* x, double* y, double* w, double* h);
-void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8, double* x, double* y, double* w, double* h);
-void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, double* x, double* y, double* w, double* h);
-void plutovg_font_get_extents(const plutovg_font_t* font, double* x, double* y, double* w, double* h);
+void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, plutovg_rect_t* rect);
+void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8, plutovg_rect_t* rect);
+void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, plutovg_rect_t* rect);
+void plutovg_font_get_extents(const plutovg_font_t* font, plutovg_rect_t* rect);
 plutovg_path_t* plutovg_font_get_char_path(const plutovg_font_t* font, int ch);
 plutovg_path_t* plutovg_font_get_text_path(const plutovg_font_t* font, const char* utf8);
 plutovg_path_t* plutovg_font_get_textn_path(const plutovg_font_t* font, const char* utf8, int size);
@@ -643,34 +643,25 @@ void plutovg_stroke_preserve(plutovg_t* pluto);
 void plutovg_clip_preserve(plutovg_t* pluto);
 
 /**
- * @brief Computes a bounding box in user coordinates covering the area inside the current fill.
- * @param pluto - a pluto context
- * @param x - the x coordinate of the bounding box
- * @param y - the y coordinate of the bounding box
- * @param w - the width of the bounding box
- * @param h - the height of the bounding box
+ * @brief plutovg_fill_extents
+ * @param pluto
+ * @param rect
  */
-void plutovg_fill_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h);
+void plutovg_fill_extents(plutovg_t* pluto, plutovg_rect_t* rect);
 
 /**
- * @brief Computes a bounding box in user coordinates covering the area inside the current stroke.
- * @param pluto - a pluto context
- * @param x - the x coordinate of the bounding box
- * @param y - the y coordinate of the bounding box
- * @param w - the width of the bounding box
- * @param h - the height of the bounding box
+ * @brief plutovg_stroke_extents
+ * @param pluto
+ * @param rect
  */
-void plutovg_stroke_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h);
+void plutovg_stroke_extents(plutovg_t* pluto, plutovg_rect_t* rect);
 
 /**
- * @brief Computes a bounding box in user coordinates covering the area inside the current clip.
- * @param pluto - a pluto context
- * @param x - the x coordinate of the bounding box
- * @param y - the y coordinate of the bounding box
- * @param w - the width of the bounding box
- * @param h - the height of the bounding box
+ * @brief plutovg_clip_extents
+ * @param pluto
+ * @param rect
  */
-void plutovg_clip_extents(plutovg_t* pluto, double* x, double* y, double* w, double* h);
+void plutovg_clip_extents(plutovg_t* pluto, plutovg_rect_t* rect);
 
 /**
  * @brief Reset the current clip region to its original, unrestricted state.

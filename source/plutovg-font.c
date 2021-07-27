@@ -213,13 +213,10 @@ plutovg_path_t* plutovg_font_face_get_char_path(const plutovg_font_face_t* face,
     return plutovg_path_reference(glyph->path);
 }
 
-void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch, double* x, double* y, double* w, double* h)
+void plutovg_font_face_get_char_extents(const plutovg_font_face_t* face, int ch, plutovg_rect_t* rect)
 {
     plutovg_glyph_t* glyph = find_glyph(face, ch);
-    if(x) *x = glyph->x1;
-    if(y) *y = glyph->y1;
-    if(w) *w = glyph->x2 - glyph->x1;
-    if(h) *h = glyph->y2 - glyph->y1;
+    plutovg_rect_init(rect, glyph->x1, glyph->y1, glyph->x2 - glyph->x1, glyph->y2 - glyph->y1);
 }
 
 double plutovg_font_face_get_char_advance(const plutovg_font_face_t* face, int ch)
@@ -264,12 +261,9 @@ double plutovg_font_face_get_kerning(const plutovg_font_face_t* face, int ch1, i
     return stbtt_GetCodepointKernAdvance(&face->info, ch1, ch2);
 }
 
-void plutovg_font_face_get_extents(const plutovg_font_face_t* face, double* x, double* y, double* w, double* h)
+void plutovg_font_face_get_extents(const plutovg_font_face_t* face, plutovg_rect_t* rect)
 {
-    if(x) *x = face->x1;
-    if(y) *y = face->y1;
-    if(w) *w = face->x2 - face->x1;
-    if(h) *h = face->y2 - face->y1;
+    plutovg_rect_init(rect, face->x1, face->y1, face->x2 - face->x1, face->y2 - face->y1);
 }
 
 struct plutovg_font {
@@ -468,30 +462,22 @@ double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* ut
     return advance;
 }
 
-void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, double* x, double* y, double* w, double* h)
+void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, plutovg_rect_t* rect)
 {
-    plutovg_rect_t rect;
     plutovg_matrix_t matrix;
     plutovg_font_face_get_matrix(font->face, font->size, &matrix);
-    plutovg_font_face_get_char_extents(font->face, ch, &rect.x, &rect.y, &rect.w, &rect.h);
-    plutovg_matrix_map_rect(&matrix, &rect, &rect);
-
-    if(x) *x = rect.x;
-    if(y) *y = rect.y;
-    if(w) *w = rect.w;
-    if(h) *h = rect.h;
+    plutovg_font_face_get_char_extents(font->face, ch, rect);
+    plutovg_matrix_map_rect(&matrix, rect, rect);
 }
 
-void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8, double* x, double* y, double* w, double* h)
+void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8, plutovg_rect_t* rect)
 {
-    plutovg_font_get_textn_extents(font, utf8, strlen(utf8), x, y, w, h);
+    plutovg_font_get_textn_extents(font, utf8, strlen(utf8), rect);
 }
 
-void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, double* x, double* y, double* w, double* h)
+void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, plutovg_rect_t* rect)
 {
-    plutovg_rect_t rect;
-    plutovg_rect_init_invalid(&rect);
-
+    plutovg_rect_init_invalid(rect);
     double advance = 0;
     double scale = plutovg_font_get_scale(font);
     const char* end = utf8 + size;
@@ -506,30 +492,19 @@ void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8
         plutovg_matrix_scale(&matrix, scale, -scale);
 
         plutovg_rect_t box;
-        plutovg_font_face_get_char_extents(font->face, ch, &box.x, &box.y, &box.w, &box.h);
+        plutovg_font_face_get_char_extents(font->face, ch, &box);
         plutovg_matrix_map_rect(&matrix, &box, &box);
-        plutovg_rect_unite(&rect, &box);
+        plutovg_rect_unite(rect, &box);
         advance += plutovg_font_get_char_advance(font, ch);
     }
-
-    if(x) *x = rect.x;
-    if(y) *y = rect.y;
-    if(w) *w = rect.w;
-    if(h) *h = rect.h;
 }
 
-void plutovg_font_get_extents(const plutovg_font_t* font, double* x, double* y, double* w, double* h)
+void plutovg_font_get_extents(const plutovg_font_t* font, plutovg_rect_t* rect)
 {
-    plutovg_rect_t rect;
     plutovg_matrix_t matrix;
     plutovg_font_face_get_matrix(font->face, font->size, &matrix);
-    plutovg_font_face_get_extents(font->face, &rect.x, &rect.y, &rect.w, &rect.h);
-    plutovg_matrix_map_rect(&matrix, &rect, &rect);
-
-    if(x) *x = rect.x;
-    if(y) *y = rect.y;
-    if(w) *w = rect.w;
-    if(h) *h = rect.h;
+    plutovg_font_face_get_extents(font->face, rect);
+    plutovg_matrix_map_rect(&matrix, rect, rect);
 }
 
 plutovg_path_t* plutovg_font_get_char_path(const plutovg_font_t* font, int ch)
