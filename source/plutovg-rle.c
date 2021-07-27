@@ -318,8 +318,8 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
         if(len)
         {
             plutovg_span_t* span = result->spans.data + result->spans.size;
-            span->x = (short)x;
-            span->len = (unsigned short)len;
+            span->x = x;
+            span->len = len;
             span->y = a_spans->y;
             span->coverage = DIV255(a_spans->coverage * b_spans->coverage);
             result->spans.size += 1;
@@ -362,7 +362,7 @@ plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rl
     return result;
 }
 
-void plutovg_rle_clip_path(plutovg_rle_t* rle, const plutovg_rle_t* clip)
+void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* clip)
 {
     if(rle == NULL || clip == NULL)
         return;

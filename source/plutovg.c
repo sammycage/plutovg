@@ -573,7 +573,7 @@ void plutovg_clip(plutovg_t* pluto)
 void plutovg_paint(plutovg_t* pluto)
 {
     plutovg_state_t* state = pluto->state;
-    if(state->clippath==NULL && pluto->clippath==NULL)
+    if(state->clippath == NULL && pluto->clippath == NULL)
     {
         plutovg_path_t* path = plutovg_path_create();
         plutovg_path_add_rect(path, pluto->clip.x, pluto->clip.y, pluto->clip.w, pluto->clip.h);
@@ -593,7 +593,7 @@ void plutovg_fill_preserve(plutovg_t* pluto)
     plutovg_state_t* state = pluto->state;
     plutovg_rle_clear(pluto->rle);
     plutovg_rle_rasterize(pluto->rle, pluto->path, &state->matrix, &pluto->clip, NULL, state->winding);
-    plutovg_rle_clip_path(pluto->rle, state->clippath);
+    plutovg_rle_intersect(pluto->rle, state->clippath);
     plutovg_blend(pluto, pluto->rle);
 }
 
@@ -602,7 +602,7 @@ void plutovg_stroke_preserve(plutovg_t* pluto)
     plutovg_state_t* state = pluto->state;
     plutovg_rle_clear(pluto->rle);
     plutovg_rle_rasterize(pluto->rle, pluto->path, &state->matrix, &pluto->clip, &state->stroke, plutovg_fill_rule_non_zero);
-    plutovg_rle_clip_path(pluto->rle, state->clippath);
+    plutovg_rle_intersect(pluto->rle, state->clippath);
     plutovg_blend(pluto, pluto->rle);
 }
 
@@ -613,7 +613,7 @@ void plutovg_clip_preserve(plutovg_t* pluto)
     {
         plutovg_rle_clear(pluto->rle);
         plutovg_rle_rasterize(pluto->rle, pluto->path, &state->matrix, &pluto->clip, NULL, state->winding);
-        plutovg_rle_clip_path(state->clippath, pluto->rle);
+        plutovg_rle_intersect(state->clippath, pluto->rle);
     }
     else
     {

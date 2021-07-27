@@ -125,7 +125,7 @@ plutovg_rle_t* plutovg_rle_create(void);
 void plutovg_rle_destroy(plutovg_rle_t* rle);
 void plutovg_rle_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip, const plutovg_stroke_data_t* stroke, plutovg_fill_rule_t winding);
 plutovg_rle_t* plutovg_rle_intersection(const plutovg_rle_t* a, const plutovg_rle_t* b);
-void plutovg_rle_clip_path(plutovg_rle_t* rle, const plutovg_rle_t* clip);
+void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* clip);
 plutovg_rle_t* plutovg_rle_clone(const plutovg_rle_t* rle);
 void plutovg_rle_clear(plutovg_rle_t* rle);
 
