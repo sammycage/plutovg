@@ -1,7 +1,8 @@
-#include "plutovg-private.h"
-
 #define STB_TRUETYPE_IMPLEMENTATION
+#include "plutovg-private.h"
 #include "stb_truetype.h"
+
+#include <stdio.h>
 
 struct plutovg_font_data_t {
     int ref;
@@ -459,7 +460,7 @@ double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* ut
     {
         int ch = 0;
         if(!decode_utf8(&utf8, end, &ch))
-            return advance;
+            break;
 
         advance += plutovg_font_get_char_advance(font, ch);
     }
