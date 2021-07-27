@@ -1,6 +1,5 @@
-#include "plutovg-private.h"
-
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "plutovg-private.h"
 #include "stb_image_write.h"
 
 plutovg_surface_t* plutovg_surface_create(int width, int height)
