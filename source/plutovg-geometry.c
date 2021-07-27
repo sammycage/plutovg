@@ -10,12 +10,62 @@ void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, doubl
     rect->h = h;
 }
 
-void plutovg_rect_init_zero(plutovg_rect_t* rect)
+void plutovg_rect_init_empty(plutovg_rect_t* rect)
 {
-    rect->x = 0.0;
-    rect->y = 0.0;
-    rect->w = 0.0;
-    rect->h = 0.0;
+    plutovg_rect_init(rect, 0, 0, 0, 0);
+}
+
+void plutovg_rect_init_invalid(plutovg_rect_t* rect)
+{
+    plutovg_rect_init(rect, 0, 0, -1, -1);
+}
+
+int plutovg_rect_empty(plutovg_rect_t* rect)
+{
+    return rect->w <= 0.0 || rect->h <= 0.0;
+}
+
+int plutovg_rect_invalid(plutovg_rect_t* rect)
+{
+    return rect->w < 0.0 || rect->h < 0.0;
+}
+
+void plutovg_rect_unite(plutovg_rect_t* rect, plutovg_rect_t* source)
+{
+    if(plutovg_rect_invalid(source))
+        return;
+
+    if(plutovg_rect_invalid(rect))
+    {
+        plutovg_rect_init(rect, source->x, source->y, source->w, source->h);
+        return;
+    }
+
+    double l = MIN(rect->x, source->x);
+    double t = MIN(rect->y, source->y);
+    double r = MAX(rect->x + rect->w, source->x + source->w);
+    double b = MAX(rect->y + rect->h, source->y + source->h);
+
+    plutovg_rect_init(rect, l, t, r - l, b - t);
+}
+
+void plutovg_rect_intersect(plutovg_rect_t* rect, plutovg_rect_t* source)
+{
+   if(plutovg_rect_invalid(source))
+        return;
+
+    if(plutovg_rect_invalid(rect))
+    {
+        plutovg_rect_init(rect, source->x, source->y, source->w, source->h);
+        return;
+    }
+
+    double l = MAX(rect->x, source->x);
+    double t = MAX(rect->y, source->y);
+    double r = MIN(rect->x + rect->w, source->x + source->w);
+    double b = MIN(rect->y + rect->h, source->y + source->h);
+
+    plutovg_rect_init(rect, l, t, r - l, b - t);
 }
 
 void plutovg_matrix_init(plutovg_matrix_t* matrix, double m00, double m10, double m01, double m11, double m02, double m12)

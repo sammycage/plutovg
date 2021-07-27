@@ -3,8 +3,6 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
-#include <stdio.h>
-
 struct plutovg_font_data_t {
     int ref;
     int owndata;
@@ -390,35 +388,35 @@ double plutovg_font_get_scale(const plutovg_font_t* font)
 
 double plutovg_font_get_ascent(const plutovg_font_t* font)
 {
-    double scale = plutovg_font_face_get_scale(font->face, font->size);
+    double scale = plutovg_font_get_scale(font);
     return plutovg_font_face_get_ascent(font->face) * scale;
 }
 
 double plutovg_font_get_descent(const plutovg_font_t* font)
 {
-    double scale = plutovg_font_face_get_scale(font->face, font->size);
+    double scale = plutovg_font_get_scale(font);
     return plutovg_font_face_get_descent(font->face) * scale;
 }
 
 double plutovg_font_get_line_gap(const plutovg_font_t* font)
 {
-    double scale = plutovg_font_face_get_scale(font->face, font->size);
+    double scale = plutovg_font_get_scale(font);
     return plutovg_font_face_get_line_gap(font->face) * scale;
 }
 
 double plutovg_font_get_leading(const plutovg_font_t* font)
 {
-    double scale = plutovg_font_face_get_scale(font->face, font->size);
+    double scale = plutovg_font_get_scale(font);
     return plutovg_font_face_get_leading(font->face) * scale;
 }
 
 double plutovg_font_get_kerning(const plutovg_font_t* font, int ch1, int ch2)
 {
-    double scale = plutovg_font_face_get_scale(font->face, font->size);
+    double scale = plutovg_font_get_scale(font);
     return plutovg_font_face_get_kerning(font->face, ch1, ch2) * scale;
 }
 
-static inline int decode_utf8(const char** begin, const char* end, uint32_t* codepoint)
+static inline int decode_utf8(const char** begin, const char* end, int* codepoint)
 {
     static const int trailing[256] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -458,7 +456,7 @@ static inline int decode_utf8(const char** begin, const char* end, uint32_t* cod
 
 double plutovg_font_get_char_advance(const plutovg_font_t* font, int ch)
 {
-    double scale = plutovg_font_face_get_scale(font->face, font->size);
+    double scale = plutovg_font_get_scale(font);
     return plutovg_font_face_get_char_advance(font->face, ch) * scale;
 }
 
@@ -469,15 +467,15 @@ double plutovg_font_get_text_advance(const plutovg_font_t* font, const char* utf
 
 double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* utf8, int size)
 {
-    uint32_t cp = 0;
     double advance = 0;
     const char* end = utf8 + size;
     while(utf8 < end)
     {
-        if(!decode_utf8(&utf8, end, &cp))
+        int ch = 0;
+        if(!decode_utf8(&utf8, end, &ch))
             return advance;
 
-        advance += plutovg_font_get_char_advance(font, cp);
+        advance += plutovg_font_get_char_advance(font, ch);
     }
 
     return advance;
@@ -485,8 +483,8 @@ double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* ut
 
 void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, double* x, double* y, double* w, double* h)
 {
-    plutovg_matrix_t matrix;
     plutovg_rect_t rect;
+    plutovg_matrix_t matrix;
     plutovg_font_face_get_matrix(font->face, font->size, &matrix);
     plutovg_font_face_get_char_extents(font->face, ch, &rect.x, &rect.y, &rect.w, &rect.h);
     plutovg_matrix_map_rect(&matrix, &rect, &rect);
@@ -504,24 +502,42 @@ void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8,
 
 void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, double* x, double* y, double* w, double* h)
 {
-    if(x) *x = 0;
-    if(y) *y = 0;
-    if(w) *w = 0;
-    if(h) *h = 0;
+    plutovg_rect_t rect;
+    plutovg_rect_init_invalid(&rect);
 
-    plutovg_rect_t rect = {0, 0, 0, 0};
-    uint32_t cp = 0;
+    double advance = 0;
+    double scale = plutovg_font_get_scale(font);
     const char* end = utf8 + size;
     while(utf8 < end)
     {
-        if(!decode_utf8(&utf8, end, &cp))
-            return;
+        int ch = 0;
+        if(!decode_utf8(&utf8, end, &ch))
+            break;
+
+        plutovg_matrix_t matrix;
+        plutovg_matrix_init_translate(&matrix, advance, 0);
+        plutovg_matrix_scale(&matrix, scale, -scale);
 
         plutovg_rect_t box;
-        plutovg_font_get_char_extents(font, cp, &box.x, &box.y, &box.w, &box.h);
-        //plutovg_rect_unite(&rect, &box);
-        rect.w += plutovg_font_get_char_advance(font, cp);
+        plutovg_font_face_get_char_extents(font->face, ch, &box.x, &box.y, &box.w, &box.h);
+        plutovg_matrix_map_rect(&matrix, &box, &box);
+        plutovg_rect_unite(&rect, &box);
+        advance += plutovg_font_get_char_advance(font, ch);
     }
+
+    if(x) *x = rect.x;
+    if(y) *y = rect.y;
+    if(w) *w = rect.w;
+    if(h) *h = rect.h;
+}
+
+void plutovg_font_get_extents(const plutovg_font_t* font, double* x, double* y, double* w, double* h)
+{
+    plutovg_rect_t rect;
+    plutovg_matrix_t matrix;
+    plutovg_font_face_get_matrix(font->face, font->size, &matrix);
+    plutovg_font_face_get_extents(font->face, &rect.x, &rect.y, &rect.w, &rect.h);
+    plutovg_matrix_map_rect(&matrix, &rect, &rect);
 
     if(x) *x = rect.x;
     if(y) *y = rect.y;
@@ -547,22 +563,24 @@ plutovg_path_t* plutovg_font_get_text_path(const plutovg_font_t* font, const cha
 
 plutovg_path_t* plutovg_font_get_textn_path(const plutovg_font_t* font, const char* utf8, int size)
 {
-    plutovg_matrix_t matrix;
-    plutovg_font_face_get_matrix(font->face, font->size, &matrix);
     plutovg_path_t* result = plutovg_path_create();
-    uint32_t cp = 0;
     double advance = 0;
+    double scale = plutovg_font_get_scale(font);
     const char* end = utf8 + size;
     while(utf8 < end)
     {
-        if(!decode_utf8(&utf8, end, &cp))
-            return result;
+        int ch = 0;
+        if(!decode_utf8(&utf8, end, &ch))
+            break;
 
-        plutovg_path_t* path = plutovg_font_face_get_char_path(font->face, cp);
-        double advance = plutovg_font_get_char_advance(font, cp);
+        plutovg_matrix_t matrix;
+        plutovg_matrix_init_translate(&matrix, advance, 0);
+        plutovg_matrix_scale(&matrix, scale, -scale);
+
+        plutovg_path_t* path = plutovg_font_face_get_char_path(font->face, ch);
         plutovg_path_add_path(result, path, &matrix);
         plutovg_path_destroy(path);
-        plutovg_matrix_translate(&matrix, advance, 0);
+        advance += plutovg_font_get_char_advance(font, ch);
     }
 
     return result;

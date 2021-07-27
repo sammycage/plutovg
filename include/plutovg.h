@@ -34,7 +34,12 @@ typedef struct {
 } plutovg_rect_t;
 
 void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, double h);
-void plutovg_rect_init_zero(plutovg_rect_t* rect);
+void plutovg_rect_init_empty(plutovg_rect_t* rect);
+void plutovg_rect_init_invalid(plutovg_rect_t* rect);
+int plutovg_rect_empty(plutovg_rect_t* rect);
+int plutovg_rect_invalid(plutovg_rect_t* rect);
+void plutovg_rect_unite(plutovg_rect_t* rect, plutovg_rect_t* source);
+void plutovg_rect_intersect(plutovg_rect_t* rect, plutovg_rect_t* source);
 
 typedef struct {
     double m00; double m10;
@@ -267,6 +272,7 @@ double plutovg_font_get_textn_advance(const plutovg_font_t* font, const char* ut
 void plutovg_font_get_char_extents(const plutovg_font_t* font, int ch, double* x, double* y, double* w, double* h);
 void plutovg_font_get_text_extents(const plutovg_font_t* font, const char* utf8, double* x, double* y, double* w, double* h);
 void plutovg_font_get_textn_extents(const plutovg_font_t* font, const char* utf8, int size, double* x, double* y, double* w, double* h);
+void plutovg_font_get_extents(const plutovg_font_t* font, double* x, double* y, double* w, double* h);
 plutovg_path_t* plutovg_font_get_char_path(const plutovg_font_t* font, int ch);
 plutovg_path_t* plutovg_font_get_text_path(const plutovg_font_t* font, const char* utf8);
 plutovg_path_t* plutovg_font_get_textn_path(const plutovg_font_t* font, const char* utf8, int size);
