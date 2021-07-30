@@ -83,7 +83,6 @@ int plutovg_surface_get_stride(const plutovg_surface_t* surface);
  */
 void plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename);
 
-
 typedef struct plutovg_point plutovg_point_t;
 
 struct plutovg_point {
@@ -1064,10 +1063,11 @@ typedef struct plutovg_font_data_t plutovg_font_data_t;
 /**
  * @brief plutovg_font_data_load_from_memory
  * @param data
+ * @param datasize
  * @param owndata
  * @return
  */
-plutovg_font_data_t* plutovg_font_data_load_from_memory(unsigned char* data, int owndata);
+plutovg_font_data_t* plutovg_font_data_load_from_memory(const unsigned char* data, int datasize, int owndata);
 
 /**
  * @brief plutovg_font_data_load_from_file
@@ -1108,10 +1108,11 @@ typedef struct plutovg_font_face plutovg_font_face_t;
 /**
  * @brief plutovg_font_face_load_from_memory
  * @param data
+ * @param datasize
  * @param owndata
  * @return
  */
-plutovg_font_face_t* plutovg_font_face_load_from_memory(unsigned char* data, int owndata);
+plutovg_font_face_t* plutovg_font_face_load_from_memory(const unsigned char* data, int datasize, int owndata);
 
 /**
  * @brief plutovg_font_face_load_from_file
@@ -1251,11 +1252,12 @@ typedef struct plutovg_font plutovg_font_t;
 /**
  * @brief plutovg_font_load_from_memory
  * @param data
+ * @param datasize
  * @param owndata
  * @param size
  * @return
  */
-plutovg_font_t* plutovg_font_load_from_memory(unsigned char* data, int owndata, double size);
+plutovg_font_t* plutovg_font_load_from_memory(const unsigned char* data, int datasize, int owndata, double size);
 
 /**
  * @brief plutovg_font_load_from_file
@@ -1303,25 +1305,18 @@ void plutovg_font_destroy(plutovg_font_t* font);
 int plutovg_font_get_reference_count(const plutovg_font_t* font);
 
 /**
+ * @brief plutovg_font_set_face
+ * @param font
+ * @param face
+ */
+void plutovg_font_set_face(plutovg_font_t* font, plutovg_font_face_t* face);
+
+/**
  * @brief plutovg_font_get_face
  * @param font
  * @return
  */
 plutovg_font_face_t* plutovg_font_get_face(const plutovg_font_t* font);
-
-/**
- * @brief plutovg_font_get_style
- * @param font
- * @return
- */
-plutovg_font_style_t plutovg_font_get_style(const plutovg_font_t* font);
-
-/**
- * @brief plutovg_font_get_family
- * @param font
- * @return
- */
-const char* plutovg_font_get_family(const plutovg_font_t* font);
 
 /**
  * @brief plutovg_font_set_size
@@ -1336,6 +1331,20 @@ void plutovg_font_set_size(plutovg_font_t* font, double size);
  * @return
  */
 double plutovg_font_get_size(const plutovg_font_t* font);
+
+/**
+ * @brief plutovg_font_get_style
+ * @param font
+ * @return
+ */
+plutovg_font_style_t plutovg_font_get_style(const plutovg_font_t* font);
+
+/**
+ * @brief plutovg_font_get_family
+ * @param font
+ * @return
+ */
+const char* plutovg_font_get_family(const plutovg_font_t* font);
 
 /**
  * @brief plutovg_font_get_scale
