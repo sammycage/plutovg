@@ -589,7 +589,7 @@ void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, c
 void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix)
 {
     plutovg_point_t* points = path->points.data;
-    plutovg_point_t* end = ptr + path->points.size;
+    plutovg_point_t* end = points + path->points.size;
     while(points < end)
     {
         plutovg_matrix_map_point(matrix, points, points);
