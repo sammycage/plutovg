@@ -82,7 +82,7 @@ void plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* 
     int width = surface->width;
     int height = surface->height;
     int stride = surface->stride;
-    unsigned char* image = malloc((size_t)(stride * height));
+    unsigned char* image = calloc(1, (size_t)(stride * height));
     for(int y = 0;y < height;y++)
     {
         const uint32_t* src = (uint32_t*)(data + stride * y);
