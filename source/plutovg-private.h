@@ -145,6 +145,8 @@ void plutovg_blend_texture(plutovg_t* pluto, const plutovg_rle_t* rle, const plu
 
 #define SQRT2 1.41421356237309504880
 #define PI 3.14159265358979323846
+#define TWO_PI 6.28318530717958647693
+#define HALF_PI 1.57079632679489661923
 #define KAPPA 0.55228474983079339840
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

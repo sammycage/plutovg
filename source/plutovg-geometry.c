@@ -499,62 +499,41 @@ void plutovg_path_add_circle(plutovg_path_t* path, double cx, double cy, double 
 void plutovg_path_add_arc(plutovg_path_t* path, double cx, double cy, double r, double a0, double a1, int ccw)
 {
     double da = a1 - a0;
-    if(ccw == 0)
-    {
-        if(fabs(da) >= PI*2)
-        {
-            da = PI*2;
-        }
-        else
-        {
-            while(da < 0.0) da += PI*2;
-        }
-    }
-    else
-    {
-        if(fabs(da) >= PI*2)
-        {
-            da = -PI*2;
-        }
-        else
-        {
-            while(da > 0.0) da -= PI*2;
-        }
+    if(fabs(da) > TWO_PI) {
+        da = TWO_PI;
+    } else if(da != 0.0 && ccw != (da < 0.0)) {
+        da += TWO_PI * (ccw ? -1 : 1);
     }
 
-    int ndivs = MAX(1, MIN((int)(fabs(da) / (PI*0.5) + 0.5), 5));
-    double hda = (da / (double)ndivs) / 2.0;
-    double kappa = fabs(4.0 / 3.0 * (1.0 - cos(hda)) / sin(hda));
-    if(ccw == 1)
-        kappa = -kappa;
+    int seg_n = (int)(ceil(fabs(da) / HALF_PI));
+    double seg_a = da / seg_n;
+    double d = (seg_a / HALF_PI) * KAPPA * r;
 
-    double px = 0, py = 0;
-    double ptanx = 0, ptany = 0;
-    for(int i = 0;i <= ndivs;i++)
-    {
-        double a = a0 + da * (i / (double)ndivs);
-        double dx = cos(a);
-        double dy = sin(a);
-        double x = cx + dx * r;
-        double y = cy + dy * r;
-        double tanx = -dy * r * kappa;
-        double tany = dx * r * kappa;
-        if(i == 0)
-        {
-            if(path->elements.size == 0)
-                plutovg_path_move_to(path, x, y);
-            else
-                plutovg_path_line_to(path, x, y);
-        }
-        else
-        {
-            plutovg_path_cubic_to(path, px+ptanx, py+ptany, x-tanx, y-tany, x, y);
-        }
+    double a = a0;
 
-        px = x;
-        py = y;
-        ptanx = tanx;
-        ptany = tany;
+    double ax = cx + cos(a) * r;
+    double ay = cy + sin(a) * r;
+
+    double dx = -sin(a) * d;
+    double dy = cos(a) * d;
+
+    plutovg_path_move_to(path, ax, ay);
+    for(int i = 0; i < seg_n; i++) {
+        double cp1x = ax + dx;
+        double cp1y = ay + dy;
+
+        a += seg_a;
+
+        ax = cx + cos(a) * r;
+        ay = cy + sin(a) * r;
+
+        dx = -sin(a) * d;
+        dy = cos(a) * d;
+
+        double cp2x = ax - dx;
+        double cp2y = ay - dy;
+
+        plutovg_path_cubic_to(path, cp1x, cp1y, cp2x, cp2y, ax, ay);
     }
 }
 
