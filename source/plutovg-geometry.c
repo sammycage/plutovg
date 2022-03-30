@@ -517,7 +517,12 @@ void plutovg_path_add_arc(plutovg_path_t* path, double cx, double cy, double r, 
     double dx = -sin(a) * d;
     double dy = cos(a) * d;
 
-    plutovg_path_move_to(path, ax, ay);
+    
+    if(path->points.size == 0)
+        plutovg_path_move_to(path, ax, ay);
+    else
+        plutovg_path_line_to(path, ax, ay);
+
     for(int i = 0; i < seg_n; i++) {
         double cp1x = ax + dx;
         double cp1y = ay + dy;
