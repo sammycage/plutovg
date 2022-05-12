@@ -37,6 +37,9 @@ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
     const int width = bytes_to_int(s_data, &size);
     const int height = bytes_to_int(s_data, &size);
+    const int a0 = bytes_to_double(s_data, &size);
+    const int a1 = bytes_to_double(s_data, &size);
+    const int a2 = bytes_to_double(s_data, &size);
 
     plutovg_surface_t* surface = plutovg_surface_create(width, height);
     plutovg_t* pluto = plutovg_create(surface);
@@ -54,22 +57,24 @@ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     const double pi = 3.14159265358979323846;
 
     plutovg_save(pluto);
-    plutovg_arc(pluto, center_x, center_y, face_radius, 0, 2 * pi, 0);
-    plutovg_set_source_rgb(pluto, 1, 1, 0);
+    plutovg_arc(pluto, center_x, center_y, face_radius, a0, a1 * pi, a2);
+    plutovg_set_source_rgb(pluto, bytes_to_double(s_data, &size), bytes_to_double(s_data, &size), bytes_to_double(s_data, &size));
     plutovg_fill_preserve(pluto);
-    plutovg_set_source_rgb(pluto, 0, 0, 0);
-    plutovg_set_line_width(pluto, 5);
+    plutovg_set_source_rgb(pluto, bytes_to_double(s_data, &size), bytes_to_double(s_data, &size), bytes_to_double(s_data, &size));
+    plutovg_set_line_width(pluto, bytes_to_double(s_data, &size));
     plutovg_stroke(pluto);
     plutovg_restore(pluto);
 
     plutovg_save(pluto);
-    plutovg_arc(pluto, eye_x, eye_y, eye_radius, 0, 2 * pi, 0);
-    plutovg_arc(pluto, center_x + eye_offset_x, eye_y, eye_radius, 0, 2 * pi, 0);
+    plutovg_arc(pluto, eye_x, eye_y, eye_radius, bytes_to_double(s_data, &size), bytes_to_double(s_data, &size) * pi,
+                bytes_to_int(s_data, &size));
+    plutovg_arc(pluto, center_x + eye_offset_x, eye_y, eye_radius, bytes_to_double(s_data, &size),
+                bytes_to_double(s_data, &size) * pi, bytes_to_int(s_data, &size));
     plutovg_fill(pluto);
     plutovg_restore(pluto);
 
     plutovg_save(pluto);
-    plutovg_arc(pluto, center_x, center_y, mouth_radius, 0, pi, 0);
+    plutovg_arc(pluto, center_x, center_y, mouth_radius, bytes_to_double(s_data, &size), pi, bytes_to_int(s_data, &size));
     plutovg_set_line_width(pluto, 5);
     plutovg_stroke(pluto);
     plutovg_restore(pluto);

@@ -1,5 +1,5 @@
-project: plutosvg
-target: plutosvg-fuzz
+project: plutovg
+target: plutovg-fuzz
 
 cmds:
-  - cmd: /plutosvg-fuzz
+  - cmd: /plutovg-fuzz
