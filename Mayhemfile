@@ -1,0 +1,5 @@
+project: plutosvg
+target: plutosvg-fuzz
+
+cmds:
+  - cmd: /plutosvg-fuzz
