@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/plutovg.h
+
+/home/bailey/mayhem/plutovg/fuzz/fuzz.c
+plutovg.h
+-
+stdint.h
+-
+stddef.h
+-
+stdlib.h
+-
+string.h
+-
+

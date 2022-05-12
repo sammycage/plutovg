@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/plutovg.h
+
+/home/bailey/mayhem/plutovg/example/smiley.c
+plutovg.h
+/home/bailey/mayhem/plutovg/example/plutovg.h
+

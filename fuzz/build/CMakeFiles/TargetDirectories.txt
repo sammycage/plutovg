@@ -1,0 +1,3 @@
+/home/bailey/mayhem/plutovg/fuzz/build/CMakeFiles/rebuild_cache.dir
+/home/bailey/mayhem/plutovg/fuzz/build/CMakeFiles/edit_cache.dir
+/home/bailey/mayhem/plutovg/fuzz/build/CMakeFiles/plutovg-fuzz.dir
