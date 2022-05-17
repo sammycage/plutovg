@@ -1,1 +1,0 @@
-/usr/bin/clang   -rdynamic CMakeFiles/smiley.dir/smiley.c.o  -o smiley  ../libplutovg.a -lm 

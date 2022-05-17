@@ -1,1 +1,0 @@
-/usr/bin/clang   -rdynamic -fsanitize=fuzzer CMakeFiles/plutovg-fuzz.dir/fuzz.o  -o plutovg-fuzz  -lplutovg 

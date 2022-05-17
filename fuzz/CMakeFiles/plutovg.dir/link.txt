@@ -1,2 +1,0 @@
-/usr/bin/ar qc libplutovg.a  CMakeFiles/plutovg.dir/source/plutovg.c.o CMakeFiles/plutovg.dir/source/plutovg-paint.c.o CMakeFiles/plutovg.dir/source/plutovg-geometry.c.o CMakeFiles/plutovg.dir/source/plutovg-blend.c.o CMakeFiles/plutovg.dir/source/plutovg-rle.c.o CMakeFiles/plutovg.dir/source/plutovg-dash.c.o CMakeFiles/plutovg.dir/source/plutovg-font.c.o CMakeFiles/plutovg.dir/3rdparty/software/sw_ft_math.c.o CMakeFiles/plutovg.dir/3rdparty/software/sw_ft_raster.c.o CMakeFiles/plutovg.dir/3rdparty/software/sw_ft_stroker.c.o
-/usr/bin/ranlib libplutovg.a
