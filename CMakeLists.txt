@@ -8,6 +8,4 @@ add_library(plutovg STATIC)
 
 add_subdirectory(include)
 add_subdirectory(source)
-add_subdirectory(3rdparty/stb)
-add_subdirectory(3rdparty/software)
 add_subdirectory(example)

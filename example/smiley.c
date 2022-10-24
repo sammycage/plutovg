@@ -22,9 +22,9 @@ int main(void)
 
     plutovg_save(pluto);
     plutovg_arc(pluto, center_x, center_y, face_radius, 0, 2 * pi, 0);
-    plutovg_set_source_rgb(pluto, 1, 1, 0);
+    plutovg_set_rgb(pluto, 1, 1, 0);
     plutovg_fill_preserve(pluto);
-    plutovg_set_source_rgb(pluto, 0, 0, 0);
+    plutovg_set_rgb(pluto, 0, 0, 0);
     plutovg_set_line_width(pluto, 5);
     plutovg_stroke(pluto);
     plutovg_restore(pluto);

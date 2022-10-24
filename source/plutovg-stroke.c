@@ -2,34 +2,31 @@
 
 #include <math.h>
 
-plutovg_dash_t* plutovg_dash_create(double offset, const double* data, int size)
+void plutovg_stroke_data_init(plutovg_stroke_data_t* strokedata)
 {
-    if(data == NULL || size == 0)
-        return NULL;
-
-    plutovg_dash_t* dash = malloc(sizeof(plutovg_dash_t));
-    dash->offset = offset;
-    dash->data = malloc((size_t)size * sizeof(double));
-    dash->size = size;
-    memcpy(dash->data, data, (size_t)size * sizeof(double));
-    return dash;
+    strokedata->cap = plutovg_line_cap_butt;
+    strokedata->join = plutovg_line_join_miter;
+    strokedata->width = 1.0;
+    strokedata->miterlimit = 4.0;
+    strokedata->dash.offset = 0;
+    plutovg_array_init(strokedata->dash);
 }
 
-plutovg_dash_t* plutovg_dash_clone(const plutovg_dash_t* dash)
+void plutovg_stroke_data_destroy(plutovg_stroke_data_t* strokedata)
 {
-    if(dash == NULL)
-        return NULL;
-
-    return plutovg_dash_create(dash->offset, dash->data, dash->size);
+    plutovg_array_destroy(strokedata->dash);
 }
 
-void plutovg_dash_destroy(plutovg_dash_t* dash)
+void plutovg_stroke_data_copy(plutovg_stroke_data_t* strokedata, const plutovg_stroke_data_t* source)
 {
-    if(dash == NULL)
-        return;
-
-    free(dash->data);
-    free(dash);
+    strokedata->cap = source->cap;
+    strokedata->join = source->join;
+    strokedata->width = source->width;
+    strokedata->miterlimit = source->miterlimit;
+    strokedata->dash.offset = source->dash.offset;
+    plutovg_array_ensure(strokedata->dash, source->dash.size);
+    memcpy(strokedata->dash.data, source->dash.data, source->dash.size * sizeof(double));
+    strokedata->dash.size = source->dash.size;
 }
 
 plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path_t* path)
@@ -43,8 +40,7 @@ plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path
     int toggle = 1;
     int offset = 0;
     double phase = dash->offset;
-    while(phase >= dash->data[offset])
-    {
+    while(phase >= dash->data[offset]) {
         toggle = !toggle;
         phase -= dash->data[offset];
         offset += 1;
@@ -54,8 +50,7 @@ plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path
     plutovg_path_element_t* elements = flat->elements.data;
     plutovg_path_element_t* end = elements + flat->elements.size;
     plutovg_point_t* points = flat->points.data;
-    while(elements < end)
-    {
+    while(elements < end) {
         int itoggle = toggle;
         int ioffset = offset;
         double iphase = phase;
@@ -69,14 +64,12 @@ plutovg_path_t* plutovg_dash_path(const plutovg_dash_t* dash, const plutovg_path
         ++elements;
         ++points;
 
-        while(elements < end && *elements == plutovg_path_element_line_to)
-        {
+        while(elements < end && *elements == plutovg_path_element_line_to) {
             double dx = points->x - x0;
             double dy = points->y - y0;
             double dist0 = sqrt(dx*dx + dy*dy);
             double dist1 = 0;
-            while(dist0 - dist1 > dash->data[ioffset] - iphase)
-            {
+            while(dist0 - dist1 > dash->data[ioffset] - iphase) {
                 dist1 += dash->data[ioffset] - iphase;
                 double a = dist1 / dist0;
                 double x = x0 + a * dx;
