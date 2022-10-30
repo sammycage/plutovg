@@ -154,6 +154,7 @@ plutovg_t* plutovg_create(plutovg_surface_t* surface)
     pluto->surface = plutovg_surface_reference(surface);
     pluto->state = plutovg_state_create();
     pluto->path = plutovg_path_create();
+    pluto->freedstate = NULL;
     pluto->outline_data = NULL;
     pluto->outline_size = 0;
     plutovg_rle_init(&pluto->rle);
