@@ -112,12 +112,13 @@ void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plu
     rle->h = y2 - y1 + 1;
 }
 
+#define ALIGN_SIZE(size) (((size) + 7ul) & ~7ul)
 static void ft_outline_init(PVG_FT_Outline* outline, plutovg_t* pluto, int points, int contours)
 {
-    size_t size_a = (points + contours) * sizeof(PVG_FT_Vector);
-    size_t size_b = (points + contours) * sizeof(char);
-    size_t size_c = contours * sizeof(int);
-    size_t size_d = contours * sizeof(char);
+    size_t size_a = ALIGN_SIZE((points + contours) * sizeof(PVG_FT_Vector));
+    size_t size_b = ALIGN_SIZE((points + contours) * sizeof(char));
+    size_t size_c = ALIGN_SIZE(contours * sizeof(int));
+    size_t size_d = ALIGN_SIZE(contours * sizeof(char));
     size_t size_n = size_a + size_b + size_c + size_d;
     if(size_n > pluto->outline_size) {
         pluto->outline_data = realloc(pluto->outline_data, size_n);
