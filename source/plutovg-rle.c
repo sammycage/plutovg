@@ -3,7 +3,6 @@
 #include "plutovg-ft-raster.h"
 #include "plutovg-ft-stroker.h"
 #include "plutovg-ft-types.h"
-#include "plutovg-ft-math.h"
 
 #include <math.h>
 #include <limits.h>
@@ -13,8 +12,8 @@ void plutovg_rle_init(plutovg_rle_t* rle)
     plutovg_array_init(rle->spans);
     rle->x = 0;
     rle->y = 0;
-    rle->w = 0;
-    rle->h = 0;
+    rle->w = -1;
+    rle->h = -1;
 }
 
 void plutovg_rle_destroy(plutovg_rle_t* rle)
@@ -32,6 +31,38 @@ void plutovg_rle_copy(plutovg_rle_t* rle, const plutovg_rle_t* source)
     rle->y = source->y;
     rle->w = source->w;
     rle->h = source->h;
+}
+
+void plutovg_rle_rect(plutovg_rle_t* rle, plutovg_rect_t* rect)
+{
+    if(rle->w == -1 && rle->h == -1) {
+        if(rle->spans.size == 0) {
+            rle->x = 0;
+            rle->y = 0;
+            rle->w = 0;
+            rle->h = 0;
+        } else {
+            plutovg_span_t* spans = rle->spans.data;
+            int x1 = INT_MAX;
+            int y1 = spans[0].y;
+            int x2 = 0;
+            int y2 = spans[rle->spans.size - 1].y;
+            for(int i = 0;i < rle->spans.size;i++) {
+                if(spans[i].x < x1) x1 = spans[i].x;
+                if(spans[i].x + spans[i].len > x2) x2 = spans[i].x + spans[i].len;
+            }
+
+            rle->x = x1;
+            rle->y = y1;
+            rle->w = x2 - x1;
+            rle->h = y2 - y1 + 1;
+        }
+    }
+
+    rect->x = rle->x;
+    rect->y = rle->y;
+    rect->w = rle->w;
+    rect->h = rle->h;
 }
 
 void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plutovg_rle_t* b)
@@ -87,29 +118,6 @@ void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plu
             ++b_spans;
         }
     }
-
-    if(rle->spans.size == 0) {
-        rle->x = 0;
-        rle->y = 0;
-        rle->w = 0;
-        rle->h = 0;
-        return;
-    }
-
-    plutovg_span_t* spans = rle->spans.data;
-    int x1 = INT_MAX;
-    int y1 = spans[0].y;
-    int x2 = 0;
-    int y2 = spans[rle->spans.size - 1].y;
-    for(int i = 0;i < rle->spans.size;i++) {
-        if(spans[i].x < x1) x1 = spans[i].x;
-        if(spans[i].x + spans[i].len > x2) x2 = spans[i].x + spans[i].len;
-    }
-
-    rle->x = x1;
-    rle->y = y1;
-    rle->w = x2 - x1;
-    rle->h = y2 - y1 + 1;
 }
 
 #define ALIGN_SIZE(size) (((size) + 7ul) & ~7ul)
@@ -344,29 +352,6 @@ void plutovg_rasterize(plutovg_t* pluto, plutovg_rle_t* rle, const plutovg_path_
         params.source = &outline;
         PVG_FT_Raster_Render(&params);
     }
-
-    if(rle->spans.size == 0) {
-        rle->x = 0;
-        rle->y = 0;
-        rle->w = 0;
-        rle->h = 0;
-        return;
-    }
-
-    plutovg_span_t* spans = rle->spans.data;
-    int x1 = INT_MAX;
-    int y1 = spans[0].y;
-    int x2 = 0;
-    int y2 = spans[rle->spans.size - 1].y;
-    for(int i = 0;i < rle->spans.size;i++) {
-        if(spans[i].x < x1) x1 = spans[i].x;
-        if(spans[i].x + spans[i].len > x2) x2 = spans[i].x + spans[i].len;
-    }
-
-    rle->x = x1;
-    rle->y = y1;
-    rle->w = x2 - x1;
-    rle->h = y2 - y1 + 1;
 }
 
 void plutovg_rasterize_rect(plutovg_rle_t* rle, int x, int y, int width, int height)

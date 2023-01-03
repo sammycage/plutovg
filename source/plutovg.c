@@ -598,23 +598,28 @@ void plutovg_fill_extents(plutovg_t* pluto, plutovg_rect_t* rect)
 {
     plutovg_state_t* state = pluto->state;
     plutovg_rasterize(pluto, &pluto->rle, pluto->path, &state->matrix, NULL, NULL, state->winding);
-    plutovg_rect_init(rect, pluto->rle.x, pluto->rle.y, pluto->rle.w, pluto->rle.h);
+    plutovg_rle_rect(&pluto->rle, rect);
 }
 
 void plutovg_stroke_extents(plutovg_t* pluto, plutovg_rect_t* rect)
 {
     plutovg_state_t* state = pluto->state;
     plutovg_rasterize(pluto, &pluto->rle, pluto->path, &state->matrix, NULL, &state->stroke, plutovg_fill_rule_non_zero);
-    plutovg_rect_init(rect, pluto->rle.x, pluto->rle.y, pluto->rle.w, pluto->rle.h);
+    plutovg_rle_rect(&pluto->rle, rect);
 }
 
 void plutovg_clip_extents(plutovg_t* pluto, plutovg_rect_t* rect)
 {
     plutovg_state_t* state = pluto->state;
-    rect->x = state->clipping ? state->clippath.x : pluto->clip.x;
-    rect->y = state->clipping ? state->clippath.y : pluto->clip.y;
-    rect->w = state->clipping ? state->clippath.w : pluto->clip.w;
-    rect->h = state->clipping ? state->clippath.h : pluto->clip.h;
+    if(state->clipping) {
+        plutovg_rle_rect(&state->clippath, rect);
+        return;
+    }
+
+    rect->x = pluto->clip.x;
+    rect->y = pluto->clip.y;
+    rect->w = pluto->clip.w;
+    rect->h = pluto->clip.h;
 }
 
 void plutovg_reset_clip(plutovg_t* pluto)
