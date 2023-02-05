@@ -203,7 +203,6 @@ int plutovg_get_reference_count(const plutovg_t* pluto)
 {
     if(pluto == NULL)
         return 0;
-
     return pluto->ref;
 }
 
@@ -227,53 +226,249 @@ void plutovg_restore(plutovg_t* pluto)
     pluto->freedstate = oldstate;
 }
 
-plutovg_color_t* plutovg_set_rgb(plutovg_t* pluto, double r, double g, double b)
+void plutovg_set_paint_type(const plutovg_t* pluto, plutovg_paint_type_t type)
 {
-    return plutovg_set_rgba(pluto, r, g, b, 1.0);
+    pluto->state->paint.type = plutovg_paint_type_color;
 }
 
-plutovg_color_t* plutovg_set_rgba(plutovg_t* pluto, double r, double g, double b, double a)
+plutovg_paint_type_t plutovg_get_paint_type(const plutovg_t* pluto)
 {
-    plutovg_paint_t* paint = &pluto->state->paint;
-    paint->type = plutovg_paint_type_color;
-    plutovg_color_init_rgba(&paint->color, r, g, b, a);
-    return &paint->color;
+    return pluto->state->paint.type;
 }
 
-plutovg_color_t* plutovg_set_color(plutovg_t* pluto, const plutovg_color_t* color)
+void plutovg_set_rgb(plutovg_t* pluto, double r, double g, double b)
 {
-    return plutovg_set_rgba(pluto, color->r, color->g, color->b, color->a);
+    plutovg_set_rgba(pluto, r, g, b, 1.0);
 }
 
-plutovg_gradient_t* plutovg_set_linear_gradient(plutovg_t* pluto, double x1, double y1, double x2, double y2)
+void plutovg_set_rgba(plutovg_t* pluto, double r, double g, double b, double a)
 {
-    plutovg_paint_t* paint = &pluto->state->paint;
-    paint->type = plutovg_paint_type_gradient;
-    plutovg_gradient_init_linear(&paint->gradient, x1, y1, x2, y2);
-    return &paint->gradient;
+    pluto->state->paint.type = plutovg_paint_type_color;
+    pluto->state->paint.color.r = r;
+    pluto->state->paint.color.g = g;
+    pluto->state->paint.color.b = b;
+    pluto->state->paint.color.a = a;
 }
 
-plutovg_gradient_t* plutovg_set_radial_gradient(plutovg_t* pluto, double cx, double cy, double cr, double fx, double fy, double fr)
+void plutovg_set_color(plutovg_t* pluto, const plutovg_color_t* color)
 {
-    plutovg_paint_t* paint = &pluto->state->paint;
-    paint->type = plutovg_paint_type_gradient;
-    plutovg_gradient_init_radial(&paint->gradient, cx, cy, cr, fx, fy, fr);
-    return &paint->gradient;
+    plutovg_set_rgba(pluto, color->r, color->g, color->b, color->a);
 }
 
-plutovg_texture_t* plutovg_set_texture_surface(plutovg_t* pluto, plutovg_surface_t* surface, double x, double y)
+const plutovg_color_t* plutovg_get_color(const plutovg_t* pluto)
 {
-    plutovg_texture_t* texture = plutovg_set_texture(pluto, surface, plutovg_texture_type_plain);
-    plutovg_matrix_init_translate(&texture->matrix, x, y);
-    return texture;
+    return &pluto->state->paint.color;
 }
 
-plutovg_texture_t* plutovg_set_texture(plutovg_t* pluto, plutovg_surface_t* surface, plutovg_texture_type_t type)
+void plutovg_set_linear_gradient(plutovg_t* pluto, double x1, double y1, double x2, double y2)
 {
-    plutovg_paint_t* paint = &pluto->state->paint;
-    paint->type = plutovg_paint_type_texture;
-    plutovg_texture_init(&paint->texture, surface, type);
-    return &paint->texture;
+    plutovg_set_paint_type(pluto, plutovg_paint_type_gradient);
+    plutovg_set_gradient_type(pluto, plutovg_gradient_type_linear);
+    plutovg_set_gradient_spread(pluto, plutovg_spread_method_pad);
+    plutovg_set_gradient_opacity(pluto, 1.0);
+    plutovg_set_linear_gradient_values(pluto, x1, y1, x2, y2);
+    plutovg_reset_gradient_matrix(pluto);
+    plutovg_clear_gradient_stops(pluto);
+}
+
+void plutovg_set_radial_gradient(plutovg_t* pluto, double cx, double cy, double cr, double fx, double fy, double fr)
+{
+    plutovg_set_paint_type(pluto, plutovg_paint_type_gradient);
+    plutovg_set_gradient_type(pluto, plutovg_gradient_type_radial);
+    plutovg_set_gradient_spread(pluto, plutovg_spread_method_pad);
+    plutovg_set_gradient_opacity(pluto, 1.0);
+    plutovg_set_radial_gradient_values(pluto, cx, cy, cr, fx, fy, fr);
+    plutovg_reset_gradient_matrix(pluto);
+    plutovg_clear_gradient_stops(pluto);
+}
+
+void plutovg_set_gradient_type(const plutovg_t* pluto, plutovg_gradient_type_t type)
+{
+    pluto->state->paint.gradient.type = type;
+}
+
+plutovg_gradient_type_t plutovg_get_gradient_type(const plutovg_t* pluto)
+{
+    return pluto->state->paint.gradient.type;
+}
+
+void plutovg_set_gradient_spread(plutovg_t* pluto, plutovg_spread_method_t spread)
+{
+    pluto->state->paint.gradient.spread = spread;
+}
+
+plutovg_spread_method_t plutovg_get_gradient_spread(const plutovg_t* pluto)
+{
+    return pluto->state->paint.gradient.spread;
+}
+
+void plutovg_set_gradient_matrix(plutovg_t* pluto, const plutovg_matrix_t* matrix)
+{
+    pluto->state->paint.gradient.matrix = *matrix;
+}
+
+void plutovg_reset_gradient_matrix(plutovg_t* pluto)
+{
+    plutovg_matrix_init_identity(&pluto->state->paint.gradient.matrix);
+};
+
+const plutovg_matrix_t* plutovg_get_gradient_matrix(const plutovg_t* pluto)
+{
+    return &pluto->state->paint.gradient.matrix;
+}
+
+void plutovg_set_gradient_opacity(plutovg_t* pluto, double opacity)
+{
+    pluto->state->paint.gradient.opacity = opacity;
+}
+
+double plutovg_get_gradient_opacity(const plutovg_t* pluto)
+{
+    return pluto->state->paint.gradient.opacity;
+}
+
+void plutovg_add_gradient_stop_rgb(plutovg_t* pluto, double offset, double r, double g, double b)
+{
+    plutovg_add_gradient_stop_rgba(pluto, offset, r, g, b, 1);
+}
+
+void plutovg_add_gradient_stop_rgba(plutovg_t* pluto, double offset, double r, double g, double b, double a)
+{
+    if(offset < 0.0) offset = 0.0;
+    if(offset > 1.0) offset = 1.0;
+
+    plutovg_array_ensure(pluto->state->paint.gradient.stops, 1);
+    plutovg_gradient_stop_t* stops = pluto->state->paint.gradient.stops.data;
+    int nstops = pluto->state->paint.gradient.stops.size;
+    int i = 0;
+    for(;i < nstops;i++) {
+        if(offset < stops[i].offset) {
+            memmove(&stops[i+1], &stops[i], (nstops - i) * sizeof(plutovg_gradient_stop_t));
+            break;
+        }
+    }
+
+    plutovg_gradient_stop_t* stop = &stops[i];
+    stop->offset = offset;
+    plutovg_color_init_rgba(&stop->color, r, g, b, a);
+    pluto->state->paint.gradient.stops.size += 1;
+}
+
+void plutovg_add_gradient_stop_color(plutovg_t* pluto, double offset, const plutovg_color_t* color)
+{
+    plutovg_add_gradient_stop_rgba(pluto, offset, color->r, color->g, color->b, color->a);
+}
+
+void plutovg_add_gradient_stop(plutovg_t* pluto, const plutovg_gradient_stop_t* stop)
+{
+    plutovg_add_gradient_stop_color(pluto, stop->offset, &stop->color);
+}
+
+void plutovg_clear_gradient_stops(plutovg_t* pluto)
+{
+    pluto->state->paint.gradient.stops.size = 0;
+}
+
+int plutovg_get_gradient_stop_count(const plutovg_t* pluto)
+{
+    return pluto->state->paint.gradient.stops.size;
+}
+
+const plutovg_gradient_stop_t* plutovg_get_gradient_stop_data(const plutovg_t* pluto)
+{
+    return pluto->state->paint.gradient.stops.data;
+}
+
+void plutovg_set_linear_gradient_values(plutovg_t* pluto, double x1, double y1, double x2, double y2)
+{
+    pluto->state->paint.gradient.values[0] = x1;
+    pluto->state->paint.gradient.values[1] = y1;
+    pluto->state->paint.gradient.values[2] = x2;
+    pluto->state->paint.gradient.values[3] = y2;
+}
+
+void plutovg_set_radial_gradient_values(plutovg_t* pluto, double cx, double cy, double cr, double fx, double fy, double fr)
+{
+    pluto->state->paint.gradient.values[0] = cx;
+    pluto->state->paint.gradient.values[1] = cy;
+    pluto->state->paint.gradient.values[2] = cr;
+    pluto->state->paint.gradient.values[3] = fx;
+    pluto->state->paint.gradient.values[4] = fy;
+    pluto->state->paint.gradient.values[5] = fr;
+}
+
+void plutovg_get_linear_gradient_values(const plutovg_t* pluto, double* x1, double* y1, double* x2, double* y2)
+{
+    if(x1) *x1 = pluto->state->paint.gradient.values[0];
+    if(y1) *y1 = pluto->state->paint.gradient.values[1];
+    if(x2) *x2 = pluto->state->paint.gradient.values[2];
+    if(y2) *y2 = pluto->state->paint.gradient.values[3];
+}
+
+void plutovg_get_radial_gradient_values(const plutovg_t* pluto, double* cx, double* cy, double* cr, double* fx, double* fy, double* fr)
+{
+    if(cx) *cx = pluto->state->paint.gradient.values[0];
+    if(cy) *cy = pluto->state->paint.gradient.values[1];
+    if(cr) *cr = pluto->state->paint.gradient.values[2];
+    if(fx) *fx = pluto->state->paint.gradient.values[3];
+    if(fy) *fy = pluto->state->paint.gradient.values[4];
+    if(fr) *fr = pluto->state->paint.gradient.values[5];
+}
+
+void plutovg_set_texture(plutovg_t* pluto, plutovg_surface_t* surface, plutovg_texture_type_t type, double x, double y)
+{
+    plutovg_set_paint_type(pluto, plutovg_paint_type_texture);
+    plutovg_set_texture_surface(pluto, surface);
+    plutovg_set_texture_type(pluto, type);
+    plutovg_reset_texture_matrix(pluto, x, y);
+    plutovg_set_texture_opacity(pluto, 1.0);
+}
+
+void plutovg_set_texture_surface(plutovg_t* pluto, plutovg_surface_t* surface)
+{
+    surface = plutovg_surface_reference(surface);
+    plutovg_surface_destroy(pluto->state->paint.texture.surface);
+    pluto->state->paint.texture.surface = surface;
+}
+
+plutovg_surface_t* plutovg_get_texture_surface(const plutovg_t* pluto)
+{
+    return pluto->state->paint.texture.surface;
+}
+
+void plutovg_set_texture_type(plutovg_t* pluto, plutovg_texture_type_t type)
+{
+    pluto->state->paint.texture.type = type;
+}
+
+plutovg_texture_type_t plutovg_get_texture_type(const plutovg_t* pluto)
+{
+    return pluto->state->paint.texture.type;
+}
+
+void plutovg_set_texture_matrix(plutovg_t* pluto, const plutovg_matrix_t* matrix)
+{
+    pluto->state->paint.texture.matrix = *matrix;
+}
+
+void plutovg_reset_texture_matrix(plutovg_t* pluto, double x, double y)
+{
+    plutovg_matrix_init_translate(&pluto->state->paint.texture.matrix, -x, -y);
+}
+
+const plutovg_matrix_t* plutovg_get_texture_matrix(const plutovg_t* pluto)
+{
+    return &pluto->state->paint.texture.matrix;
+}
+
+void plutovg_set_texture_opacity(plutovg_t* pluto, double opacity)
+{
+    pluto->state->paint.texture.opacity = opacity;
+}
+
+double plutovg_get_texture_opacity(const plutovg_t* pluto)
+{
+    return pluto->state->paint.texture.opacity;
 }
 
 void plutovg_set_operator(plutovg_t* pluto, plutovg_operator_t op)
@@ -349,10 +544,9 @@ double plutovg_get_miter_limit(const plutovg_t* pluto)
 void plutovg_set_dash(plutovg_t* pluto, double offset, const double* data, int size)
 {
     plutovg_array_ensure(pluto->state->stroke.dash, 1);
-    plutovg_dash_t* dash = &pluto->state->stroke.dash;
-    memcpy(dash->data, data, size * sizeof(double));
-    dash->offset = offset;
-    dash->size = size;
+    memcpy(pluto->state->stroke.dash.data, data, size * sizeof(double));
+    pluto->state->stroke.dash.offset = offset;
+    pluto->state->stroke.dash.size = size;
 }
 
 void plutovg_set_dash_offset(plutovg_t* pluto, double offset)
@@ -363,17 +557,15 @@ void plutovg_set_dash_offset(plutovg_t* pluto, double offset)
 void plutovg_set_dash_data(plutovg_t* pluto, const double* data, int size)
 {
     plutovg_array_ensure(pluto->state->stroke.dash, 1);
-    plutovg_dash_t* dash = &pluto->state->stroke.dash;
-    memcpy(dash->data, data, size * sizeof(double));
-    dash->size = size;
+    memcpy(pluto->state->stroke.dash.data, data, size * sizeof(double));
+    pluto->state->stroke.dash.size = size;
 }
 
 void plutovg_add_dash_data(plutovg_t* pluto, double value)
 {
     plutovg_array_ensure(pluto->state->stroke.dash, 1);
-    plutovg_dash_t* dash = &pluto->state->stroke.dash;
-    dash->data[dash->size] = value;
-    dash->size += 1;
+    pluto->state->stroke.dash.data[pluto->state->stroke.dash.size] = value;
+    pluto->state->stroke.dash.size += 1;
 }
 
 void plutovg_clear_dash_data(plutovg_t* pluto)
@@ -383,20 +575,17 @@ void plutovg_clear_dash_data(plutovg_t* pluto)
 
 double plutovg_get_dash_offset(const plutovg_t* pluto)
 {
-    plutovg_stroke_data_t* stroke = &pluto->state->stroke;
-    return stroke->dash.offset;
+    return pluto->state->stroke.dash.offset;
 }
 
 const double* plutovg_get_dash_data(const plutovg_t* pluto)
 {
-    plutovg_stroke_data_t* stroke = &pluto->state->stroke;
-    return stroke->dash.data;
+    return pluto->state->stroke.dash.data;
 }
 
 int plutovg_get_dash_data_count(const plutovg_t* pluto)
 {
-    plutovg_stroke_data_t* stroke = &pluto->state->stroke;
-    return stroke->dash.size;
+    return pluto->state->stroke.dash.size;
 }
 
 void plutovg_translate(plutovg_t* pluto, double x, double y)

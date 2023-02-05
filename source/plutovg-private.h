@@ -33,7 +33,7 @@ struct plutovg_path {
     } points;
 };
 
-struct plutovg_gradient {
+typedef struct {
     plutovg_gradient_type_t type;
     plutovg_spread_method_t spread;
     plutovg_matrix_t matrix;
@@ -44,22 +44,14 @@ struct plutovg_gradient {
         int size;
         int capacity;
     } stops;
-};
+} plutovg_gradient_t;
 
-struct plutovg_texture {
+typedef struct {
     plutovg_texture_type_t type;
     plutovg_surface_t* surface;
     plutovg_matrix_t matrix;
     double opacity;
-};
-
-typedef int plutovg_paint_type_t;
-
-enum {
-    plutovg_paint_type_color,
-    plutovg_paint_type_gradient,
-    plutovg_paint_type_texture
-};
+} plutovg_texture_t;
 
 typedef struct {
     plutovg_paint_type_t type;
@@ -131,12 +123,6 @@ struct plutovg {
 void plutovg_paint_init(plutovg_paint_t* paint);
 void plutovg_paint_destroy(plutovg_paint_t* paint);
 void plutovg_paint_copy(plutovg_paint_t* paint, const plutovg_paint_t* source);
-
-void plutovg_gradient_copy(plutovg_gradient_t* gradient, const plutovg_gradient_t* source);
-void plutovg_gradient_destroy(plutovg_gradient_t* gradient);
-
-void plutovg_texture_copy(plutovg_texture_t* texture, const plutovg_texture_t* source);
-void plutovg_texture_destroy(plutovg_texture_t* texture);
 
 void plutovg_stroke_data_init(plutovg_stroke_data_t* stroke);
 void plutovg_stroke_data_destroy(plutovg_stroke_data_t* stroke);
