@@ -25,7 +25,9 @@ void plutovg_stroke_data_copy(plutovg_stroke_data_t* strokedata, const plutovg_s
     strokedata->miterlimit = source->miterlimit;
     strokedata->dash.offset = source->dash.offset;
     plutovg_array_ensure(strokedata->dash, source->dash.size);
-    memcpy(strokedata->dash.data, source->dash.data, source->dash.size * sizeof(double));
+    if (strokedata->dash.data != 0) {
+        memcpy(strokedata->dash.data, source->dash.data, source->dash.size * sizeof(double));
+    }
     strokedata->dash.size = source->dash.size;
 }
 

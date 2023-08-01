@@ -30,7 +30,9 @@ static void plutovg_gradient_copy(plutovg_gradient_t* gradient, const plutovg_gr
     gradient->matrix = source->matrix;
     gradient->opacity = source->opacity;
     plutovg_array_ensure(gradient->stops, source->stops.size);
-    memcpy(gradient->stops.data, source->stops.data, source->stops.size * sizeof(plutovg_gradient_stop_t));
+    if (gradient->stops.data != 0) {
+        memcpy(gradient->stops.data, source->stops.data, source->stops.size * sizeof(plutovg_gradient_stop_t));
+    }
     memcpy(gradient->values, source->values, sizeof(source->values));
 }
 
