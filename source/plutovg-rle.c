@@ -25,7 +25,9 @@ void plutovg_rle_copy(plutovg_rle_t* rle, const plutovg_rle_t* source)
 {
     plutovg_array_clear(rle->spans);
     plutovg_array_ensure(rle->spans, source->spans.size);
-    memcpy(rle->spans.data, source->spans.data, source->spans.size * sizeof(plutovg_span_t));
+    if (rle->spans.data != 0) {
+        memcpy(rle->spans.data, source->spans.data, source->spans.size * sizeof(plutovg_span_t));
+    }
     rle->spans.size = source->spans.size;
     rle->x = source->x;
     rle->y = source->y;
