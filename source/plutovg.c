@@ -668,6 +668,11 @@ void plutovg_rect(plutovg_t* pluto, double x, double y, double w, double h)
     plutovg_path_add_rect(pluto->path, x, y, w, h);
 }
 
+void plutovg_pixel(plutovg_t* pluto, double x, double y)
+{
+    plutovg_path_add_pixel(pluto->path, x, y);
+}
+
 void plutovg_round_rect(plutovg_t* pluto, double x, double y, double w, double h, double rx, double ry)
 {
     plutovg_path_add_round_rect(pluto->path, x, y, w, h, rx, ry);
