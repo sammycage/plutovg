@@ -6,6 +6,7 @@
 int main(void) {
     const char *image_path = "/Users/ivan/Desktop/texture.png";
 
+    // TODO: optimize loading if canvas is smaller
     int width, height, channels;
     unsigned char *image_data = stbi_load(image_path, &width, &height, &channels, 0);
 
@@ -22,8 +23,9 @@ int main(void) {
     plutovg_surface_t *surface = plutovg_surface_create(width, height);
     plutovg_t *pluto = plutovg_create(surface);
 
+    // Draw 4 elements texture 4 corners
     plutovg_save(pluto);
-    plutovg_bitmap(pluto, image_data, width, height, channels);
+    plutovg_image(pluto, -width / 2, -height / 2, image_data, width, height, channels);
     plutovg_restore(pluto);
 
     stbi_image_free(image_data);
