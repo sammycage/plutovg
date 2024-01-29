@@ -445,11 +445,6 @@ void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, d
     plutovg_path_close(path);
 }
 
-void plutovg_path_add_pixel(plutovg_path_t* path, double x, double y)
-{
-    plutovg_path_add_rect(path, x, y, 1, 1);
-}
-
 void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry)
 {
     rx = plutovg_min(rx, w * 0.5);

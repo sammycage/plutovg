@@ -98,7 +98,6 @@ void plutovg_path_rel_quad_to(plutovg_path_t* path, double dx1, double dy1, doub
 void plutovg_path_rel_cubic_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3);
 void plutovg_path_rel_arc_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2, double radius);
 void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, double h);
-void plutovg_path_add_pixel(plutovg_path_t* path, double x, double y);
 void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry);
 void plutovg_path_add_ellipse(plutovg_path_t* path, double cx, double cy, double rx, double ry);
 void plutovg_path_add_circle(plutovg_path_t* path, double cx, double cy, double r);
@@ -304,6 +303,7 @@ void plutovg_rel_cubic_to(plutovg_t* pluto, double dx1, double dy1, double dx2, 
 
 void plutovg_rect(plutovg_t* pluto, double x, double y, double w, double h);
 void plutovg_pixel(plutovg_t* pluto, double x, double y);
+void plutovg_bitmap(plutovg_t* pluto, unsigned char* data, int w, int h, int c);
 void plutovg_round_rect(plutovg_t* pluto, double x, double y, double w, double h, double rx, double ry);
 void plutovg_ellipse(plutovg_t* pluto, double cx, double cy, double rx, double ry);
 void plutovg_circle(plutovg_t* pluto, double cx, double cy, double r);

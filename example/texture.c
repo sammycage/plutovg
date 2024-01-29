@@ -22,22 +22,9 @@ int main(void) {
     plutovg_surface_t *surface = plutovg_surface_create(width, height);
     plutovg_t *pluto = plutovg_create(surface);
 
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            plutovg_save(pluto);
-            plutovg_pixel(pluto, j, i);
-
-            unsigned char *pixelOffset = image_data + (j + width * i) * channels;
-            const double r = pixelOffset[0] / 255.0;
-            const double g = pixelOffset[1] / 255.0;
-            const double b = pixelOffset[2] / 255.0;
-            const double a = channels >= 4 ? pixelOffset[3] / 255.0 : 1.0;
-
-            plutovg_set_rgba(pluto, r, g, b, a);
-            plutovg_fill(pluto);
-            plutovg_restore(pluto);
-        }
-    }
+    plutovg_save(pluto);
+    plutovg_bitmap(pluto, image_data, width, height, channels);
+    plutovg_restore(pluto);
 
     stbi_image_free(image_data);
 

@@ -670,7 +670,25 @@ void plutovg_rect(plutovg_t* pluto, double x, double y, double w, double h)
 
 void plutovg_pixel(plutovg_t* pluto, double x, double y)
 {
-    plutovg_path_add_pixel(pluto->path, x, y);
+    plutovg_path_add_rect(pluto->path, x, y, 1, 1);
+}
+
+void plutovg_bitmap(plutovg_t* pluto, unsigned char* data, int w, int h, int c)
+{
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            plutovg_pixel(pluto, j, i);
+
+            unsigned char *pixelOffset = data + (j + w * i) * c;
+            const double r = pixelOffset[0] / 255.0;
+            const double g = pixelOffset[1] / 255.0;
+            const double b = pixelOffset[2] / 255.0;
+            const double a = c >= 4 ? pixelOffset[3] / 255.0 : 1.0;
+
+            plutovg_set_rgba(pluto, r, g, b, a);
+            plutovg_fill(pluto);
+        }
+    }
 }
 
 void plutovg_round_rect(plutovg_t* pluto, double x, double y, double w, double h, double rx, double ry)
