@@ -3,46 +3,47 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define NUM_TEXTURES 4
+
 int main(void) {
-    int width, height, channels;
-    unsigned char *image_data1 = stbi_load("assets/texture1.png", &width, &height, &channels, 0);
-    unsigned char *image_data2 = stbi_load("assets/texture2.png", &width, &height, &channels, 0);
-    unsigned char *image_data3 = stbi_load("assets/texture3.png", &width, &height, &channels, 0);
-    unsigned char *image_data4 = stbi_load("assets/texture4.png", &width, &height, &channels, 0);
-
-    if (!image_data1 || !image_data2 || !image_data3 || !image_data4) {
-        fprintf(stderr, "Error loading textures: %s\n", stbi_failure_reason());
-        return 1;
-    }
-
     // PlutoVG
-    plutovg_surface_t *surface = plutovg_surface_create(width, height);
+    const int canvas_width = 900;
+    const int canvas_height = 900;
+    plutovg_surface_t *surface = plutovg_surface_create(canvas_width, canvas_height);
     plutovg_t *pluto = plutovg_create(surface);
 
-    plutovg_save(pluto);
-    plutovg_image(pluto, -width / 2, -height / 2, image_data1, width, height, channels);
-    plutovg_restore(pluto);
+    // Draw raster textures in 4 corners
+    int positions[NUM_TEXTURES][2] = {{-1, -1},
+                                      {1,  -1},
+                                      {-1, 1},
+                                      {1,  1}};
+    for (int i = 0; i < NUM_TEXTURES; ++i)
+    {
+        char filename[PATH_MAX];
+        sprintf(filename, "assets/texture%d.png", i + 1);
 
-    plutovg_save(pluto);
-    plutovg_image(pluto, width / 2, -height / 2, image_data2, width, height, channels);
-    plutovg_restore(pluto);
+        int width, height, channels;
+        unsigned char *image_data = stbi_load(filename, &width, &height, &channels, 0);
 
-    plutovg_save(pluto);
-    plutovg_image(pluto, -width / 2, height / 2, image_data3, width, height, channels);
-    plutovg_restore(pluto);
+        if (!image_data) {
+            fprintf(stderr, "Error loading textures: %s\n", stbi_failure_reason());
+            return 1;
+        }
 
-    plutovg_save(pluto);
-    plutovg_image(pluto, width / 2, height / 2, image_data4, width, height, channels);
-    plutovg_restore(pluto);
+        const int x = positions[i][0] * width / 2;
+        const int y = positions[i][1] * height / 2;
 
-    stbi_image_free(image_data1);
-    stbi_image_free(image_data2);
-    stbi_image_free(image_data3);
-    stbi_image_free(image_data4);
+        plutovg_save(pluto);
+        plutovg_image(pluto, x, y, image_data, width, height, channels);
+        plutovg_restore(pluto);
 
-    const double center_x = width * 0.5;
-    const double center_y = height * 0.5;
-    const double face_radius = width * 0.25;
+        stbi_image_free(image_data);
+    }
+
+    // Draw vector shapes on top of the textures
+    const double center_x = canvas_width * 0.5;
+    const double center_y = canvas_height * 0.5;
+    const double face_radius = canvas_width * 0.25;
     const double eye_radius = face_radius * 0.1;
     const double mouth_radius = face_radius * 0.7;
     const double eye_offset_x = face_radius * 0.35;
