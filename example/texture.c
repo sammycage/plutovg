@@ -4,31 +4,41 @@
 #include "stb_image.h"
 
 int main(void) {
-    const char *image_path = "/Users/ivan/Desktop/texture.png";
-
-    // TODO: optimize loading if canvas is smaller
     int width, height, channels;
-    unsigned char *image_data = stbi_load(image_path, &width, &height, &channels, 0);
+    unsigned char *image_data1 = stbi_load("assets/texture1.png", &width, &height, &channels, 0);
+    unsigned char *image_data2 = stbi_load("assets/texture2.png", &width, &height, &channels, 0);
+    unsigned char *image_data3 = stbi_load("assets/texture3.png", &width, &height, &channels, 0);
+    unsigned char *image_data4 = stbi_load("assets/texture4.png", &width, &height, &channels, 0);
 
-    if (!image_data) {
-        fprintf(stderr, "Error loading image: %s\n", stbi_failure_reason());
+    if (!image_data1 || !image_data2 || !image_data3 || !image_data4) {
+        fprintf(stderr, "Error loading textures: %s\n", stbi_failure_reason());
         return 1;
     }
-
-    printf("Image width: %d\n", width);
-    printf("Image height: %d\n", height);
-    printf("Number of channels: %d\n", channels);
 
     // PlutoVG
     plutovg_surface_t *surface = plutovg_surface_create(width, height);
     plutovg_t *pluto = plutovg_create(surface);
 
-    // Draw 4 elements texture 4 corners
     plutovg_save(pluto);
-    plutovg_image(pluto, -width / 2, -height / 2, image_data, width, height, channels);
+    plutovg_image(pluto, -width / 2, -height / 2, image_data1, width, height, channels);
     plutovg_restore(pluto);
 
-    stbi_image_free(image_data);
+    plutovg_save(pluto);
+    plutovg_image(pluto, width / 2, -height / 2, image_data2, width, height, channels);
+    plutovg_restore(pluto);
+
+    plutovg_save(pluto);
+    plutovg_image(pluto, -width / 2, height / 2, image_data3, width, height, channels);
+    plutovg_restore(pluto);
+
+    plutovg_save(pluto);
+    plutovg_image(pluto, width / 2, height / 2, image_data4, width, height, channels);
+    plutovg_restore(pluto);
+
+    stbi_image_free(image_data1);
+    stbi_image_free(image_data2);
+    stbi_image_free(image_data3);
+    stbi_image_free(image_data4);
 
     const double center_x = width * 0.5;
     const double center_y = height * 0.5;

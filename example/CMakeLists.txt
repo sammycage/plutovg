@@ -9,3 +9,5 @@ target_link_libraries(smiley plutovg m)
 
 add_executable(texture texture.c)
 target_link_libraries(texture plutovg m)
+
+file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
