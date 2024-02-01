@@ -10,60 +10,12 @@ void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, doubl
     rect->h = h;
 }
 
-void plutovg_rect_init_empty(plutovg_rect_t* rect)
+void plutovg_rect_init_zero(plutovg_rect_t* rect)
 {
-    plutovg_rect_init(rect, 0, 0, 0, 0);
-}
-
-void plutovg_rect_init_invalid(plutovg_rect_t* rect)
-{
-    plutovg_rect_init(rect, 0, 0, -1, -1);
-}
-
-int plutovg_rect_empty(const plutovg_rect_t* rect)
-{
-    return rect->w <= 0.0 || rect->h <= 0.0;
-}
-
-int plutovg_rect_invalid(const plutovg_rect_t* rect)
-{
-    return rect->w < 0.0 || rect->h < 0.0;
-}
-
-void plutovg_rect_unite(plutovg_rect_t* rect, const plutovg_rect_t* source)
-{
-    if(plutovg_rect_invalid(source))
-        return;
-
-    if(plutovg_rect_invalid(rect)) {
-        plutovg_rect_init(rect, source->x, source->y, source->w, source->h);
-        return;
-    }
-
-    double l = plutovg_min(rect->x, source->x);
-    double t = plutovg_min(rect->y, source->y);
-    double r = plutovg_max(rect->x + rect->w, source->x + source->w);
-    double b = plutovg_max(rect->y + rect->h, source->y + source->h);
-
-    plutovg_rect_init(rect, l, t, r - l, b - t);
-}
-
-void plutovg_rect_intersect(plutovg_rect_t* rect, const plutovg_rect_t* source)
-{
-   if(plutovg_rect_invalid(source))
-        return;
-
-    if(plutovg_rect_invalid(rect)) {
-        plutovg_rect_init(rect, source->x, source->y, source->w, source->h);
-        return;
-    }
-
-    double l = plutovg_max(rect->x, source->x);
-    double t = plutovg_max(rect->y, source->y);
-    double r = plutovg_min(rect->x + rect->w, source->x + source->w);
-    double b = plutovg_min(rect->y + rect->h, source->y + source->h);
-
-    plutovg_rect_init(rect, l, t, r - l, b - t);
+    rect->x = 0.0;
+    rect->y = 0.0;
+    rect->w = 0.0;
+    rect->h = 0.0;
 }
 
 void plutovg_matrix_init(plutovg_matrix_t* matrix, double m00, double m10, double m01, double m11, double m02, double m12)
@@ -95,15 +47,7 @@ void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, double x, double y)
     plutovg_matrix_init(matrix, 1.0, tan(y), tan(x), 1.0, 0.0, 0.0);
 }
 
-void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, double radians)
-{
-    double c = cos(radians);
-    double s = sin(radians);
-
-    plutovg_matrix_init(matrix, c, s, -s, c, 0.0, 0.0);
-}
-
-void plutovg_matrix_init_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y)
+void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, double radians, double x, double y)
 {
     double c = cos(radians);
     double s = sin(radians);
@@ -135,17 +79,10 @@ void plutovg_matrix_shear(plutovg_matrix_t* matrix, double x, double y)
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 
-void plutovg_matrix_rotate(plutovg_matrix_t* matrix, double radians)
+void plutovg_matrix_rotate(plutovg_matrix_t* matrix, double radians, double x, double y)
 {
     plutovg_matrix_t m;
-    plutovg_matrix_init_rotate(&m, radians);
-    plutovg_matrix_multiply(matrix, &m, matrix);
-}
-
-void plutovg_matrix_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y)
-{
-    plutovg_matrix_t m;
-    plutovg_matrix_init_rotate_translate(&m, radians, x, y);
+    plutovg_matrix_init_rotate(&m, radians, x, y);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 
@@ -212,7 +149,7 @@ void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_
     double r = p[0].x;
     double b = p[0].y;
 
-    for(int i = 1;i < 4;i++)
+    for(int i = 0;i < 4;i++)
     {
         if(p[i].x < l) l = p[i].x;
         if(p[i].x > r) r = p[i].x;
@@ -240,19 +177,17 @@ plutovg_path_t* plutovg_path_create(void)
 
 plutovg_path_t* plutovg_path_reference(plutovg_path_t* path)
 {
-    if(path == NULL)
-        return NULL;
-
     ++path->ref;
     return path;
 }
 
 void plutovg_path_destroy(plutovg_path_t* path)
 {
-    if(path == NULL)
+    if(path==NULL)
         return;
 
-    if(--path->ref == 0) {
+    if(--path->ref==0)
+    {
         free(path->elements.data);
         free(path->points.data);
         free(path);
@@ -261,9 +196,6 @@ void plutovg_path_destroy(plutovg_path_t* path)
 
 int plutovg_path_get_reference_count(const plutovg_path_t* path)
 {
-    if(path == NULL)
-        return 0;
-
     return path->ref;
 }
 
@@ -273,12 +205,13 @@ void plutovg_path_move_to(plutovg_path_t* path, double x, double y)
     plutovg_array_ensure(path->points, 1);
 
     path->elements.data[path->elements.size] = plutovg_path_element_move_to;
-    path->elements.size += 1;
-    path->contours += 1;
+    plutovg_point_t* points = path->points.data + path->points.size;
+    points[0].x = x;
+    points[0].y = y;
 
-    path->points.data[path->points.size].x = x;
-    path->points.data[path->points.size].y = y;
+    path->elements.size += 1;
     path->points.size += 1;
+    path->contours += 1;
 
     path->start.x = x;
     path->start.y = y;
@@ -290,10 +223,11 @@ void plutovg_path_line_to(plutovg_path_t* path, double x, double y)
     plutovg_array_ensure(path->points, 1);
 
     path->elements.data[path->elements.size] = plutovg_path_element_line_to;
-    path->elements.size += 1;
+    plutovg_point_t* points = path->points.data + path->points.size;
+    points[0].x = x;
+    points[0].y = y;
 
-    path->points.data[path->points.size].x = x;
-    path->points.data[path->points.size].y = y;
+    path->elements.size += 1;
     path->points.size += 1;
 }
 
@@ -315,62 +249,16 @@ void plutovg_path_cubic_to(plutovg_path_t* path, double x1, double y1, double x2
     plutovg_array_ensure(path->points, 3);
 
     path->elements.data[path->elements.size] = plutovg_path_element_cubic_to;
+    plutovg_point_t* points = path->points.data + path->points.size;
+    points[0].x = x1;
+    points[0].y = y1;
+    points[1].x = x2;
+    points[1].y = y2;
+    points[2].x = x3;
+    points[2].y = y3;
+
     path->elements.size += 1;
-
-    path->points.data[path->points.size].x = x1;
-    path->points.data[path->points.size].y = y1;
-    path->points.size += 1;
-
-    path->points.data[path->points.size].x = x2;
-    path->points.data[path->points.size].y = y2;
-    path->points.size += 1;
-
-    path->points.data[path->points.size].x = x3;
-    path->points.data[path->points.size].y = y3;
-    path->points.size += 1;
-}
-
-void plutovg_path_arc_to(plutovg_path_t* path, double x1, double y1, double x2, double y2, double radius)
-{
-    double x0, y0;
-    plutovg_path_get_current_point(path, &x0, &y0);
-    if((x0 == x1 && y0 == y1) || (x1 == x2 && y1 == y2) || radius == 0.0) {
-        plutovg_path_line_to(path, x1, y2);
-        return;
-    }
-
-    double dir = (x2 - x1) * (y0 - y1) + (y2 - y1) * (x1 - x0);
-    if(dir == 0.0) {
-        plutovg_path_line_to(path, x1, y2);
-        return;
-    }
-
-    double a2 = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
-    double b2 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-    double c2 = (x0 - x2) * (x0 - x2) + (y0 - y2) * (y0 - y2);
-
-    double cosx = (a2 + b2 - c2) / (2 * sqrt(a2 * b2));
-    double sinx = sqrt(1 - cosx * cosx);
-    double d = radius / ((1 - cosx) / sinx);
-
-    double anx = (x1 - x0) / sqrt(a2);
-    double any = (y1 - y0) / sqrt(a2);
-    double bnx = (x1 - x2) / sqrt(b2);
-    double bny = (y1 - y2) / sqrt(b2);
-
-    double x3 = x1 - anx * d;
-    double y3 = y1 - any * d;
-    double x4 = x1 - bnx * d;
-    double y4 = y1 - bny * d;
-
-    int ccw = dir < 0.0;
-    double cx = x3 + any * radius * (ccw ? 1 : -1);
-    double cy = y3 - anx * radius * (ccw ? 1 : -1);
-    double a0 = atan2(y3 - cy, x3 - cx);
-    double a1 = atan2(y4 - cy, x4 - cx);
-
-    plutovg_path_line_to(path, x3, y3);
-    plutovg_path_add_arc(path, cx, cy, radius, a0, a1, ccw);
+    path->points.size += 3;
 }
 
 void plutovg_path_close(plutovg_path_t* path)
@@ -385,10 +273,11 @@ void plutovg_path_close(plutovg_path_t* path)
     plutovg_array_ensure(path->points, 1);
 
     path->elements.data[path->elements.size] = plutovg_path_element_close;
-    path->elements.size += 1;
+    plutovg_point_t* points = path->points.data + path->points.size;
+    points[0].x = path->start.x;
+    points[0].y = path->start.y;
 
-    path->points.data[path->points.size].x = path->start.x;
-    path->points.data[path->points.size].y = path->start.y;
+    path->elements.size += 1;
     path->points.size += 1;
 }
 
@@ -401,38 +290,31 @@ static inline void rel_to_abs(const plutovg_path_t* path, double* x, double* y)
     *y += _y;
 }
 
-void plutovg_path_rel_move_to(plutovg_path_t* path, double dx, double dy)
+void plutovg_path_rel_move_to(plutovg_path_t* path, double x, double y)
 {
-    rel_to_abs(path, &dx, &dy);
-    plutovg_path_move_to(path, dx, dy);
+    rel_to_abs(path, &x, &y);
+    plutovg_path_move_to(path, x, y);
 }
 
-void plutovg_path_rel_line_to(plutovg_path_t* path, double dx, double dy)
+void plutovg_path_rel_line_to(plutovg_path_t* path, double x, double y)
 {
-    rel_to_abs(path, &dx, &dy);
-    plutovg_path_line_to(path, dx, dy);
+    rel_to_abs(path, &x, &y);
+    plutovg_path_line_to(path, x, y);
 }
 
-void plutovg_path_rel_quad_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2)
+void plutovg_path_rel_quad_to(plutovg_path_t* path, double x1, double y1, double x2, double y2)
 {
-    rel_to_abs(path, &dx1, &dy1);
-    rel_to_abs(path, &dx2, &dy2);
-    plutovg_path_quad_to(path, dx1, dy1, dx2, dy2);
+    rel_to_abs(path, &x1, &y1);
+    rel_to_abs(path, &x2, &y2);
+    plutovg_path_quad_to(path, x1, y1, x2, y2);
 }
 
-void plutovg_path_rel_cubic_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3)
+void plutovg_path_rel_cubic_to(plutovg_path_t* path, double x1, double y1, double x2, double y2, double x3, double y3)
 {
-    rel_to_abs(path, &dx1, &dy1);
-    rel_to_abs(path, &dx2, &dy2);
-    rel_to_abs(path, &dx3, &dy3);
-    plutovg_path_cubic_to(path, dx1, dy1, dx2, dy2, dx3, dy3);
-}
-
-void plutovg_path_rel_arc_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2, double radius)
-{
-    rel_to_abs(path, &dx1, &dy1);
-    rel_to_abs(path, &dx2, &dy2);
-    plutovg_path_arc_to(path, dx1, dy1, dx2, dy2, radius);
+    rel_to_abs(path, &x1, &y1);
+    rel_to_abs(path, &x2, &y2);
+    rel_to_abs(path, &x3, &y3);
+    plutovg_path_cubic_to(path, x1, y1, x2, y2, x3, y3);
 }
 
 void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, double h)
@@ -447,9 +329,6 @@ void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, d
 
 void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry)
 {
-    rx = plutovg_min(rx, w * 0.5);
-    ry = plutovg_min(ry, h * 0.5);
-
     double right = x + w;
     double bottom = y + h;
 
@@ -544,7 +423,8 @@ void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, c
     plutovg_point_t* points = path->points.data + path->points.size;
     const plutovg_point_t* data = source->points.data;
     const plutovg_point_t* end = data + source->points.size;
-    while(data < end) {
+    while(data < end)
+    {
         if(matrix)
             plutovg_matrix_map_point(matrix, data, points);
         else
@@ -555,7 +435,7 @@ void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, c
     }
 
     plutovg_path_element_t* elements = path->elements.data + path->elements.size;
-    memcpy(elements, source->elements.data, source->elements.size * sizeof(plutovg_path_element_t));
+    memcpy(elements, source->elements.data, (size_t)source->elements.size * sizeof(plutovg_path_element_t));
 
     path->elements.size += source->elements.size;
     path->points.size += source->points.size;
@@ -567,7 +447,8 @@ void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix
 {
     plutovg_point_t* points = path->points.data;
     plutovg_point_t* end = points + path->points.size;
-    while(points < end) {
+    while(points < end)
+    {
         plutovg_matrix_map_point(matrix, points, points);
         points += 1;
     }
@@ -575,14 +456,14 @@ void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix
 
 void plutovg_path_get_current_point(const plutovg_path_t* path, double* x, double* y)
 {
-    if(x) *x = 0.0;
-    if(y) *y = 0.0;
+    *x = 0.0;
+    *y = 0.0;
 
     if(path->points.size == 0)
         return;
 
-    if(x) *x = path->points.data[path->points.size - 1].x;
-    if(y) *y = path->points.data[path->points.size - 1].y;
+    *x = path->points.data[path->points.size - 1].x;
+    *y = path->points.data[path->points.size - 1].y;
 }
 
 int plutovg_path_get_element_count(const plutovg_path_t* path)
@@ -678,22 +559,29 @@ static void flatten(plutovg_path_t* path, const plutovg_point_t* p0, const pluto
     const double threshold = 0.25;
 
     bezier_t* b = beziers;
-    while(b >= beziers) {
+    while(b >= beziers)
+    {
         double y4y1 = b->y4 - b->y1;
         double x4x1 = b->x4 - b->x1;
         double l = fabs(x4x1) + fabs(y4y1);
         double d;
-        if(l > 1.0) {
+        if(l > 1.0)
+        {
             d = fabs((x4x1)*(b->y1 - b->y2) - (y4y1)*(b->x1 - b->x2)) + fabs((x4x1)*(b->y1 - b->y3) - (y4y1)*(b->x1 - b->x3));
-        } else {
+        }
+        else
+        {
             d = fabs(b->x1 - b->x2) + fabs(b->y1 - b->y2) + fabs(b->x1 - b->x3) + fabs(b->y1 - b->y3);
             l = 1.0;
         }
 
-        if(d < threshold*l || b == beziers + 31) {
+        if(d < threshold*l || b == beziers + 31)
+        {
             plutovg_path_line_to(path, b->x4, b->y4);
             --b;
-        } else {
+        }
+        else
+        {
             split(b, b+1, b);
             ++b;
         }
@@ -706,18 +594,25 @@ plutovg_path_t* plutovg_path_clone_flat(const plutovg_path_t* path)
     plutovg_array_ensure(result->elements, path->elements.size);
     plutovg_array_ensure(result->points, path->points.size);
     plutovg_point_t* points = path->points.data;
-    for(int i = 0;i < path->elements.size;i++) {
-        switch(path->elements.data[i]) {
+
+    for(int i = 0;i < path->elements.size;i++)
+    {
+        switch(path->elements.data[i])
+        {
         case plutovg_path_element_move_to:
             plutovg_path_move_to(result, points[0].x, points[0].y);
             points += 1;
             break;
         case plutovg_path_element_line_to:
+            plutovg_path_line_to(result, points[0].x, points[0].y);
+            points += 1;
+            break;
         case plutovg_path_element_close:
             plutovg_path_line_to(result, points[0].x, points[0].y);
             points += 1;
             break;
-        case plutovg_path_element_cubic_to: {
+        case plutovg_path_element_cubic_to:
+        {
             plutovg_point_t p0;
             plutovg_path_get_current_point(result, &p0.x, &p0.y);
             flatten(result, &p0, points, points + 1, points + 2);
