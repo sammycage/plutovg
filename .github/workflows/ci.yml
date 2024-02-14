@@ -1,0 +1,53 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+    - main
+
+  pull_request:
+    branches:
+    - main
+    - feature/*
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-12, ubuntu-22.04, windows-2022]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure
+      shell: pwsh
+      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+        "-DCMAKE_INSTALL_PREFIX:PATH=$pwd/prefix"
+
+    - name: Build
+      run: cmake --build build --config Debug -j 2
+
+    - name: Install
+      run: cmake --install build --config Debug --prefix prefix
+
+    - name: Example configure
+      working-directory: example
+      shell: pwsh
+      run: |
+        Copy-Item ../CMakePresets.json .
+        cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])" `
+          "-DCMAKE_PREFIX_PATH=$pwd/../prefix" `
+          "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=$pwd/build"
+
+    - name: Example build
+      working-directory: example
+      run: cmake --build build --config Debug -j 2
+
+    - name: Example run
+      working-directory: example/build
+      shell: pwsh
+      run: |
+        ./smiley
+        file smiley.png

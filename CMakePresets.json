@@ -1,0 +1,114 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "cmake-pedantic",
+      "hidden": true,
+      "warnings": {
+        "dev": true,
+        "deprecated": true,
+        "uninitialized": true,
+        "unusedCli": true,
+        "systemVars": false
+      },
+      "errors": {
+        "dev": true,
+        "deprecated": true
+      }
+    },
+    {
+      "name": "ci-std",
+      "description": "This preset makes sure the project actually builds with at least the specified standard",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_EXTENSIONS": "OFF",
+        "CMAKE_C_STANDARD": "99",
+        "CMAKE_C_STANDARD_REQUIRED": "ON"
+      }
+    },
+    {
+      "name": "flags-gcc-clang",
+      "description": "These flags are supported by both GCC and Clang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS=1 -fstack-protector-strong -fcf-protection=full -fstack-clash-protection -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough -Werror=strict-prototypes -Wwrite-strings",
+        "CMAKE_EXE_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now,-z,nodlopen"
+      }
+    },
+    {
+      "name": "flags-appleclang",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-fstack-protector-strong -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough -Werror=strict-prototypes -Wwrite-strings"
+      }
+    },
+    {
+      "name": "flags-msvc",
+      "description": "Note that all the flags after /W4 are required for MSVC to conform to the language standard",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "/sdl /guard:cf /utf-8 /diagnostics:caret /w14165 /w44242 /w44254 /w34287 /w44296 /w44365 /w44388 /w44464 /w14545 /w14546 /w14547 /w14549 /w14555 /w34619 /w44774 /w44777 /w24826 /w14905 /w14906 /w14928 /W4 /permissive- /volatile:iso /Zc:inline /Zc:preprocessor",
+        "CMAKE_EXE_LINKER_FLAGS": "/machine:x64 /guard:cf"
+      }
+    },
+    {
+      "name": "ci-linux",
+      "generator": "Unix Makefiles",
+      "hidden": true,
+      "inherits": ["flags-gcc-clang", "ci-std"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "ci-darwin",
+      "generator": "Unix Makefiles",
+      "hidden": true,
+      "inherits": ["flags-appleclang", "ci-std"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "ci-win64",
+      "inherits": ["flags-msvc", "ci-std"],
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "hidden": true
+    },
+    {
+      "name": "ci-build",
+      "binaryDir": "${sourceDir}/build",
+      "hidden": true,
+      "cacheVariables": {
+        "BUILD_EXAMPLE": "ON"
+      }
+    },
+    {
+      "name": "ci-macos",
+      "inherits": ["ci-build", "ci-darwin", "cmake-pedantic"],
+      "cacheVariables": {
+        "HAVE_LIBM": "NO"
+      }
+    },
+    {
+      "name": "ci-ubuntu",
+      "inherits": ["ci-build", "ci-linux", "cmake-pedantic"],
+      "cacheVariables": {
+        "HAVE_LIBM": "YES"
+      }
+    },
+    {
+      "name": "ci-windows",
+      "inherits": ["ci-build", "ci-win64", "cmake-pedantic"],
+      "cacheVariables": {
+        "HAVE_LIBM": "NO"
+      }
+    }
+  ]
+}

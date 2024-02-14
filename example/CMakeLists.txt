@@ -1,8 +1,12 @@
-cmake_minimum_required(VERSION 3.3)
-
-set(CMAKE_C_STANDARD 99)
+cmake_minimum_required(VERSION 3.8)
 
 project(smiley C)
 
+include(../cmake/top.cmake)
+
+if(PROJECT_IS_TOP_LEVEL)
+  find_package(plutovg REQUIRED)
+endif()
+
 add_executable(smiley smiley.c)
-target_link_libraries(smiley plutovg m)
+target_link_libraries(smiley PRIVATE plutovg::plutovg)
