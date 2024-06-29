@@ -91,6 +91,7 @@ void plutovg_rle_add_rect(plutovg_rle_t* rle, int x, int y, int width, int heigh
         rle->w = width;
         rle->h = height;
         rle->spans.size = height;
+        return;
     }
 
     plutovg_rle_update_extents(rle);

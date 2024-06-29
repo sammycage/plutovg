@@ -1,5 +1,6 @@
 #include "plutovg-private.h"
 
+#include <assert.h>
 #include <stdint.h>
 #include <limits.h>
 #include <math.h>
@@ -479,9 +480,13 @@ static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_
             const uint32_t* end = buffer + l;
             uint32_t* b = buffer;
             while(b < end) {
-                int px = plutovg_clamp(x >> 16, 0, image_width - 1);
-                int py = plutovg_clamp(y >> 16, 0, image_height - 1);
-                *b = ((const uint32_t*)(texture->data + py * texture->stride))[px];
+                int px = x >> 16;
+                int py = y >> 16;
+                if((px < 0) || (px >= image_width) || (py < 0) || (py >= image_height)) {
+                    *b = 0x00000000;
+                } else {
+                    *b = ((const uint32_t*)(texture->data + py * texture->stride))[px];
+                }
 
                 x += fdx;
                 y += fdy;
@@ -611,26 +616,21 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
             int l = plutovg_min(length, BUFFER_SIZE);
             const uint32_t* end = buffer + l;
             uint32_t* b = buffer;
-            int px16 = x % (image_width << 16);
-            int py16 = y % (image_height << 16);
-            int px_delta = fdx % (image_width << 16);
-            int py_delta = fdy % (image_height << 16);
             while(b < end) {
-                if(px16 < 0) px16 += image_width << 16;
-                if(py16 < 0) py16 += image_height << 16;
-                int px = px16 >> 16;
-                int py = py16 >> 16;
+                int px = x >> 16;
+                int py = y >> 16;
+                px %= image_width;
+                py %= image_height;
+                if(px < 0) px += image_width;
+                if(py < 0) py += image_height;
                 int y_offset = py * scanline_offset;
+
+                assert(px >= 0 && px < image_width);
+                assert(py >= 0 && py < image_height);
 
                 *b = image_bits[y_offset + px];
                 x += fdx;
                 y += fdy;
-                px16 += px_delta;
-                if(px16 >= image_width << 16)
-                    px16 -= image_width << 16;
-                py16 += py_delta;
-                if(py16 >= image_height << 16)
-                    py16 -= image_height << 16;
                 ++b;
             }
 

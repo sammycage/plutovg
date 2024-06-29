@@ -80,9 +80,9 @@ void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg_matrix_t* l
 bool plutovg_matrix_invert(const plutovg_matrix_t* matrix, plutovg_matrix_t* inverse)
 {
     float det = (matrix->a * matrix->d - matrix->b * matrix->c);
-    if(det == 0.0)
+    if(det == 0.f)
         return false;
-    float inv_det = 1.0 / det;
+    float inv_det = 1.f / det;
     float a = matrix->a * inv_det;
     float b = matrix->b * inv_det;
     float c = matrix->c * inv_det;

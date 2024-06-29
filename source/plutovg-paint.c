@@ -22,8 +22,12 @@ plutovg_paint_t* plutovg_paint_create_color(const plutovg_color_t* color)
     return plutovg_paint_create_rgba(color->r, color->g, color->b, color->a);
 }
 
+static const plutovg_matrix_t PLUTOVG_IDENTITY_MATRIX = {1, 0, 0, 1, 0, 0};
+
 plutovg_paint_t* plutovg_paint_create_linear_gradient(float x1, float y1, float x2, float y2, plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix)
 {
+    if(matrix == NULL)
+        matrix = &PLUTOVG_IDENTITY_MATRIX;
     plutovg_paint_t* paint = malloc(sizeof(plutovg_paint_t));
     paint->ref_count = 1;
     paint->type = PLUTOVG_PAINT_TYPE_GRADIENT;
@@ -41,6 +45,8 @@ plutovg_paint_t* plutovg_paint_create_linear_gradient(float x1, float y1, float 
 
 plutovg_paint_t* plutovg_paint_create_radial_gradient(float cx, float cy, float cr, float fx, float fy, float fr, plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix)
 {
+    if(matrix == NULL)
+        matrix = &PLUTOVG_IDENTITY_MATRIX;
     plutovg_paint_t* paint = malloc(sizeof(plutovg_paint_t));
     paint->ref_count = 1;
     paint->type = PLUTOVG_PAINT_TYPE_GRADIENT;
@@ -60,6 +66,8 @@ plutovg_paint_t* plutovg_paint_create_radial_gradient(float cx, float cy, float 
 
 plutovg_paint_t* plutovg_paint_create_texture(plutovg_surface_t* surface, plutovg_texture_type_t type, float opacity, const plutovg_matrix_t* matrix)
 {
+    if(matrix == NULL)
+        matrix = &PLUTOVG_IDENTITY_MATRIX;
     plutovg_paint_t* paint = malloc(sizeof(plutovg_paint_t));
     paint->ref_count = 1;
     paint->type = PLUTOVG_PAINT_TYPE_TEXTURE;
