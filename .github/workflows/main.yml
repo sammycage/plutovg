@@ -22,6 +22,8 @@ jobs:
   macos:
     runs-on: macos-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -33,13 +35,14 @@ jobs:
           
       - name: Setup and Build
         run: |
-          ls .
           meson setup build
           meson compile -C build
           
   windows:
     runs-on: windows-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -51,6 +54,5 @@ jobs:
           
       - name: Setup and Build
         run: |
-          ls .
           meson setup build
           meson compile -C build
