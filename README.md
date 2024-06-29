@@ -10,7 +10,7 @@ PlutoVG is a standalone 2D vector graphics library in C.
 
 ## Example
 ```c
-#include "plutovg.h"
+#include <plutovg.h>
 
 int main(void)
 {
