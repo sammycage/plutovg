@@ -58,7 +58,7 @@ typedef enum {
     PLUTOVG_PAINT_TYPE_TEXTURE
 } plutovg_paint_type_t;
 
-typedef struct plutovg_paint {
+struct plutovg_paint {
     int ref_count;
     plutovg_paint_type_t type;
     union {
@@ -66,7 +66,7 @@ typedef struct plutovg_paint {
         plutovg_gradient_t gradient;
         plutovg_texture_t texture;
     } data;
-} plutovg_paint_t;
+};
 
 typedef struct {
     int x;
