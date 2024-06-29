@@ -1,15 +1,3 @@
-# PlutoVG
-PlutoVG is a standalone 2D vector graphics library in C.
-
-## Features
-- Path Filling, Stroking and Dashing
-- Soild, Gradient and Texture Paints
-- Clipping and Compositing
-- Transformations
-- Images
-
-## Example
-```c
 #include "plutovg.h"
 
 int main(void)
@@ -60,27 +48,3 @@ int main(void)
     plutovg_canvas_destroy(canvas);
     return 0;
 }
-```
-
-output :
-
-![smiley.png](smiley.png)
-
-## Installation
-
-Ensure you have [Meson](http://mesonbuild.com) and [Ninja](http://ninja-build.org) installed.
-
-```bash
-git clone https://github.com/sammycage/plutovg.git
-cd plutovg
-meson setup build
-ninja -C build
-ninja -C build install
-```
-
-## Projects using PlutoVG
-- [LunaSVG](https://github.com/sammycage/lunasvg)
-- [PlutoSVG](https://github.com/sammycage/plutosvg)
-
-## Support
-If you like what we do, [you can buy us a coffee](https://www.paypal.me/sammycage)

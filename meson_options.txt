@@ -1,0 +1,6 @@
+option('curl', type : 'feature', value : 'auto')
+option('turbojpeg', type : 'feature', value : 'auto')
+option('webp', type : 'feature', value : 'auto')
+
+option('examples', type : 'feature', value : 'auto')
+option('tests', type : 'feature', value : 'auto')

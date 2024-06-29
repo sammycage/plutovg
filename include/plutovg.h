@@ -1,332 +1,309 @@
 #ifndef PLUTOVG_H
 #define PLUTOVG_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#if !defined(PLUTOVG_BUILD_STATIC) && (defined(_WIN32) || defined(__CYGWIN__))
+#define PLUTOVG_EXPORT __declspec(dllexport)
+#define PLUTOVG_IMPORT __declspec(dllimport)
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
+#define PLUTOVG_EXPORT __attribute__((__visibility__("default")))
+#define PLUTOVG_IMPORT
+#else
+#define PLUTOVG_EXPORT
+#define PLUTOVG_IMPORT
+#endif
+
+#ifdef PLUTOVG_BUILD
+#define PLUTOVG_API PLUTOVG_EXPORT
+#else
+#define PLUTOVG_API PLUTOVG_IMPORT
+#endif
+
+#define PLUTOVG_VERSION_MAJOR 0
+#define PLUTOVG_VERSION_MINOR 0
+#define PLUTOVG_VERSION_MICRO 1
+
+#define PLUTOVG_VERSION_ENCODE(major, minor, micro) (((major) * 10000) + ((minor) * 100) + ((micro) * 1))
+#define PLUTOVG_VERSION PLUTOVG_VERSION_ENCODE(PLUTOVG_VERSION_MAJOR, PLUTOVG_VERSION_MINOR, PLUTOVG_VERSION_MICRO)
+
+#define PLUTOVG_VERSION_XSTRINGIZE(major, minor, micro) #major"."#minor"."#micro
+#define PLUTOVG_VERSION_STRINGIZE(major, minor, micro) PLUTOVG_VERSION_XSTRINGIZE(major, minor, micro)
+#define PLUTOVG_VERSION_STRING PLUTOVG_VERSION_STRINGIZE(PLUTOVG_VERSION_MAJOR, PLUTOVG_VERSION_MINOR, PLUTOVG_VERSION_MICRO)
+
+PLUTOVG_API int plutovg_version(void);
+PLUTOVG_API const char* plutovg_version_string(void);
+
+typedef struct plutovg_point {
+    float x;
+    float y;
+} plutovg_point_t;
+
+typedef struct plutovg_rect {
+    float x;
+    float y;
+    float w;
+    float h;
+} plutovg_rect_t;
+
+typedef struct plutovg_matrix {
+    float a;
+    float b;
+    float c;
+    float d;
+    float e;
+    float f;
+} plutovg_matrix_t;
+
+PLUTOVG_API void plutovg_matrix_init(plutovg_matrix_t* matrix, float a, float b, float c, float d, float e, float f);
+PLUTOVG_API void plutovg_matrix_init_identity(plutovg_matrix_t* matrix);
+PLUTOVG_API void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float x, float y);
+PLUTOVG_API void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float x, float y);
+PLUTOVG_API void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float x, float y);
+PLUTOVG_API void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float radians);
+PLUTOVG_API void plutovg_matrix_translate(plutovg_matrix_t* matrix, float x, float y);
+PLUTOVG_API void plutovg_matrix_scale(plutovg_matrix_t* matrix, float x, float y);
+PLUTOVG_API void plutovg_matrix_shear(plutovg_matrix_t* matrix, float x, float y);
+PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float radians);
+PLUTOVG_API void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg_matrix_t* left, const plutovg_matrix_t* right);
+PLUTOVG_API bool plutovg_matrix_invert(const plutovg_matrix_t* matrix, plutovg_matrix_t* inverse);
+PLUTOVG_API void plutovg_matrix_map(const plutovg_matrix_t* matrix, float x, float y, float* xx, float* yy);
+PLUTOVG_API void plutovg_matrix_map_point(const plutovg_matrix_t* matrix, const plutovg_point_t* src, plutovg_point_t* dst);
+PLUTOVG_API void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst);
+
+typedef struct plutovg_path plutovg_path_t;
+
+typedef enum plutovg_path_command {
+    PLUTOVG_PATH_COMMAND_MOVE_TO,
+    PLUTOVG_PATH_COMMAND_LINE_TO,
+    PLUTOVG_PATH_COMMAND_CURVE_TO,
+    PLUTOVG_PATH_COMMAND_CLOSE
+} plutovg_path_command_t;
+
+typedef union plutovg_path_element {
+    struct {
+        plutovg_path_command_t command;
+        int length;
+    } header;
+    plutovg_point_t point;
+} plutovg_path_element_t;
+
+typedef struct plutovg_path_iterator {
+    const plutovg_path_element_t* elements;
+    int nelements;
+    int element_index;
+} plutovg_path_iterator_t;
+
+PLUTOVG_API void plutovg_path_iterator_init(plutovg_path_iterator_t* it, const plutovg_path_t* path);
+PLUTOVG_API bool plutovg_path_iterator_has_next(const plutovg_path_iterator_t* it);
+PLUTOVG_API plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_iterator_t* it, plutovg_point_t points[3]);
+
+PLUTOVG_API plutovg_path_t* plutovg_path_create(void);
+PLUTOVG_API void plutovg_path_move_to(plutovg_path_t* path, float x, float y);
+PLUTOVG_API void plutovg_path_line_to(plutovg_path_t* path, float x, float y);
+PLUTOVG_API void plutovg_path_curve_to(plutovg_path_t* path, float x1, float y1, float x2, float y2, float x3, float y3);
+PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
+PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y);
+PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int nelements);
+PLUTOVG_API void plutovg_path_reset(plutovg_path_t* path);
+PLUTOVG_API void plutovg_path_add_rect(plutovg_path_t* path, float x, float y, float w, float h);
+PLUTOVG_API void plutovg_path_add_round_rect(plutovg_path_t* path, float x, float y, float w, float h, float rx, float ry);
+PLUTOVG_API void plutovg_path_add_ellipse(plutovg_path_t* path, float cx, float cy, float rx, float ry);
+PLUTOVG_API void plutovg_path_add_circle(plutovg_path_t* path, float cx, float cy, float r);
+PLUTOVG_API void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, float r, float a0, float a1, bool ccw);
+PLUTOVG_API void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, const plutovg_matrix_t* matrix);
+PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix);
+
+PLUTOVG_API int plutovg_path_get_elements(const plutovg_path_t* path, const plutovg_path_element_t** elements);
+PLUTOVG_API plutovg_path_t* plutovg_path_reference(plutovg_path_t* path);
+PLUTOVG_API void plutovg_path_destroy(plutovg_path_t* path);
+PLUTOVG_API int plutovg_path_get_reference_count(const plutovg_path_t* path);
+
+typedef void (*plutovg_path_traverse_func_t)(void* closure, plutovg_path_command_t command, const plutovg_point_t* points, int npoints);
+
+PLUTOVG_API void plutovg_path_traverse(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure);
+PLUTOVG_API void plutovg_path_traverse_flatten(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure);
+PLUTOVG_API void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes, plutovg_path_traverse_func_t traverse_func, void* closure);
+
+PLUTOVG_API float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents);
+PLUTOVG_API float plutovg_path_length(const plutovg_path_t* path);
+
+PLUTOVG_API plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path);
+PLUTOVG_API plutovg_path_t* plutovg_path_clone_flatten(const plutovg_path_t* path);
+PLUTOVG_API plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes);
 
 /**
  * @note plutovg_surface_t format is ARGB32_Premultiplied.
  */
 typedef struct plutovg_surface plutovg_surface_t;
 
-plutovg_surface_t* plutovg_surface_create(int width, int height);
-plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int width, int height, int stride);
-plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface);
-void plutovg_surface_destroy(plutovg_surface_t* surface);
-int plutovg_surface_get_reference_count(const plutovg_surface_t* surface);
-unsigned char* plutovg_surface_get_data(const plutovg_surface_t* surface);
-int plutovg_surface_get_width(const plutovg_surface_t* surface);
-int plutovg_surface_get_height(const plutovg_surface_t* surface);
-int plutovg_surface_get_stride(const plutovg_surface_t* surface);
-void plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename);
+PLUTOVG_API plutovg_surface_t* plutovg_surface_create(int width, int height);
+PLUTOVG_API plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int width, int height, int stride);
 
-typedef struct plutovg_point plutovg_point_t;
+PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename);
+PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, unsigned int length);
 
-struct plutovg_point {
-    double x;
-    double y;
-};
+PLUTOVG_API plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface);
+PLUTOVG_API void plutovg_surface_destroy(plutovg_surface_t* surface);
+PLUTOVG_API int plutovg_surface_get_reference_count(const plutovg_surface_t* surface);
 
-typedef struct plutovg_rect plutovg_rect_t;
+PLUTOVG_API unsigned char* plutovg_surface_get_data(const plutovg_surface_t* surface);
+PLUTOVG_API int plutovg_surface_get_width(const plutovg_surface_t* surface);
+PLUTOVG_API int plutovg_surface_get_height(const plutovg_surface_t* surface);
+PLUTOVG_API int plutovg_surface_get_stride(const plutovg_surface_t* surface);
 
-struct plutovg_rect {
-    double x;
-    double y;
-    double w;
-    double h;
-};
+PLUTOVG_API bool plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename);
+PLUTOVG_API bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* filename, int quality);
 
-void plutovg_rect_init(plutovg_rect_t* rect, double x, double y, double w, double h);
-void plutovg_rect_init_empty(plutovg_rect_t* rect);
-void plutovg_rect_init_invalid(plutovg_rect_t* rect);
-int plutovg_rect_empty(const plutovg_rect_t* rect);
-int plutovg_rect_invalid(const plutovg_rect_t* rect);
-void plutovg_rect_unite(plutovg_rect_t* rect, const plutovg_rect_t* source);
-void plutovg_rect_intersect(plutovg_rect_t* rect, const plutovg_rect_t* source);
+typedef void (*plutovg_stream_write_func_t)(void* closure, void* data, int size);
 
-typedef struct plutovg_matrix plutovg_matrix_t;
+PLUTOVG_API bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_stream_write_func_t write_func, void* closure);
+PLUTOVG_API bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_stream_write_func_t write_func, void* closure, int quality);
 
-struct plutovg_matrix {
-    double m00; double m10;
-    double m01; double m11;
-    double m02; double m12;
-};
+typedef struct plutovg_color {
+    float r;
+    float g;
+    float b;
+    float a;
+} plutovg_color_t;
 
-void plutovg_matrix_init(plutovg_matrix_t* matrix, double m00, double m10, double m01, double m11, double m02, double m12);
-void plutovg_matrix_init_identity(plutovg_matrix_t* matrix);
-void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, double x, double y);
-void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, double x, double y);
-void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, double x, double y);
-void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, double radians);
-void plutovg_matrix_init_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y);
-void plutovg_matrix_translate(plutovg_matrix_t* matrix, double x, double y);
-void plutovg_matrix_scale(plutovg_matrix_t* matrix, double x, double y);
-void plutovg_matrix_shear(plutovg_matrix_t* matrix, double x, double y);
-void plutovg_matrix_rotate(plutovg_matrix_t* matrix, double radians);
-void plutovg_matrix_rotate_translate(plutovg_matrix_t* matrix, double radians, double x, double y);
-void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg_matrix_t* a, const plutovg_matrix_t* b);
-int plutovg_matrix_invert(plutovg_matrix_t* matrix);
-void plutovg_matrix_map(const plutovg_matrix_t* matrix, double x, double y, double* _x, double* _y);
-void plutovg_matrix_map_point(const plutovg_matrix_t* matrix, const plutovg_point_t* src, plutovg_point_t* dst);
-void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst);
+typedef enum {
+    PLUTOVG_TEXTURE_TYPE_PLAIN,
+    PLUTOVG_TEXTURE_TYPE_TILED
+} plutovg_texture_type_t;
 
-typedef char plutovg_path_element_t;
+typedef enum {
+    PLUTOVG_SPREAD_METHOD_PAD,
+    PLUTOVG_SPREAD_METHOD_REFLECT,
+    PLUTOVG_SPREAD_METHOD_REPEAT
+} plutovg_spread_method_t;
 
-enum {
-    plutovg_path_element_move_to,
-    plutovg_path_element_line_to,
-    plutovg_path_element_cubic_to,
-    plutovg_path_element_close
-};
-
-typedef struct plutovg_path plutovg_path_t;
-
-plutovg_path_t* plutovg_path_create(void);
-plutovg_path_t* plutovg_path_reference(plutovg_path_t* path);
-void plutovg_path_destroy(plutovg_path_t* path);
-int plutovg_path_get_reference_count(const plutovg_path_t* path);
-void plutovg_path_move_to(plutovg_path_t* path, double x, double y);
-void plutovg_path_line_to(plutovg_path_t* path, double x, double y);
-void plutovg_path_quad_to(plutovg_path_t* path, double x1, double y1, double x2, double y2);
-void plutovg_path_cubic_to(plutovg_path_t* path, double x1, double y1, double x2, double y2, double x3, double y3);
-void plutovg_path_arc_to(plutovg_path_t* path, double x1, double y1, double x2, double y2, double radius);
-void plutovg_path_close(plutovg_path_t* path);
-void plutovg_path_rel_move_to(plutovg_path_t* path, double dx, double dy);
-void plutovg_path_rel_line_to(plutovg_path_t* path, double dx, double dy);
-void plutovg_path_rel_quad_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2);
-void plutovg_path_rel_cubic_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3);
-void plutovg_path_rel_arc_to(plutovg_path_t* path, double dx1, double dy1, double dx2, double dy2, double radius);
-void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, double h);
-void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry);
-void plutovg_path_add_ellipse(plutovg_path_t* path, double cx, double cy, double rx, double ry);
-void plutovg_path_add_circle(plutovg_path_t* path, double cx, double cy, double r);
-void plutovg_path_add_arc(plutovg_path_t* path, double cx, double cy, double r, double a0, double a1, int ccw);
-void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, const plutovg_matrix_t* matrix);
-void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix);
-void plutovg_path_get_current_point(const plutovg_path_t* path, double* x, double* y);
-int plutovg_path_get_element_count(const plutovg_path_t* path);
-plutovg_path_element_t* plutovg_path_get_elements(const plutovg_path_t* path);
-int plutovg_path_get_point_count(const plutovg_path_t* path);
-plutovg_point_t* plutovg_path_get_points(const plutovg_path_t* path);
-void plutovg_path_clear(plutovg_path_t* path);
-int plutovg_path_empty(const plutovg_path_t* path);
-plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path);
-plutovg_path_t* plutovg_path_clone_flat(const plutovg_path_t* path);
-
-typedef struct plutovg_color plutovg_color_t;
-
-struct plutovg_color {
-    double r;
-    double g;
-    double b;
-    double a;
-};
-
-void plutovg_color_init_rgb(plutovg_color_t* color, double r, double g, double b);
-void plutovg_color_init_rgba(plutovg_color_t* color, double r, double g, double b, double a);
-
-typedef int plutovg_gradient_type_t;
-
-enum {
-    plutovg_gradient_type_linear,
-    plutovg_gradient_type_radial
-};
-
-typedef int plutovg_spread_method_t;
-
-enum {
-    plutovg_spread_method_pad,
-    plutovg_spread_method_reflect,
-    plutovg_spread_method_repeat
-};
-
-typedef struct plutovg_gradient_stop plutovg_gradient_stop_t;
-
-struct plutovg_gradient_stop {
-    double offset;
+typedef struct plutovg_gradient_stop {
+    float offset;
     plutovg_color_t color;
-};
+} plutovg_gradient_stop_t;
 
-typedef int plutovg_texture_type_t;
+typedef struct plutovg_paint plutovg_paint_t;
 
-enum {
-    plutovg_texture_type_plain,
-    plutovg_texture_type_tiled
-};
+PLUTOVG_API plutovg_paint_t* plutovg_paint_create_rgb(float r, float g, float b);
+PLUTOVG_API plutovg_paint_t* plutovg_paint_create_rgba(float r, float g, float b, float a);
+PLUTOVG_API plutovg_paint_t* plutovg_paint_create_color(const plutovg_color_t* color);
+PLUTOVG_API plutovg_paint_t* plutovg_paint_create_linear_gradient(float x1, float y1, float x2, float y2,
+    plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix);
+PLUTOVG_API plutovg_paint_t* plutovg_paint_create_radial_gradient(float cx, float cy, float cr, float fx, float fy, float fr,
+    plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix);
+PLUTOVG_API plutovg_paint_t* plutovg_paint_create_texture(plutovg_surface_t* surface, plutovg_texture_type_t type, float opacity, const plutovg_matrix_t* matrix);
 
-typedef int plutovg_paint_type_t;
+PLUTOVG_API plutovg_paint_t* plutovg_paint_reference(plutovg_paint_t* paint);
+PLUTOVG_API void plutovg_paint_destroy(plutovg_paint_t* paint);
+PLUTOVG_API int plutovg_paint_get_reference_count(const plutovg_paint_t* paint);
 
-enum {
-    plutovg_paint_type_color,
-    plutovg_paint_type_gradient,
-    plutovg_paint_type_texture
-};
+typedef enum {
+    PLUTOVG_FILL_RULE_NON_ZERO,
+    PLUTOVG_FILL_RULE_EVEN_ODD
+} plutovg_fill_rule_t;
 
-typedef int plutovg_line_cap_t;
+typedef enum {
+    PLUTOVG_OPERATOR_SRC,
+    PLUTOVG_OPERATOR_SRC_OVER,
+    PLUTOVG_OPERATOR_DST_IN,
+    PLUTOVG_OPERATOR_DST_OUT
+} plutovg_operator_t;
 
-enum {
-    plutovg_line_cap_butt,
-    plutovg_line_cap_round,
-    plutovg_line_cap_square
-};
+typedef enum {
+    PLUTOVG_LINE_CAP_BUTT,
+    PLUTOVG_LINE_CAP_ROUND,
+    PLUTOVG_LINE_CAP_SQUARE
+} plutovg_line_cap_t;
 
-typedef int plutovg_line_join_t;
+typedef enum {
+    PLUTOVG_LINE_JOIN_MITER,
+    PLUTOVG_LINE_JOIN_ROUND,
+    PLUTOVG_LINE_JOIN_BEVEL
+} plutovg_line_join_t;
 
-enum {
-    plutovg_line_join_miter,
-    plutovg_line_join_round,
-    plutovg_line_join_bevel
-};
+typedef struct plutovg_canvas plutovg_canvas_t;
 
-typedef int plutovg_fill_rule_t;
+PLUTOVG_API plutovg_canvas_t* plutovg_canvas_create(plutovg_surface_t* surface);
 
-enum {
-    plutovg_fill_rule_non_zero,
-    plutovg_fill_rule_even_odd
-};
+PLUTOVG_API plutovg_canvas_t* plutovg_canvas_reference(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_destroy(plutovg_canvas_t* canvas);
+PLUTOVG_API int plutovg_canvas_get_reference_count(const plutovg_canvas_t* canvas);
 
-typedef int plutovg_operator_t;
+PLUTOVG_API void plutovg_canvas_save(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_restore(plutovg_canvas_t* canvas);
 
-enum {
-    plutovg_operator_src,
-    plutovg_operator_src_over,
-    plutovg_operator_dst_in,
-    plutovg_operator_dst_out
-};
+PLUTOVG_API void plutovg_canvas_set_rgb(plutovg_canvas_t* canvas, float r, float g, float b);
+PLUTOVG_API void plutovg_canvas_set_rgba(plutovg_canvas_t* canvas, float r, float g, float b, float a);
+PLUTOVG_API void plutovg_canvas_set_color(plutovg_canvas_t* canvas, const plutovg_color_t* color);
+PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_paint_t* paint);
 
-typedef struct plutovg plutovg_t;
+PLUTOVG_API void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_fill_rule_t winding);
+PLUTOVG_API void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_operator_t op);
+PLUTOVG_API void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opacity);
 
-plutovg_t* plutovg_create(plutovg_surface_t* surface);
-plutovg_t* plutovg_reference(plutovg_t* pluto);
-void plutovg_destroy(plutovg_t* pluto);
-int plutovg_get_reference_count(const plutovg_t* pluto);
-void plutovg_save(plutovg_t* pluto);
-void plutovg_restore(plutovg_t* pluto);
+PLUTOVG_API plutovg_fill_rule_t plutovg_canvas_get_fill_rule(const plutovg_canvas_t* canvas);
+PLUTOVG_API plutovg_operator_t plutovg_canvas_get_operator(const plutovg_canvas_t* canvas);
+PLUTOVG_API float plutovg_canvas_get_opacity(const plutovg_canvas_t* canvas);
 
-void plutovg_set_paint_type(const plutovg_t* pluto, plutovg_paint_type_t type);
-plutovg_paint_type_t plutovg_get_paint_type(const plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_set_line_width(plutovg_canvas_t* canvas, float line_width);
+PLUTOVG_API void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_line_cap_t line_cap);
+PLUTOVG_API void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_line_join_t line_join);
+PLUTOVG_API void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float miter_limit);
 
-void plutovg_set_rgb(plutovg_t* pluto, double r, double g, double b);
-void plutovg_set_rgba(plutovg_t* pluto, double r, double g, double b, double a);
-void plutovg_set_color(plutovg_t* pluto, const plutovg_color_t* color);
-const plutovg_color_t* plutovg_get_color(const plutovg_t* pluto);
+PLUTOVG_API float plutovg_canvas_get_line_width(const plutovg_canvas_t* canvas);
+PLUTOVG_API plutovg_line_cap_t plutovg_canvas_get_line_cap(const plutovg_canvas_t* canvas);
+PLUTOVG_API plutovg_line_join_t plutovg_canvas_get_line_join(const plutovg_canvas_t* canvas);
+PLUTOVG_API float plutovg_canvas_get_miter_limit(const plutovg_canvas_t* canvas);
 
-void plutovg_set_linear_gradient(plutovg_t* pluto, double x1, double y1, double x2, double y2);
-void plutovg_set_radial_gradient(plutovg_t* pluto, double cx, double cy, double cr, double fx, double fy, double fr);
+PLUTOVG_API void plutovg_canvas_set_dash(plutovg_canvas_t* canvas, float offset, const float* dashes, int ndashes);
+PLUTOVG_API void plutovg_canvas_set_dash_offset(plutovg_canvas_t* canvas, float offset);
+PLUTOVG_API void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const float* dashes, int ndashes);
 
-void plutovg_set_gradient_type(const plutovg_t* pluto, plutovg_gradient_type_t type);
-plutovg_gradient_type_t plutovg_get_gradient_type(const plutovg_t* pluto);
+PLUTOVG_API float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas);
+PLUTOVG_API int plutovg_canvas_get_dash_array(const plutovg_canvas_t* canvas, const float** dashes);
 
-void plutovg_set_gradient_spread(plutovg_t* pluto, plutovg_spread_method_t spread);
-plutovg_spread_method_t plutovg_get_gradient_spread(const plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_translate(plutovg_canvas_t* canvas, float x, float y);
+PLUTOVG_API void plutovg_canvas_scale(plutovg_canvas_t* canvas, float x, float y);
+PLUTOVG_API void plutovg_canvas_rotate(plutovg_canvas_t* canvas, float radians);
+PLUTOVG_API void plutovg_canvas_transform(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix);
+PLUTOVG_API void plutovg_canvas_reset_matrix(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_set_matrix(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix);
+PLUTOVG_API void plutovg_canvas_get_matrix(const plutovg_canvas_t* canvas, plutovg_matrix_t* matrix);
 
-void plutovg_set_gradient_matrix(plutovg_t* pluto, const plutovg_matrix_t* matrix);
-void plutovg_reset_gradient_matrix(plutovg_t* pluto);
-const plutovg_matrix_t* plutovg_get_gradient_matrix(const plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_move_to(plutovg_canvas_t* canvas, float x, float y);
+PLUTOVG_API void plutovg_canvas_line_to(plutovg_canvas_t* canvas, float x, float y);
+PLUTOVG_API void plutovg_canvas_curve_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, float x3, float y3);
 
-void plutovg_set_gradient_opacity(plutovg_t* pluto, double opacity);
-double plutovg_get_gradient_opacity(const plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+PLUTOVG_API void plutovg_canvas_round_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h, float rx, float ry);
+PLUTOVG_API void plutovg_canvas_ellipse(plutovg_canvas_t* canvas, float cx, float cy, float rx, float ry);
+PLUTOVG_API void plutovg_canvas_circle(plutovg_canvas_t* canvas, float cx, float cy, float r);
+PLUTOVG_API void plutovg_canvas_arc(plutovg_canvas_t* canvas, float cx, float cy, float r, float a0, float a1, bool ccw);
 
-void plutovg_add_gradient_stop_rgb(plutovg_t* pluto, double offset, double r, double g, double b);
-void plutovg_add_gradient_stop_rgba(plutovg_t* pluto, double offset, double r, double g, double b, double a);
-void plutovg_add_gradient_stop_color(plutovg_t* pluto, double offset, const plutovg_color_t* color);
-void plutovg_add_gradient_stop(plutovg_t* pluto, const plutovg_gradient_stop_t* stop);
-void plutovg_clear_gradient_stops(plutovg_t* pluto);
-int plutovg_get_gradient_stop_count(const plutovg_t* pluto);
-const plutovg_gradient_stop_t* plutovg_get_gradient_stop_data(const plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_add_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
+PLUTOVG_API void plutovg_canvas_new_path(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_close_path(plutovg_canvas_t* canvas);
 
-void plutovg_set_linear_gradient_values(plutovg_t* pluto, double x1, double y1, double x2, double y2);
-void plutovg_set_radial_gradient_values(plutovg_t* pluto, double cx, double cy, double cr, double fx, double fy, double fr);
-void plutovg_get_linear_gradient_values(const plutovg_t* pluto, double* x1, double* y1, double* x2, double* y2);
-void plutovg_get_radial_gradient_values(const plutovg_t* pluto, double* cx, double* cy, double* cr, double* fx, double* fy, double* fr);
+PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas, float* x, float* y);
+PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas);
 
-void plutovg_set_texture(plutovg_t* pluto, plutovg_surface_t* surface, plutovg_texture_type_t type, double x, double y);
+PLUTOVG_API void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_canvas_clip_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
-void plutovg_set_texture_surface(plutovg_t* pluto, plutovg_surface_t* surface);
-plutovg_surface_t* plutovg_get_texture_surface(const plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_fill(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_stroke(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_clip(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_paint(plutovg_canvas_t* canvas);
 
-void plutovg_set_texture_type(plutovg_t* pluto, plutovg_texture_type_t type);
-plutovg_texture_type_t plutovg_get_texture_type(const plutovg_t* pluto);
-
-void plutovg_set_texture_matrix(plutovg_t* pluto, const plutovg_matrix_t* matrix);
-void plutovg_reset_texture_matrix(plutovg_t* pluto, double x, double y);
-const plutovg_matrix_t* plutovg_get_texture_matrix(const plutovg_t* pluto);
-
-void plutovg_set_texture_opacity(plutovg_t* pluto, double opacity);
-double plutovg_get_texture_opacity(const plutovg_t* pluto);
-
-void plutovg_set_operator(plutovg_t* pluto, plutovg_operator_t op);
-void plutovg_set_opacity(plutovg_t* pluto, double opacity);
-void plutovg_set_fill_rule(plutovg_t* pluto, plutovg_fill_rule_t winding);
-
-plutovg_operator_t plutovg_get_operator(const plutovg_t* pluto);
-double plutovg_get_opacity(const plutovg_t* pluto);
-plutovg_fill_rule_t plutovg_get_fill_rule(const plutovg_t* pluto);
-
-void plutovg_set_line_width(plutovg_t* pluto, double width);
-void plutovg_set_line_cap(plutovg_t* pluto, plutovg_line_cap_t cap);
-void plutovg_set_line_join(plutovg_t* pluto, plutovg_line_join_t join);
-void plutovg_set_miter_limit(plutovg_t* pluto, double limit);
-
-double plutovg_get_line_width(const plutovg_t* pluto);
-plutovg_line_cap_t plutovg_get_line_cap(const plutovg_t* pluto);
-plutovg_line_join_t plutovg_get_line_join(const plutovg_t* pluto);
-double plutovg_get_miter_limit(const plutovg_t* pluto);
-
-void plutovg_set_dash(plutovg_t* pluto, double offset, const double* data, int size);
-void plutovg_set_dash_offset(plutovg_t* pluto, double offset);
-void plutovg_set_dash_data(plutovg_t* pluto, const double* data, int size);
-void plutovg_add_dash_data(plutovg_t* pluto, double value);
-void plutovg_clear_dash_data(plutovg_t* pluto);
-
-double plutovg_get_dash_offset(const plutovg_t* pluto);
-const double* plutovg_get_dash_data(const plutovg_t* pluto);
-int plutovg_get_dash_data_count(const plutovg_t* pluto);
-
-void plutovg_translate(plutovg_t* pluto, double x, double y);
-void plutovg_scale(plutovg_t* pluto, double x, double y);
-void plutovg_rotate(plutovg_t* pluto, double radians);
-void plutovg_transform(plutovg_t* pluto, const plutovg_matrix_t* matrix);
-void plutovg_set_matrix(plutovg_t* pluto, const plutovg_matrix_t* matrix);
-void plutovg_identity_matrix(plutovg_t* pluto);
-void plutovg_get_matrix(const plutovg_t* pluto, plutovg_matrix_t* matrix);
-
-void plutovg_move_to(plutovg_t* pluto, double x, double y);
-void plutovg_line_to(plutovg_t* pluto, double x, double y);
-void plutovg_quad_to(plutovg_t* pluto, double x1, double y1, double x2, double y2);
-void plutovg_cubic_to(plutovg_t* pluto, double x1, double y1, double x2, double y2, double x3, double y3);
-void plutovg_rel_move_to(plutovg_t* pluto, double dx, double dy);
-void plutovg_rel_line_to(plutovg_t* pluto, double dx, double dy);
-void plutovg_rel_quad_to(plutovg_t* pluto, double dx1, double dy1, double dx2, double dy2);
-void plutovg_rel_cubic_to(plutovg_t* pluto, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3);
-
-void plutovg_rect(plutovg_t* pluto, double x, double y, double w, double h);
-void plutovg_round_rect(plutovg_t* pluto, double x, double y, double w, double h, double rx, double ry);
-void plutovg_ellipse(plutovg_t* pluto, double cx, double cy, double rx, double ry);
-void plutovg_circle(plutovg_t* pluto, double cx, double cy, double r);
-void plutovg_arc(plutovg_t* path, double cx, double cy, double r, double a0, double a1, int ccw);
-
-void plutovg_add_path(plutovg_t* pluto, const plutovg_path_t* path);
-void plutovg_new_path(plutovg_t* pluto);
-void plutovg_close_path(plutovg_t* pluto);
-
-void plutovg_get_current_point(const plutovg_t* pluto, double* x, double* y);
-plutovg_path_t* plutovg_get_path(const plutovg_t* pluto);
-
-void plutovg_fill(plutovg_t* pluto);
-void plutovg_stroke(plutovg_t* pluto);
-void plutovg_clip(plutovg_t* pluto);
-void plutovg_paint(plutovg_t* pluto);
-
-void plutovg_fill_preserve(plutovg_t* pluto);
-void plutovg_stroke_preserve(plutovg_t* pluto);
-void plutovg_clip_preserve(plutovg_t* pluto);
-
-void plutovg_fill_extents(plutovg_t* pluto, plutovg_rect_t* rect);
-void plutovg_stroke_extents(plutovg_t* pluto, plutovg_rect_t* rect);
-void plutovg_clip_extents(plutovg_t* pluto, plutovg_rect_t* rect);
-void plutovg_reset_clip(plutovg_t* pluto);
+PLUTOVG_API void plutovg_canvas_fill_preserve(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_stroke_preserve(plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_clip_preserve(plutovg_canvas_t* canvas);
 
 #ifdef __cplusplus
 }
