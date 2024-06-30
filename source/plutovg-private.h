@@ -33,7 +33,7 @@ typedef enum {
     PLUTOVG_GRADIENT_TYPE_RADIAL
 } plutovg_gradient_type_t;
 
-typedef struct plutovg_gradient {
+typedef struct {
     plutovg_gradient_type_t type;
     plutovg_spread_method_t spread;
     plutovg_matrix_t matrix;
@@ -45,7 +45,7 @@ typedef struct plutovg_gradient {
     } stops;
 } plutovg_gradient_t;
 
-typedef struct plutovg_texture {
+typedef struct {
     plutovg_texture_type_t type;
     float opacity;
     plutovg_matrix_t matrix;
@@ -109,7 +109,7 @@ typedef struct {
     plutovg_stroke_dash_t dash;
 } plutovg_stroke_data_t;
 
-typedef struct plutovg_state {
+typedef struct {
     plutovg_paint_t* paint;
     plutovg_color_t color;
     plutovg_matrix_t matrix;
