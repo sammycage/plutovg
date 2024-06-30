@@ -643,7 +643,7 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
     }
 }
 
-void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_color_t* color)
+static void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_color_t* color)
 {
     plutovg_state_t* state = canvas->state;
     uint32_t solid = premultiply_color_with_opacity(color, state->opacity);
@@ -656,7 +656,7 @@ void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, con
     }
 }
 
-void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_gradient_t* gradient)
+static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_gradient_t* gradient)
 {
     if(gradient->stops.size == 0)
         return;
@@ -728,7 +728,7 @@ void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, 
     }
 }
 
-void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_texture_t* texture)
+static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_texture_t* texture)
 {
     plutovg_state_t* state = canvas->state;
     texture_data_t data;

@@ -54,7 +54,7 @@ static void plutovg_rle_update_extents(plutovg_rle_t* rle)
     int y1 = spans[0].y;
     int x2 = 0;
     int y2 = spans[rle->spans.size - 1].y;
-    for(int i = 0;i < rle->spans.size;i++) {
+    for(int i = 0; i < rle->spans.size; i++) {
         if(spans[i].x < x1) x1 = spans[i].x;
         if(spans[i].x + spans[i].len > x2) x2 = spans[i].x + spans[i].len;
     }
@@ -286,11 +286,11 @@ static PVG_FT_Outline* ft_outline_convert(const plutovg_path_t* path, const plut
     return outline;
 }
 
-static PVG_FT_Outline* ft_outline_convert_dash(const plutovg_path_t* path, const plutovg_matrix_t* matrix, float offset, const float* dashes, int ndashes)
+static PVG_FT_Outline* ft_outline_convert_dash(const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_stroke_dash_t* stroke_dash)
 {
-    if(ndashes == 0)
+    if(stroke_dash->array.size == 0)
         return ft_outline_convert(path, matrix, NULL);
-    plutovg_path_t* dashed = plutovg_path_clone_dashed(path, offset, dashes, ndashes);
+    plutovg_path_t* dashed = plutovg_path_clone_dashed(path, stroke_dash->offset, stroke_dash->array.data, stroke_dash->array.size);
     PVG_FT_Outline* outline = ft_outline_convert(dashed, matrix, NULL);
     plutovg_path_destroy(dashed);
     return outline;
@@ -313,12 +313,12 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
     float dy = p2.y - p1.y;
 
     float scale = sqrt(dx*dx + dy*dy) / 2.0;
-    float radius = stroke_data->line_width / 2.0;
+    float radius = stroke_data->style.width / 2.0;
 
     ftWidth = (PVG_FT_Fixed)(radius * scale * (1 << 6));
-    ftMiterLimit = (PVG_FT_Fixed)(stroke_data->miter_limit * (1 << 16));
+    ftMiterLimit = (PVG_FT_Fixed)(stroke_data->style.miter_limit * (1 << 16));
 
-    switch(stroke_data->line_cap) {
+    switch(stroke_data->style.cap) {
     case PLUTOVG_LINE_CAP_SQUARE:
         ftCap = PVG_FT_STROKER_LINECAP_SQUARE;
         break;
@@ -330,7 +330,7 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
         break;
     }
 
-    switch(stroke_data->line_join) {
+    switch(stroke_data->style.join) {
     case PLUTOVG_LINE_JOIN_BEVEL:
         ftJoin = PVG_FT_STROKER_LINEJOIN_BEVEL;
         break;
@@ -342,7 +342,7 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
         break;
     }
 
-    PVG_FT_Outline* outline = ft_outline_convert_dash(path, matrix, stroke_data->dash_offset, stroke_data->dash_array.data, stroke_data->dash_array.size);
+    PVG_FT_Outline* outline = ft_outline_convert_dash(path, matrix, &stroke_data->dash);
     PVG_FT_Stroker stroker;
     PVG_FT_Stroker_New(&stroker);
     PVG_FT_Stroker_Set(stroker, ftWidth, ftCap, ftJoin, ftMiterLimit);

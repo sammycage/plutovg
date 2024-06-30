@@ -7,17 +7,11 @@ static void plutovg_state_reset(plutovg_state_t* state)
     plutovg_paint_destroy(state->paint);
     plutovg_matrix_init_identity(&state->matrix);
     plutovg_rle_init(&state->clip_rle);
-    plutovg_array_clear(state->stroke.dash_array);
+    plutovg_array_clear(state->stroke.dash.array);
     state->paint = NULL;
-    state->color.r = 0.f;
-    state->color.g = 0.f;
-    state->color.b = 0.f;
-    state->color.a = 1.f;
-    state->stroke.line_width = 1.f;
-    state->stroke.miter_limit = 10.f;
-    state->stroke.dash_offset = 0.f;
-    state->stroke.line_cap = PLUTOVG_LINE_CAP_BUTT;
-    state->stroke.line_join = PLUTOVG_LINE_JOIN_MITER;
+    state->color = PLUTOVG_BLACK_COLOR;
+    state->stroke.style = PLUTOVG_DEFAULT_STROKE_STYLE;
+    state->stroke.dash.offset = 0.f;
     state->op = PLUTOVG_OPERATOR_SRC_OVER;
     state->winding = PLUTOVG_FILL_RULE_NON_ZERO;
     state->clipping = false;
@@ -33,17 +27,14 @@ static plutovg_state_t* plutovg_state_create(void)
 
 static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
 {
-    assert(state->paint == NULL && state->stroke.dash_array.size == 0);
-    plutovg_array_append(state->stroke.dash_array, source->stroke.dash_array);
+    assert(state->paint == NULL && state->stroke.dash.array.size == 0);
+    plutovg_array_append(state->stroke.dash.array, source->stroke.dash.array);
     plutovg_rle_copy(&state->clip_rle, &source->clip_rle);
     state->paint = plutovg_paint_reference(source->paint);
     state->color = source->color;
     state->matrix = source->matrix;
-    state->stroke.line_width = source->stroke.line_width;
-    state->stroke.miter_limit = source->stroke.miter_limit;
-    state->stroke.dash_offset = source->stroke.dash_offset;
-    state->stroke.line_cap = source->stroke.line_cap;
-    state->stroke.line_join = source->stroke.line_join;
+    state->stroke.style = source->stroke.style;
+    state->stroke.dash.offset = source->stroke.dash.offset;
     state->op = source->op;
     state->winding = source->winding;
     state->clipping = source->clipping;
@@ -53,7 +44,7 @@ static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* so
 static void plutovg_state_destroy(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
-    plutovg_array_destroy(state->stroke.dash_array);
+    plutovg_array_destroy(state->stroke.dash.array);
     plutovg_rle_finish(&state->clip_rle);
     free(state);
 }
@@ -197,42 +188,42 @@ float plutovg_canvas_get_opacity(const plutovg_canvas_t* canvas)
 
 void plutovg_canvas_set_line_width(plutovg_canvas_t* canvas, float line_width)
 {
-    canvas->state->stroke.line_width = line_width;
+    canvas->state->stroke.style.width = line_width;
 }
 
 void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_line_cap_t line_cap)
 {
-    canvas->state->stroke.line_cap = line_cap;
+    canvas->state->stroke.style.cap = line_cap;
 }
 
 void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_line_join_t line_join)
 {
-    canvas->state->stroke.line_join = line_join;
+    canvas->state->stroke.style.join = line_join;
 }
 
 void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float miter_limit)
 {
-    canvas->state->stroke.miter_limit = miter_limit;
+    canvas->state->stroke.style.miter_limit = miter_limit;
 }
 
 float plutovg_canvas_get_line_width(const plutovg_canvas_t* canvas)
 {
-    return canvas->state->stroke.line_width;
+    return canvas->state->stroke.style.width;
 }
 
 plutovg_line_cap_t plutovg_canvas_get_line_cap(const plutovg_canvas_t* canvas)
 {
-    return canvas->state->stroke.line_cap;
+    return canvas->state->stroke.style.cap;
 }
 
 plutovg_line_join_t plutovg_canvas_get_line_join(const plutovg_canvas_t* canvas)
 {
-    return canvas->state->stroke.line_join;
+    return canvas->state->stroke.style.join;
 }
 
 float plutovg_canvas_get_miter_limit(const plutovg_canvas_t* canvas)
 {
-    return canvas->state->stroke.miter_limit;
+    return canvas->state->stroke.style.miter_limit;
 }
 
 void plutovg_canvas_set_dash(plutovg_canvas_t* canvas, float offset, const float* dashes, int ndashes)
@@ -243,25 +234,25 @@ void plutovg_canvas_set_dash(plutovg_canvas_t* canvas, float offset, const float
 
 void plutovg_canvas_set_dash_offset(plutovg_canvas_t* canvas, float offset)
 {
-    canvas->state->stroke.dash_offset = offset;
+    canvas->state->stroke.dash.offset = offset;
 }
 
 void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const float* dashes, int ndashes)
 {
-    plutovg_array_clear(canvas->state->stroke.dash_array);
-    plutovg_array_append_data(canvas->state->stroke.dash_array, dashes, ndashes);
+    plutovg_array_clear(canvas->state->stroke.dash.array);
+    plutovg_array_append_data(canvas->state->stroke.dash.array, dashes, ndashes);
 }
 
 float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas)
 {
-    return canvas->state->stroke.dash_offset;
+    return canvas->state->stroke.dash.offset;
 }
 
 int plutovg_canvas_get_dash_array(const plutovg_canvas_t* canvas, const float** dashes)
 {
     if(dashes)
-        *dashes = canvas->state->stroke.dash_array.data;
-    return canvas->state->stroke.dash_array.size;
+        *dashes = canvas->state->stroke.dash.array.data;
+    return canvas->state->stroke.dash.array.size;
 }
 
 void plutovg_canvas_translate(plutovg_canvas_t* canvas, float x, float y)
@@ -291,7 +282,7 @@ void plutovg_canvas_reset_matrix(plutovg_canvas_t* canvas)
 
 void plutovg_canvas_set_matrix(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix)
 {
-    canvas->state->matrix = *matrix;
+    canvas->state->matrix = matrix ? *matrix : PLUTOVG_IDENTITY_MATRIX;
 }
 
 void plutovg_canvas_get_matrix(const plutovg_canvas_t* canvas, plutovg_matrix_t* matrix)
@@ -374,7 +365,7 @@ void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_
 {
     plutovg_stroke_data_t* stroke = &canvas->state->stroke;
     plutovg_canvas_fill_extents(canvas, extents);
-    float delta = stroke->line_width / 2.f;
+    float delta = stroke->style.width / 2.f;
     extents->x -= delta;
     extents->y -= delta;
     extents->w += delta * 2.f;

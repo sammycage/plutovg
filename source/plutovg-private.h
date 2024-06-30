@@ -89,16 +89,24 @@ typedef struct {
 } plutovg_rle_t;
 
 typedef struct {
-    float line_width;
-    float miter_limit;
-    plutovg_line_cap_t line_cap;
-    plutovg_line_join_t line_join;
-    float dash_offset;
+    float offset;
     struct {
         float* data;
         int size;
         int capacity;
-    } dash_array;
+    } array;
+} plutovg_stroke_dash_t;
+
+typedef struct {
+    float width;
+    plutovg_line_cap_t cap;
+    plutovg_line_join_t join;
+    float miter_limit;
+} plutovg_stroke_style_t;
+
+typedef struct {
+    plutovg_stroke_style_t style;
+    plutovg_stroke_dash_t dash;
 } plutovg_stroke_data_t;
 
 typedef struct plutovg_state {
@@ -132,12 +140,9 @@ void plutovg_rle_copy(plutovg_rle_t* rle, const plutovg_rle_t* source);
 void plutovg_rle_extents(plutovg_rle_t* rle, plutovg_rect_t* extents);
 void plutovg_rle_add_rect(plutovg_rle_t* rle, int x, int y, int width, int height);
 void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plutovg_rle_t* b);
-void plutovg_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
 
+void plutovg_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_rle_t* rle);
-void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_color_t* color);
-void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_gradient_t* gradient);
-void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, const plutovg_texture_t* texture);
 
 #define PLUTOVG_SQRT2 1.41421356237309504880
 #define PLUTOVG_PI 3.14159265358979323846
@@ -154,6 +159,10 @@ void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_rle_t* rle, c
 #define plutovg_red(c) (((c) >> 16) & 0xff)
 #define plutovg_green(c) (((c) >> 8) & 0xff)
 #define plutovg_blue(c) (((c) >> 0) & 0xff)
+
+#define PLUTOVG_DEFAULT_STROKE_STYLE ((plutovg_stroke_style_t){1, PLUTOVG_LINE_CAP_BUTT, PLUTOVG_LINE_JOIN_MITER, 10});
+#define PLUTOVG_IDENTITY_MATRIX ((plutovg_matrix_t){1, 0, 0, 1, 0, 0});
+#define PLUTOVG_BLACK_COLOR ((plutovg_color_t){0, 0, 0, 1});
 
 #define plutovg_array_init(array) \
     do { \
