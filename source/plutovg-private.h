@@ -109,7 +109,7 @@ typedef struct {
     plutovg_stroke_dash_t dash;
 } plutovg_stroke_data_t;
 
-typedef struct {
+typedef struct plutovg_state {
     plutovg_paint_t* paint;
     plutovg_color_t color;
     plutovg_matrix_t matrix;
