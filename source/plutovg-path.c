@@ -535,28 +535,26 @@ static void extents_traverse_func(void* closure, plutovg_path_command_t command,
 {
     extents_calculator_t* calculator = (extents_calculator_t*)(closure);
     if(calculator->is_first_point) {
-        calculator->current_point = points[0];
         calculator->is_first_point = false;
-        calculator->length = 0;
+        calculator->current_point = points[0];
         calculator->x1 = points[0].x;
         calculator->y1 = points[0].y;
         calculator->x2 = points[0].x;
         calculator->y2 = points[0].y;
+        calculator->length = 0;
         return;
     }
 
     assert(command == PLUTOVG_PATH_COMMAND_MOVE_TO || command == PLUTOVG_PATH_COMMAND_LINE_TO || command == PLUTOVG_PATH_COMMAND_CLOSE);
     if(command == PLUTOVG_PATH_COMMAND_LINE_TO || command == PLUTOVG_PATH_COMMAND_CLOSE) {
-        float dx = points[0].x - calculator->current_point.x;
-        float dy = points[0].y - calculator->current_point.y;
-        calculator->length += sqrtf(dx*dx + dy*dy);
+        calculator->length += hypotf(points[0].x - calculator->current_point.x, points[0].y - calculator->current_point.y);
     }
 
-    calculator->current_point = points[0];
     calculator->x1 = plutovg_min(calculator->x1, points[0].x);
     calculator->y1 = plutovg_min(calculator->y1, points[0].y);
     calculator->x2 = plutovg_max(calculator->x2, points[0].x);
     calculator->y2 = plutovg_max(calculator->y2, points[0].y);
+    calculator->current_point = points[0];
 }
 
 float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents)

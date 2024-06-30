@@ -226,7 +226,7 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
         while(buffer < end) {
             uint32_t result = 0;
             if(det >= 0) {
-                float w = sqrt(det) - b;
+                float w = sqrtf(det) - b;
                 if(gradient->values.radial.fr + v->dr * w >= 0) {
                     result = gradient_pixel(gradient, w);
                 }
@@ -240,7 +240,7 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
         }
     } else {
         while(buffer < end) {
-            *buffer++ = gradient_pixel(gradient, sqrt(det) - b);
+            *buffer++ = gradient_pixel(gradient, sqrtf(det) - b);
             det += delta_det;
             delta_det += delta_delta_det;
             b += delta_b;
@@ -743,7 +743,7 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_rle_t*
     plutovg_matrix_invert(&data.matrix, &data.matrix);
 
     const plutovg_matrix_t* matrix = &data.matrix;
-    int translating = (matrix->a == 1 && matrix->b == 0 && matrix->c == 0 && matrix->d == 1);
+    bool translating = (matrix->a == 1 && matrix->b == 0 && matrix->c == 0 && matrix->d == 1);
     if(translating) {
         if(texture->type == PLUTOVG_TEXTURE_TYPE_PLAIN) {
             blend_untransformed_argb(canvas->surface, state->op, rle, &data);

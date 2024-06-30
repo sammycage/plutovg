@@ -309,10 +309,7 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
     plutovg_matrix_map_point(matrix, &p1, &p1);
     plutovg_matrix_map_point(matrix, &p2, &p2);
 
-    float dx = p2.x - p1.x;
-    float dy = p2.y - p1.y;
-
-    float scale = sqrt(dx*dx + dy*dy) / 2.0;
+    float scale = hypotf(p2.x - p1.x, p2.y - p1.y) / 2.0;
     float radius = stroke_data->style.width / 2.0;
 
     ftWidth = (PVG_FT_Fixed)(radius * scale * (1 << 6));
