@@ -24,14 +24,14 @@ static void plutovg_state_reset(plutovg_state_t* state)
     state->opacity = 1.f;
 }
 
-plutovg_state_t* plutovg_state_create(void)
+static plutovg_state_t* plutovg_state_create(void)
 {
     plutovg_state_t* state = calloc(1, sizeof(plutovg_state_t));
     plutovg_state_reset(state);
     return state;
 }
 
-void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
+static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
 {
     assert(state->paint == NULL && state->stroke.dash_array.size == 0);
     plutovg_array_append(state->stroke.dash_array, source->stroke.dash_array);
@@ -50,7 +50,7 @@ void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
     state->opacity = source->opacity;
 }
 
-void plutovg_state_destroy(plutovg_state_t* state)
+static void plutovg_state_destroy(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
     plutovg_array_destroy(state->stroke.dash_array);
