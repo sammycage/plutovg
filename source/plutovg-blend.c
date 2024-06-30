@@ -103,12 +103,73 @@ static inline uint32_t BYTE_MUL(uint32_t x, uint32_t a)
     return x;
 }
 
-static inline void memfill32(uint32_t* dest, uint32_t value, int length)
+#ifdef __SSE2__
+
+#include <emmintrin.h>
+
+static void memfill32(uint32_t* dest, uint32_t value, int length)
 {
-    for(int i = 0; i < length; i++) {
-        dest[i] = value;
+    __m128i vector_data = _mm_set_epi32(value, value, value, value);
+    while(length && ((uintptr_t)dest & 0xf)) {
+        *dest++ = value;
+        length--;
+    }
+
+    while(length >= 32) {
+        _mm_store_si128((__m128i*)(dest), vector_data);
+        _mm_store_si128((__m128i*)(dest + 4), vector_data);
+        _mm_store_si128((__m128i*)(dest + 8), vector_data);
+        _mm_store_si128((__m128i*)(dest + 12), vector_data);
+        _mm_store_si128((__m128i*)(dest + 16), vector_data);
+        _mm_store_si128((__m128i*)(dest + 20), vector_data);
+        _mm_store_si128((__m128i*)(dest + 24), vector_data);
+        _mm_store_si128((__m128i*)(dest + 28), vector_data);
+
+        dest += 32;
+        length -= 32;
+    }
+
+    if(length >= 16) {
+        _mm_store_si128((__m128i*)(dest), vector_data);
+        _mm_store_si128((__m128i*)(dest + 4), vector_data);
+        _mm_store_si128((__m128i*)(dest + 8), vector_data);
+        _mm_store_si128((__m128i*)(dest + 12), vector_data);
+
+        dest += 16;
+        length -= 16;
+    }
+
+    if(length >= 8) {
+        _mm_store_si128((__m128i*)(dest), vector_data);
+        _mm_store_si128((__m128i*)(dest + 4), vector_data);
+
+        dest += 8;
+        length -= 8;
+    }
+
+    if(length >= 4) {
+        _mm_store_si128((__m128i*)(dest), vector_data);
+
+        dest += 4;
+        length -= 4;
+    }
+
+    while(length) {
+        *dest++ = value;
+        length--;
     }
 }
+
+#else
+
+static inline void memfill32(uint32_t* dest, uint32_t value, int length)
+{
+    while(length--) {
+        *dest++ = value;
+    }
+}
+
+#endif // __SSE2__
 
 static inline int gradient_clamp(const gradient_data_t* gradient, int ipos)
 {
