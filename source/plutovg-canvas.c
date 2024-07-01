@@ -2,6 +2,16 @@
 
 #include <assert.h>
 
+int plutovg_version(void)
+{
+    return PLUTOVG_VERSION;
+}
+
+const char* plutovg_version_string(void)
+{
+    return PLUTOVG_VERSION_STRING;
+}
+
 static void plutovg_state_reset(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
