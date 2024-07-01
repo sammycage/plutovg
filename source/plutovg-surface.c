@@ -9,6 +9,8 @@
 static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int height)
 {
     plutovg_surface_t* surface = malloc(width * height * 4 + sizeof(plutovg_surface_t));
+    if(surface == NULL)
+        return NULL;
     surface->ref_count = 1;
     surface->width = width;
     surface->height = height;
@@ -20,6 +22,8 @@ static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int he
 plutovg_surface_t* plutovg_surface_create(int width, int height)
 {
     plutovg_surface_t* surface = plutovg_surface_create_uninitialized(width, height);
+    if(surface == NULL)
+        return NULL;
     memset(surface->data, 0, surface->height * surface->stride);
     return surface;
 }
@@ -84,6 +88,11 @@ static void plutovg_surface_unpremultiply_argb(const plutovg_surface_t* surface)
 static plutovg_surface_t* plutovg_surface_load_from_image(stbi_uc* image, int width, int height)
 {
     plutovg_surface_t* surface = plutovg_surface_create_uninitialized(width, height);
+    if(surface == NULL) {
+        stbi_image_free(image);
+        return NULL;
+    }
+
     memcpy(surface->data, image, surface->height * surface->stride);
     plutovg_surface_premultiply_rgba(surface);
     stbi_image_free(image);
