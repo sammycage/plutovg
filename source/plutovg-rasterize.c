@@ -7,77 +7,77 @@
 #include <math.h>
 #include <limits.h>
 
-void plutovg_rle_init(plutovg_rle_t* rle)
+void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer)
 {
-    plutovg_array_init(rle->spans);
-    plutovg_rle_reset(rle);
+    plutovg_array_init(span_buffer->spans);
+    plutovg_span_buffer_reset(span_buffer);
 }
 
-void plutovg_rle_reset(plutovg_rle_t* rle)
+void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer)
 {
-    plutovg_array_clear(rle->spans);
-    rle->x = 0;
-    rle->y = 0;
-    rle->w = -1;
-    rle->h = -1;
+    plutovg_array_clear(span_buffer->spans);
+    span_buffer->x = 0;
+    span_buffer->y = 0;
+    span_buffer->w = -1;
+    span_buffer->h = -1;
 }
 
-void plutovg_rle_finish(plutovg_rle_t* rle)
+void plutovg_span_buffer_finish(plutovg_span_buffer_t* span_buffer)
 {
-    plutovg_array_destroy(rle->spans);
+    plutovg_array_destroy(span_buffer->spans);
 }
 
-void plutovg_rle_copy(plutovg_rle_t* rle, const plutovg_rle_t* source)
+void plutovg_span_buffer_copy(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* source)
 {
-    plutovg_array_clear(rle->spans);
-    plutovg_array_append(rle->spans, source->spans);
-    rle->x = source->x;
-    rle->y = source->y;
-    rle->w = source->w;
-    rle->h = source->h;
+    plutovg_array_clear(span_buffer->spans);
+    plutovg_array_append(span_buffer->spans, source->spans);
+    span_buffer->x = source->x;
+    span_buffer->y = source->y;
+    span_buffer->w = source->w;
+    span_buffer->h = source->h;
 }
 
-static void plutovg_rle_update_extents(plutovg_rle_t* rle)
+static void plutovg_span_buffer_update_extents(plutovg_span_buffer_t* span_buffer)
 {
-    if(rle->w != -1 && rle->h != -1)
+    if(span_buffer->w != -1 && span_buffer->h != -1)
         return;
-    if(rle->spans.size == 0) {
-        rle->x = 0;
-        rle->y = 0;
-        rle->w = 0;
-        rle->h = 0;
+    if(span_buffer->spans.size == 0) {
+        span_buffer->x = 0;
+        span_buffer->y = 0;
+        span_buffer->w = 0;
+        span_buffer->h = 0;
         return;
     }
 
-    plutovg_span_t* spans = rle->spans.data;
+    plutovg_span_t* spans = span_buffer->spans.data;
     int x1 = INT_MAX;
     int y1 = spans[0].y;
     int x2 = 0;
-    int y2 = spans[rle->spans.size - 1].y;
-    for(int i = 0; i < rle->spans.size; i++) {
+    int y2 = spans[span_buffer->spans.size - 1].y;
+    for(int i = 0; i < span_buffer->spans.size; i++) {
         if(spans[i].x < x1) x1 = spans[i].x;
         if(spans[i].x + spans[i].len > x2) x2 = spans[i].x + spans[i].len;
     }
 
-    rle->x = x1;
-    rle->y = y1;
-    rle->w = x2 - x1;
-    rle->h = y2 - y1 + 1;
+    span_buffer->x = x1;
+    span_buffer->y = y1;
+    span_buffer->w = x2 - x1;
+    span_buffer->h = y2 - y1 + 1;
 }
 
-void plutovg_rle_extents(plutovg_rle_t* rle, plutovg_rect_t* extents)
+void plutovg_span_buffer_extents(plutovg_span_buffer_t* span_buffer, plutovg_rect_t* extents)
 {
-    plutovg_rle_update_extents(rle);
-    extents->x = rle->x;
-    extents->y = rle->y;
-    extents->w = rle->w;
-    extents->h = rle->h;
+    plutovg_span_buffer_update_extents(span_buffer);
+    extents->x = span_buffer->x;
+    extents->y = span_buffer->y;
+    extents->w = span_buffer->w;
+    extents->h = span_buffer->h;
 }
 
-void plutovg_rle_add_rect(plutovg_rle_t* rle, int x, int y, int width, int height)
+void plutovg_span_buffer_add_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height)
 {
-    plutovg_array_ensure(rle->spans, height);
-    plutovg_span_t* spans = rle->spans.data + rle->spans.size;
+    plutovg_array_ensure(span_buffer->spans, height);
+    plutovg_span_t* spans = span_buffer->spans.data + span_buffer->spans.size;
     for(int i = 0; i < height; i++) {
         spans[i].x = x;
         spans[i].y = y + i;
@@ -85,32 +85,32 @@ void plutovg_rle_add_rect(plutovg_rle_t* rle, int x, int y, int width, int heigh
         spans[i].coverage = 255;
     }
 
-    if(rle->spans.size == 0) {
-        rle->x = x;
-        rle->y = y;
-        rle->w = width;
-        rle->h = height;
-        rle->spans.size = height;
+    if(span_buffer->spans.size == 0) {
+        span_buffer->x = x;
+        span_buffer->y = y;
+        span_buffer->w = width;
+        span_buffer->h = height;
+        span_buffer->spans.size = height;
         return;
     }
 
-    plutovg_rle_update_extents(rle);
-    int x1 = plutovg_min(x, rle->x);
-    int y1 = plutovg_min(y, rle->y);
-    int x2 = plutovg_max(x + width, rle->x + rle->w);
-    int y2 = plutovg_max(y + height, rle->y + rle->h);
+    plutovg_span_buffer_update_extents(span_buffer);
+    int x1 = plutovg_min(x, span_buffer->x);
+    int y1 = plutovg_min(y, span_buffer->y);
+    int x2 = plutovg_max(x + width, span_buffer->x + span_buffer->w);
+    int y2 = plutovg_max(y + height, span_buffer->y + span_buffer->h);
 
-    rle->x = x1;
-    rle->y = y1;
-    rle->w = x2 - x1;
-    rle->h = y2 - y1;
-    rle->spans.size += height;
+    span_buffer->x = x1;
+    span_buffer->y = y1;
+    span_buffer->w = x2 - x1;
+    span_buffer->h = y2 - y1;
+    span_buffer->spans.size += height;
 }
 
-void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plutovg_rle_t* b)
+void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* a, const plutovg_span_buffer_t* b)
 {
-    plutovg_array_clear(rle->spans);
-    plutovg_array_ensure(rle->spans, plutovg_max(a->spans.size, b->spans.size));
+    plutovg_span_buffer_reset(span_buffer);
+    plutovg_array_ensure(span_buffer->spans, plutovg_max(a->spans.size, b->spans.size));
 
     plutovg_span_t* a_spans = a->spans.data;
     plutovg_span_t* a_end = a_spans + a->spans.size;
@@ -145,12 +145,12 @@ void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plu
         int x = plutovg_max(ax1, bx1);
         int len = plutovg_min(ax2, bx2) - x;
         if(len) {
-            plutovg_span_t* span = rle->spans.data + rle->spans.size;
+            plutovg_span_t* span = span_buffer->spans.data + span_buffer->spans.size;
             span->x = x;
             span->len = len;
             span->y = a_spans->y;
             span->coverage = plutovg_div255(a_spans->coverage * b_spans->coverage);
-            rle->spans.size += 1;
+            span_buffer->spans.size += 1;
         }
 
         if(ax2 < bx2) {
@@ -358,16 +358,16 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
 
 static void spans_generation_callback(int count, const PVG_FT_Span* spans, void* user)
 {
-    plutovg_rle_t* rle = (plutovg_rle_t*)(user);
-    plutovg_array_append_data(rle->spans, spans, count);
+    plutovg_span_buffer_t* span_buffer = (plutovg_span_buffer_t*)(user);
+    plutovg_array_append_data(span_buffer->spans, spans, count);
 }
 
-void plutovg_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding)
+void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding)
 {
     PVG_FT_Raster_Params params;
     params.flags = PVG_FT_RASTER_FLAG_DIRECT | PVG_FT_RASTER_FLAG_AA;
     params.gray_spans = spans_generation_callback;
-    params.user = rle;
+    params.user = span_buffer;
     if(clip_rect) {
         params.flags |= PVG_FT_RASTER_FLAG_CLIP;
         params.clip_box.xMin = (PVG_FT_Pos)clip_rect->x;
@@ -390,7 +390,7 @@ void plutovg_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plu
         }
     }
 
-    plutovg_array_clear(rle->spans);
+    plutovg_span_buffer_reset(span_buffer);
     params.source = outline;
     PVG_FT_Raster_Render(&params);
     ft_outline_destroy(outline);

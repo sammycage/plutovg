@@ -86,7 +86,7 @@ typedef struct {
     int y;
     int w;
     int h;
-} plutovg_rle_t;
+} plutovg_span_buffer_t;
 
 typedef struct {
     float offset;
@@ -116,7 +116,7 @@ typedef struct plutovg_state {
     plutovg_stroke_data_t stroke;
     plutovg_operator_t op;
     plutovg_fill_rule_t winding;
-    plutovg_rle_t clip_rle;
+    plutovg_span_buffer_t clip_spans;
     bool clipping;
     float opacity;
     struct plutovg_state* next;
@@ -128,21 +128,21 @@ struct plutovg_canvas {
     plutovg_state_t* state;
     plutovg_state_t* freed_state;
     plutovg_rect_t clip_rect;
-    plutovg_rle_t clip_rle;
-    plutovg_rle_t rle;
+    plutovg_span_buffer_t clip_spans;
+    plutovg_span_buffer_t fill_spans;
     plutovg_path_t* path;
 };
 
-void plutovg_rle_init(plutovg_rle_t* rle);
-void plutovg_rle_reset(plutovg_rle_t* rle);
-void plutovg_rle_finish(plutovg_rle_t* rle);
-void plutovg_rle_copy(plutovg_rle_t* rle, const plutovg_rle_t* source);
-void plutovg_rle_extents(plutovg_rle_t* rle, plutovg_rect_t* extents);
-void plutovg_rle_add_rect(plutovg_rle_t* rle, int x, int y, int width, int height);
-void plutovg_rle_intersect(plutovg_rle_t* rle, const plutovg_rle_t* a, const plutovg_rle_t* b);
+void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer);
+void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer);
+void plutovg_span_buffer_finish(plutovg_span_buffer_t* span_buffer);
+void plutovg_span_buffer_copy(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* source);
+void plutovg_span_buffer_extents(plutovg_span_buffer_t* span_buffer, plutovg_rect_t* extents);
+void plutovg_span_buffer_add_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height);
+void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* a, const plutovg_span_buffer_t* b);
 
-void plutovg_rasterize(plutovg_rle_t* rle, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
-void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_rle_t* rle);
+void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
+void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer);
 
 #define PLUTOVG_SQRT2 1.41421356237309504880
 #define PLUTOVG_PI 3.14159265358979323846
