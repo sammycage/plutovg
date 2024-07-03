@@ -117,8 +117,10 @@ typedef struct plutovg_state {
     plutovg_operator_t op;
     plutovg_fill_rule_t winding;
     plutovg_span_buffer_t clip_spans;
-    bool clipping;
+    plutovg_font_face_t* font_face;
+    float font_size;
     float opacity;
+    bool clipping;
     struct plutovg_state* next;
 } plutovg_state_t;
 

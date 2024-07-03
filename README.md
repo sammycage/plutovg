@@ -4,6 +4,7 @@ PlutoVG is a standalone 2D vector graphics library in C.
 ## Features
 - Path Filling, Stroking and Dashing
 - Soild, Gradient and Texture Paints
+- Fonts and Texts
 - Clipping and Compositing
 - Transformations
 - Images

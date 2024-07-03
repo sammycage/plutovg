@@ -9,6 +9,7 @@ plutovg_sources = [
     'source/plutovg-paint.c',
     'source/plutovg-matrix.c',
     'source/plutovg-path.c',
+    'source/plutovg-font.c',
     'source/plutovg-surface.c',
     'source/plutovg-canvas.c',
     'source/plutovg-rasterize.c',

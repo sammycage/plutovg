@@ -136,6 +136,48 @@ PLUTOVG_API plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path);
 PLUTOVG_API plutovg_path_t* plutovg_path_clone_flatten(const plutovg_path_t* path);
 PLUTOVG_API plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes);
 
+typedef enum plutovg_text_encoding {
+    PLUTOVG_TEXT_ENCODING_UTF8,
+    PLUTOVG_TEXT_ENCODING_UTF16,
+    PLUTOVG_TEXT_ENCODING_UTF32,
+    PLUTOVG_TEXT_ENCODING_LATIN1
+} plutovg_text_encoding_t;
+
+typedef struct plutovg_text_iterator {
+    const char* text;
+    int length;
+    plutovg_text_encoding_t encoding;
+    int index;
+} plutovg_text_iterator_t;
+
+PLUTOVG_API void plutovg_text_iterator_init(plutovg_text_iterator_t* it, const void* text, int length, plutovg_text_encoding_t encoding);
+PLUTOVG_API bool plutovg_text_iterator_has_next(const plutovg_text_iterator_t* it);
+PLUTOVG_API int plutovg_text_iterator_next(plutovg_text_iterator_t* it);
+
+typedef struct plutovg_font_face plutovg_font_face_t;
+
+typedef void (*plutovg_destroy_func_t)(void* closure);
+
+PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int ttcindex);
+PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned int length, int ttcindex, plutovg_destroy_func_t destroy_func, void* closure);
+
+PLUTOVG_API plutovg_font_face_t* plutovg_font_face_reference(plutovg_font_face_t* face);
+PLUTOVG_API void plutovg_font_face_destroy(plutovg_font_face_t* face);
+PLUTOVG_API int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face);
+
+PLUTOVG_API float plutovg_font_face_get_scale(const plutovg_font_face_t* face, float size);
+PLUTOVG_API float plutovg_font_face_get_kerning(const plutovg_font_face_t* face, int ch1, int ch2);
+PLUTOVG_API void plutovg_font_face_get_extents(const plutovg_font_face_t* face, plutovg_rect_t* extents);
+
+PLUTOVG_API void plutovg_font_face_get_glyph_path(const plutovg_font_face_t* face, int codepoint, plutovg_path_t* path);
+PLUTOVG_API void plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, int codepoint, plutovg_path_traverse_func_t traverse_func, void* closure);
+
+PLUTOVG_API float plutovg_font_face_get_glyph_extents(const plutovg_font_face_t* face, int codepoint, plutovg_rect_t* extents);
+PLUTOVG_API float plutovg_font_face_get_glyph_advance_width(const plutovg_font_face_t* face, int codepoint);
+PLUTOVG_API float plutovg_font_face_get_glyph_left_side_bearing(const plutovg_font_face_t* face, int codepoint);
+
+PLUTOVG_API float plutovg_font_face_text_extents(const plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
+
 /**
  * @note plutovg_surface_t format is ARGB32_Premultiplied.
  */
@@ -242,6 +284,13 @@ PLUTOVG_API void plutovg_canvas_set_rgba(plutovg_canvas_t* canvas, float r, floa
 PLUTOVG_API void plutovg_canvas_set_color(plutovg_canvas_t* canvas, const plutovg_color_t* color);
 PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_paint_t* paint);
 
+PLUTOVG_API void plutovg_canvas_set_font(plutovg_canvas_t* canvas, plutovg_font_face_t* face, float size);
+PLUTOVG_API void plutovg_canvas_set_font_face(plutovg_canvas_t* canvas, plutovg_font_face_t* face);
+PLUTOVG_API void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size);
+
+PLUTOVG_API plutovg_font_face_t* plutovg_canvas_get_font_face(const plutovg_canvas_t* canvas);
+PLUTOVG_API float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas);
+
 PLUTOVG_API void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_fill_rule_t winding);
 PLUTOVG_API void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_operator_t op);
 PLUTOVG_API void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opacity);
@@ -304,6 +353,10 @@ PLUTOVG_API void plutovg_canvas_paint(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_fill_preserve(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_stroke_preserve(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_clip_preserve(plutovg_canvas_t* canvas);
+
+PLUTOVG_API float plutovg_canvas_fill_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
+PLUTOVG_API float plutovg_canvas_stroke_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
+PLUTOVG_API float plutovg_canvas_text_extents(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
 #ifdef __cplusplus
 }
