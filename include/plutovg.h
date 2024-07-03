@@ -323,6 +323,10 @@ PLUTOVG_API void plutovg_canvas_reset_matrix(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_set_matrix(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix);
 PLUTOVG_API void plutovg_canvas_get_matrix(const plutovg_canvas_t* canvas, plutovg_matrix_t* matrix);
 
+PLUTOVG_API void plutovg_canvas_map(const plutovg_canvas_t* canvas, float x, float y, float* xx, float* yy);
+PLUTOVG_API void plutovg_canvas_map_point(const plutovg_canvas_t* canvas, const plutovg_point_t* src, plutovg_point_t* dst);
+PLUTOVG_API void plutovg_canvas_map_rect(const plutovg_canvas_t* canvas, const plutovg_rect_t* src, plutovg_rect_t* dst);
+
 PLUTOVG_API void plutovg_canvas_move_to(plutovg_canvas_t* canvas, float x, float y);
 PLUTOVG_API void plutovg_canvas_line_to(plutovg_canvas_t* canvas, float x, float y);
 PLUTOVG_API void plutovg_canvas_curve_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, float x3, float y3);

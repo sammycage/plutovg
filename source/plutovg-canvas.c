@@ -333,6 +333,21 @@ void plutovg_canvas_get_matrix(const plutovg_canvas_t* canvas, plutovg_matrix_t*
     *matrix = canvas->state->matrix;
 }
 
+void plutovg_canvas_map(const plutovg_canvas_t* canvas, float x, float y, float* xx, float* yy)
+{
+    plutovg_matrix_map(&canvas->state->matrix, x, y, xx, yy);
+}
+
+void plutovg_canvas_map_point(const plutovg_canvas_t* canvas, const plutovg_point_t* src, plutovg_point_t* dst)
+{
+    plutovg_matrix_map_point(&canvas->state->matrix, src, dst);
+}
+
+void plutovg_canvas_map_rect(const plutovg_canvas_t* canvas, const plutovg_rect_t* src, plutovg_rect_t* dst)
+{
+    plutovg_matrix_map_rect(&canvas->state->matrix, src, dst);
+}
+
 void plutovg_canvas_move_to(plutovg_canvas_t* canvas, float x, float y)
 {
     plutovg_path_move_to(canvas->path, x, y);
@@ -401,7 +416,7 @@ plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas)
 void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
 {
     plutovg_path_extents(canvas->path, extents);
-    plutovg_matrix_map_rect(&canvas->state->matrix, extents, extents);
+    plutovg_canvas_map_rect(canvas, extents, extents);
 }
 
 void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
