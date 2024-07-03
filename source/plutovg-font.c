@@ -1,17 +1,45 @@
 #include "plutovg-private.h"
 
+#include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
+static int plutovg_text_iterator_length(const void* data, int length, plutovg_text_encoding_t encoding)
+{
+    if(length >= 0)
+        return length;
+    length = 0;
+    switch(encoding) {
+    case PLUTOVG_TEXT_ENCODING_UTF8:
+    case PLUTOVG_TEXT_ENCODING_LATIN1: {
+        const uint8_t* text = data;
+        while(*text++)
+            length++;
+        break;
+    } case PLUTOVG_TEXT_ENCODING_UTF16: {
+        const uint16_t* text = data;
+        while(*text++)
+            length++;
+        break;
+    } case PLUTOVG_TEXT_ENCODING_UTF32: {
+        const uint32_t* text = data;
+        while(*text++)
+            length++;
+        break;
+    } default:
+        assert(false);
+    }
+
+    return length;
+}
+
 void plutovg_text_iterator_init(plutovg_text_iterator_t* it, const void* text, int length, plutovg_text_encoding_t encoding)
 {
     it->text = text;
-    it->length = length;
+    it->length = plutovg_text_iterator_length(text, length, encoding);
     it->encoding = encoding;
-    if(it->length < 0)
-        it->length = strlen(it->text);
     it->index = 0;
 }
 
@@ -22,8 +50,65 @@ bool plutovg_text_iterator_has_next(const plutovg_text_iterator_t* it)
 
 int plutovg_text_iterator_next(plutovg_text_iterator_t* it)
 {
-    unsigned int codepoint = it->text[it->index];
-    it->index += 1;
+    uint32_t codepoint = 0;
+    switch(it->encoding) {
+    case PLUTOVG_TEXT_ENCODING_UTF8: {
+        static const int trailing[256] = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
+        };
+
+        static const uint32_t offsets[6] = {
+            0x00000000, 0x00003080, 0x000E2080, 0x03C82080, 0xFA082080, 0x82082080
+        };
+
+        const uint8_t* text = it->text;
+        int trailing_bytes = trailing[text[it->index]];
+        if(it->index + trailing_bytes >= it->length)
+            trailing_bytes = 0;
+        switch(trailing_bytes) {
+        case 5: codepoint += text[it->index++]; codepoint <<= 6;
+        case 4: codepoint += text[it->index++]; codepoint <<= 6;
+        case 3: codepoint += text[it->index++]; codepoint <<= 6;
+        case 2: codepoint += text[it->index++]; codepoint <<= 6;
+        case 1: codepoint += text[it->index++]; codepoint <<= 6;
+        case 0: codepoint += text[it->index++];
+        }
+
+        codepoint -= offsets[trailing_bytes];
+        break;
+    } case PLUTOVG_TEXT_ENCODING_UTF16: {
+        const uint16_t* text = it->text;
+        codepoint = text[it->index++];
+        if(((codepoint) & 0xfffffc00) == 0xd800) {
+            if((((codepoint) & 0xfffffc00) == 0xdc00) && plutovg_text_iterator_has_next(it)) {
+                uint16_t trail = text[it->index];
+                codepoint = (codepoint << 10) + trail - ((0xD800u << 10) - 0x10000u + 0xDC00u);
+                it->index++;
+            }
+        }
+
+        break;
+    } case PLUTOVG_TEXT_ENCODING_UTF32: {
+        const uint32_t* text = it->text;
+        codepoint = text[it->index];
+        it->index += 1;
+        break;
+    } case PLUTOVG_TEXT_ENCODING_LATIN1: {
+        const uint8_t* text = it->text;
+        codepoint = text[it->index];
+        it->index += 1;
+        break;
+    } default:
+        assert(false);
+    }
+
     return codepoint;
 }
 

@@ -147,7 +147,7 @@ typedef enum plutovg_text_encoding {
 } plutovg_text_encoding_t;
 
 typedef struct plutovg_text_iterator {
-    const char* text;
+    const void* text;
     int length;
     plutovg_text_encoding_t encoding;
     int index;
