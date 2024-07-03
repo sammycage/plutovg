@@ -494,6 +494,48 @@ void plutovg_canvas_clip_preserve(plutovg_canvas_t* canvas)
     }
 }
 
+void plutovg_canvas_fill_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h)
+{
+    plutovg_canvas_new_path(canvas);
+    plutovg_canvas_rect(canvas, x, y, w, h);
+    plutovg_canvas_fill(canvas);
+}
+
+void plutovg_canvas_fill_path(plutovg_canvas_t* canvas, const plutovg_path_t* path)
+{
+    plutovg_canvas_new_path(canvas);
+    plutovg_canvas_add_path(canvas, path);
+    plutovg_canvas_fill(canvas);
+}
+
+void plutovg_canvas_stroke_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h)
+{
+    plutovg_canvas_new_path(canvas);
+    plutovg_canvas_rect(canvas, x, y, w, h);
+    plutovg_canvas_stroke(canvas);
+}
+
+void plutovg_canvas_stroke_path(plutovg_canvas_t* canvas, const plutovg_path_t* path)
+{
+    plutovg_canvas_new_path(canvas);
+    plutovg_canvas_add_path(canvas, path);
+    plutovg_canvas_stroke(canvas);
+}
+
+void plutovg_canvas_clip_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h)
+{
+    plutovg_canvas_new_path(canvas);
+    plutovg_canvas_rect(canvas, x, y, w, h);
+    plutovg_canvas_clip(canvas);
+}
+
+void plutovg_canvas_clip_path(plutovg_canvas_t* canvas, const plutovg_path_t* path)
+{
+    plutovg_canvas_new_path(canvas);
+    plutovg_canvas_add_path(canvas, path);
+    plutovg_canvas_clip(canvas);
+}
+
 float plutovg_canvas_fill_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y)
 {
     plutovg_canvas_new_path(canvas);
@@ -535,9 +577,9 @@ float plutovg_canvas_stroke_text(plutovg_canvas_t* canvas, const void* text, int
 
         plutovg_font_face_get_glyph_path(state->font_face, codepoint, canvas->path);
         plutovg_canvas_save(canvas);
+        plutovg_canvas_set_line_width(canvas, state->stroke.style.width / scale);
         plutovg_canvas_translate(canvas, advance_width + x, y);
         plutovg_canvas_scale(canvas, scale, -scale);
-        plutovg_canvas_set_line_width(canvas, state->stroke.style.width / scale);
         plutovg_canvas_stroke(canvas);
         plutovg_canvas_restore(canvas);
 

@@ -177,7 +177,7 @@ bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* 
     return success;
 }
 
-bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_stream_write_func_t write_func, void* closure)
+bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure)
 {
     plutovg_surface_unpremultiply_argb(surface);
     int success = stbi_write_png_to_func(write_func, closure, surface->width, surface->height, 4, surface->data, surface->stride);
@@ -185,7 +185,7 @@ bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, pluto
     return success;
 }
 
-bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_stream_write_func_t write_func, void* closure, int quality)
+bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality)
 {
     plutovg_surface_unpremultiply_argb(surface);
     int success = stbi_write_jpg_to_func(write_func, closure, surface->width, surface->height, 4, surface->data, quality);

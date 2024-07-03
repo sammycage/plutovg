@@ -239,10 +239,13 @@ void plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, int 
 float plutovg_font_face_get_glyph_extents(const plutovg_font_face_t* face, int codepoint, plutovg_rect_t* extents)
 {
     glyph_t* glyph = get_glyph(face, codepoint);
-    extents->x = glyph->x1;
-    extents->y = glyph->y1;
-    extents->w = glyph->y1 - glyph->x1;
-    extents->h = glyph->y2 - glyph->y1;
+    if(extents) {
+        extents->x = glyph->x1;
+        extents->y = glyph->y1;
+        extents->w = glyph->y1 - glyph->x1;
+        extents->h = glyph->y2 - glyph->y1;
+    }
+
     return glyph->advance_width;
 }
 

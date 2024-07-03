@@ -38,6 +38,9 @@ extern "C" {
 PLUTOVG_API int plutovg_version(void);
 PLUTOVG_API const char* plutovg_version_string(void);
 
+typedef void (*plutovg_destroy_func_t)(void* closure);
+typedef void (*plutovg_write_func_t)(void* closure, void* data, int size);
+
 typedef struct plutovg_point {
     float x;
     float y;
@@ -156,8 +159,6 @@ PLUTOVG_API int plutovg_text_iterator_next(plutovg_text_iterator_t* it);
 
 typedef struct plutovg_font_face plutovg_font_face_t;
 
-typedef void (*plutovg_destroy_func_t)(void* closure);
-
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int ttcindex);
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned int length, int ttcindex, plutovg_destroy_func_t destroy_func, void* closure);
 
@@ -201,10 +202,8 @@ PLUTOVG_API int plutovg_surface_get_stride(const plutovg_surface_t* surface);
 PLUTOVG_API bool plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename);
 PLUTOVG_API bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* filename, int quality);
 
-typedef void (*plutovg_stream_write_func_t)(void* closure, void* data, int size);
-
-PLUTOVG_API bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_stream_write_func_t write_func, void* closure);
-PLUTOVG_API bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_stream_write_func_t write_func, void* closure, int quality);
+PLUTOVG_API bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure);
+PLUTOVG_API bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality);
 
 typedef struct plutovg_color {
     float r;
@@ -353,6 +352,15 @@ PLUTOVG_API void plutovg_canvas_paint(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_fill_preserve(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_stroke_preserve(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_clip_preserve(plutovg_canvas_t* canvas);
+
+PLUTOVG_API void plutovg_canvas_fill_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+PLUTOVG_API void plutovg_canvas_fill_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
+
+PLUTOVG_API void plutovg_canvas_stroke_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+PLUTOVG_API void plutovg_canvas_stroke_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
+
+PLUTOVG_API void plutovg_canvas_clip_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+PLUTOVG_API void plutovg_canvas_clip_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
 PLUTOVG_API float plutovg_canvas_fill_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
 PLUTOVG_API float plutovg_canvas_stroke_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);

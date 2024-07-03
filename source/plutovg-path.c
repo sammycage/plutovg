@@ -353,23 +353,23 @@ typedef struct {
 
 static void split_bezier(const bezier_t* b, bezier_t* first, bezier_t* second)
 {
-    float c = (b->x2 + b->x3) * 0.5;
-    first->x2 = (b->x1 + b->x2) * 0.5;
-    second->x3 = (b->x3 + b->x4) * 0.5;
+    float c = (b->x2 + b->x3) * 0.5f;
+    first->x2 = (b->x1 + b->x2) * 0.5f;
+    second->x3 = (b->x3 + b->x4) * 0.5f;
     first->x1 = b->x1;
     second->x4 = b->x4;
-    first->x3 = (first->x2 + c) * 0.5;
-    second->x2 = (second->x3 + c) * 0.5;
-    first->x4 = second->x1 = (first->x3 + second->x2) * 0.5;
+    first->x3 = (first->x2 + c) * 0.5f;
+    second->x2 = (second->x3 + c) * 0.5f;
+    first->x4 = second->x1 = (first->x3 + second->x2) * 0.5f;
 
-    c = (b->y2 + b->y3) * 0.5;
-    first->y2 = (b->y1 + b->y2) * 0.5;
-    second->y3 = (b->y3 + b->y4) * 0.5;
+    c = (b->y2 + b->y3) * 0.5f;
+    first->y2 = (b->y1 + b->y2) * 0.5f;
+    second->y3 = (b->y3 + b->y4) * 0.5f;
     first->y1 = b->y1;
     second->y4 = b->y4;
-    first->y3 = (first->y2 + c) * 0.5;
-    second->y2 = (second->y3 + c) * 0.5;
-    first->y4 = second->y1 = (first->y3 + second->y2) * 0.5;
+    first->y3 = (first->y2 + c) * 0.5f;
+    second->y2 = (second->y3 + c) * 0.5f;
+    first->y4 = second->y1 = (first->y3 + second->y2) * 0.5f;
 }
 
 void plutovg_path_traverse_flatten(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure)
@@ -561,18 +561,19 @@ float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents)
 {
     extents_calculator_t calculator = {{0, 0}, true, 0, 0, 0, 0, 0};
     plutovg_path_traverse_flatten(path, extents_traverse_func, &calculator);
-    extents->x = calculator.x1;
-    extents->y = calculator.y1;
-    extents->w = calculator.x2 - calculator.x1;
-    extents->h = calculator.y2 - calculator.y1;
+    if(extents) {
+        extents->x = calculator.x1;
+        extents->y = calculator.y1;
+        extents->w = calculator.x2 - calculator.x1;
+        extents->h = calculator.y2 - calculator.y1;
+    }
+
     return calculator.length;
 }
 
 float plutovg_path_length(const plutovg_path_t* path)
 {
-    extents_calculator_t calculator = {{0, 0}, true, 0, 0, 0, 0, 0};
-    plutovg_path_traverse_flatten(path, extents_traverse_func, &calculator);
-    return calculator.length;
+    return plutovg_path_extents(path, NULL);
 }
 
 plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path)
