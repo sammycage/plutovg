@@ -418,23 +418,23 @@ static void composition_destination_out(uint32_t* dest, int length, const uint32
 typedef void(*composition_solid_function_t)(uint32_t* dest, int length, uint32_t color, uint32_t const_alpha);
 typedef void(*composition_function_t)(uint32_t* dest, int length, const uint32_t* src, uint32_t const_alpha);
 
-static const composition_solid_function_t composition_solid_map[] = {
+static const composition_solid_function_t composition_solid_table[] = {
     composition_solid_source,
     composition_solid_source_over,
     composition_solid_destination_in,
     composition_solid_destination_out
 };
 
-static const composition_function_t composition_map[] = {
+static const composition_function_t composition_table[] = {
     composition_source,
     composition_source_over,
     composition_destination_in,
     composition_destination_out
 };
 
-static void blend_solid(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, uint32_t solid)
+static void blend_solid(plutovg_surface_t* surface, plutovg_operator_t op, uint32_t solid, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_solid_function_t func = composition_solid_map[op];
+    composition_solid_function_t func = composition_solid_table[op];
     int count = span_buffer->spans.size;
     const plutovg_span_t* spans = span_buffer->spans.data;
     while(count--) {
@@ -445,9 +445,9 @@ static void blend_solid(plutovg_surface_t* surface, plutovg_operator_t op, const
 }
 
 #define BUFFER_SIZE 1024
-static void blend_linear_gradient(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, const gradient_data_t* gradient)
+static void blend_linear_gradient(plutovg_surface_t* surface, plutovg_operator_t op, const gradient_data_t* gradient, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_function_t func = composition_map[op];
+    composition_function_t func = composition_table[op];
     unsigned int buffer[BUFFER_SIZE];
 
     linear_gradient_values_t v;
@@ -479,9 +479,9 @@ static void blend_linear_gradient(plutovg_surface_t* surface, plutovg_operator_t
     }
 }
 
-static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, const gradient_data_t* gradient)
+static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t op, const gradient_data_t* gradient, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_function_t func = composition_map[op];
+    composition_function_t func = composition_table[op];
     unsigned int buffer[BUFFER_SIZE];
 
     radial_gradient_values_t v;
@@ -512,9 +512,9 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
 }
 
 #define FIXED_SCALE (1 << 16)
-static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, const texture_data_t* texture)
+static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_function_t func = composition_map[op];
+    composition_function_t func = composition_table[op];
     uint32_t buffer[BUFFER_SIZE];
 
     int image_width = texture->width;
@@ -563,9 +563,9 @@ static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_
     }
 }
 
-static void blend_untransformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, const texture_data_t* texture)
+static void blend_untransformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_function_t func = composition_map[op];
+    composition_function_t func = composition_table[op];
 
     const int image_width = texture->width;
     const int image_height = texture->height;
@@ -601,9 +601,9 @@ static void blend_untransformed_argb(plutovg_surface_t* surface, plutovg_operato
     }
 }
 
-static void blend_untransformed_tiled_argb(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, const texture_data_t* texture)
+static void blend_untransformed_tiled_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_function_t func = composition_map[op];
+    composition_function_t func = composition_table[op];
 
     int image_width = texture->width;
     int image_height = texture->height;
@@ -647,9 +647,9 @@ static void blend_untransformed_tiled_argb(plutovg_surface_t* surface, plutovg_o
     }
 }
 
-static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_span_buffer_t* span_buffer, const texture_data_t* texture)
+static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
-    composition_function_t func = composition_map[op];
+    composition_function_t func = composition_table[op];
     uint32_t buffer[BUFFER_SIZE];
 
     int image_width = texture->width;
@@ -704,20 +704,20 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
     }
 }
 
-static void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer, const plutovg_color_t* color)
+static void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_color_t* color, const plutovg_span_buffer_t* span_buffer)
 {
     plutovg_state_t* state = canvas->state;
     uint32_t solid = premultiply_color_with_opacity(color, state->opacity);
 
     uint32_t alpha = plutovg_alpha(solid);
     if(alpha == 255 && state->op == PLUTOVG_OPERATOR_SRC_OVER) {
-        blend_solid(canvas->surface, PLUTOVG_OPERATOR_SRC, span_buffer, solid);
+        blend_solid(canvas->surface, PLUTOVG_OPERATOR_SRC, solid, span_buffer);
     } else {
-        blend_solid(canvas->surface, state->op, span_buffer, solid);
+        blend_solid(canvas->surface, state->op, solid, span_buffer);
     }
 }
 
-static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer, const plutovg_gradient_t* gradient)
+static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradient_t* gradient, const plutovg_span_buffer_t* span_buffer)
 {
     if(gradient->stops.size == 0)
         return;
@@ -777,7 +777,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_span_
         data.values.linear.y1 = gradient->values[1];
         data.values.linear.x2 = gradient->values[2];
         data.values.linear.y2 = gradient->values[3];
-        blend_linear_gradient(canvas->surface, state->op, span_buffer, &data);
+        blend_linear_gradient(canvas->surface, state->op, &data, span_buffer);
     } else {
         data.values.radial.cx = gradient->values[0];
         data.values.radial.cy = gradient->values[1];
@@ -785,11 +785,11 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_span_
         data.values.radial.fx = gradient->values[3];
         data.values.radial.fy = gradient->values[4];
         data.values.radial.fr = gradient->values[5];
-        blend_radial_gradient(canvas->surface, state->op, span_buffer, &data);
+        blend_radial_gradient(canvas->surface, state->op, &data, span_buffer);
     }
 }
 
-static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer, const plutovg_texture_t* texture)
+static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_texture_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
     plutovg_state_t* state = canvas->state;
     texture_data_t data;
@@ -807,15 +807,15 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_span_b
     bool translating = (matrix->a == 1 && matrix->b == 0 && matrix->c == 0 && matrix->d == 1);
     if(translating) {
         if(texture->type == PLUTOVG_TEXTURE_TYPE_PLAIN) {
-            blend_untransformed_argb(canvas->surface, state->op, span_buffer, &data);
+            blend_untransformed_argb(canvas->surface, state->op, &data, span_buffer);
         } else {
-            blend_untransformed_tiled_argb(canvas->surface, state->op, span_buffer, &data);
+            blend_untransformed_tiled_argb(canvas->surface, state->op, &data, span_buffer);
         }
     } else {
         if(texture->type == PLUTOVG_TEXTURE_TYPE_PLAIN) {
-            blend_transformed_argb(canvas->surface, state->op, span_buffer, &data);
+            blend_transformed_argb(canvas->surface, state->op, &data, span_buffer);
         } else {
-            blend_transformed_tiled_argb(canvas->surface, state->op, span_buffer, &data);
+            blend_transformed_tiled_argb(canvas->surface, state->op, &data, span_buffer);
         }
     }
 }
@@ -825,16 +825,16 @@ void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_b
     if(span_buffer->spans.size == 0)
         return;
     if(canvas->state->paint == NULL) {
-        plutovg_blend_color(canvas, span_buffer, &canvas->state->color);
+        plutovg_blend_color(canvas, &canvas->state->color, span_buffer);
         return;
     }
 
     plutovg_paint_t* source = canvas->state->paint;
     if(source->type == PLUTOVG_PAINT_TYPE_COLOR) {
-        plutovg_blend_color(canvas, span_buffer, &source->data.color);
+        plutovg_blend_color(canvas, &source->data.color, span_buffer);
     } else if(source->type == PLUTOVG_PAINT_TYPE_GRADIENT) {
-        plutovg_blend_gradient(canvas, span_buffer, &source->data.gradient);
+        plutovg_blend_gradient(canvas, &source->data.gradient, span_buffer);
     } else {
-        plutovg_blend_texture(canvas, span_buffer, &source->data.texture);
+        plutovg_blend_texture(canvas, &source->data.texture, span_buffer);
     }
 }

@@ -2,7 +2,6 @@
 
 #include "plutovg-ft-raster.h"
 #include "plutovg-ft-stroker.h"
-#include "plutovg-ft-types.h"
 
 #include <math.h>
 #include <limits.h>
