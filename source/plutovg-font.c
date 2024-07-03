@@ -143,7 +143,7 @@ void plutovg_font_face_get_extents(const plutovg_font_face_t* face, plutovg_rect
 {
     extents->x = face->x1;
     extents->y = face->y1;
-    extents->w = face->y1 - face->x1;
+    extents->w = face->x2 - face->x1;
     extents->h = face->y2 - face->y1;
 }
 
@@ -242,7 +242,7 @@ float plutovg_font_face_get_glyph_extents(const plutovg_font_face_t* face, int c
     if(extents) {
         extents->x = glyph->x1;
         extents->y = glyph->y1;
-        extents->w = glyph->y1 - glyph->x1;
+        extents->w = glyph->x2 - glyph->x1;
         extents->h = glyph->y2 - glyph->y1;
     }
 
