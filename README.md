@@ -1,3 +1,8 @@
+[![Releases](https://img.shields.io/badge/Version-0.0.1-orange.svg)](https://github.com/sammycage/plutovg/releases)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/sammycage/plutovg/blob/main/LICENSE)
+[![Build Status](https://github.com/sammycage/plutovg/actions/workflows/main.yml/badge.svg)](https://github.com/sammycage/plutovg/actions)
+[![CodeFactor](https://www.codefactor.io/repository/github/sammycage/plutovg/badge)](https://www.codefactor.io/repository/github/sammycage/plutovg)
+
 # PlutoVG
 PlutoVG is a standalone 2D vector graphics library in C.
 
@@ -82,6 +87,3 @@ ninja -C build install
 ## Projects using PlutoVG
 - [LunaSVG](https://github.com/sammycage/lunasvg)
 - [PlutoSVG](https://github.com/sammycage/plutosvg)
-
-## Support
-If you like what we do, [you can buy us a coffee](https://www.paypal.me/sammycage)
