@@ -83,7 +83,7 @@ typedef struct plutovg_path plutovg_path_t;
 typedef enum plutovg_path_command {
     PLUTOVG_PATH_COMMAND_MOVE_TO,
     PLUTOVG_PATH_COMMAND_LINE_TO,
-    PLUTOVG_PATH_COMMAND_CURVE_TO,
+    PLUTOVG_PATH_COMMAND_CUBIC_TO,
     PLUTOVG_PATH_COMMAND_CLOSE
 } plutovg_path_command_t;
 
@@ -108,7 +108,9 @@ PLUTOVG_API plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_itera
 PLUTOVG_API plutovg_path_t* plutovg_path_create(void);
 PLUTOVG_API void plutovg_path_move_to(plutovg_path_t* path, float x, float y);
 PLUTOVG_API void plutovg_path_line_to(plutovg_path_t* path, float x, float y);
-PLUTOVG_API void plutovg_path_curve_to(plutovg_path_t* path, float x1, float y1, float x2, float y2, float x3, float y3);
+PLUTOVG_API void plutovg_path_quad_to(plutovg_path_t* path, float x1, float y1, float x2, float y2);
+PLUTOVG_API void plutovg_path_cubic_to(plutovg_path_t* path, float x1, float y1, float x2, float y2, float x3, float y3);
+PLUTOVG_API void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, bool large_arc_flag, bool sweep_flag, float x, float y);
 PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
 PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y);
 PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int nelements);
@@ -138,6 +140,8 @@ PLUTOVG_API float plutovg_path_length(const plutovg_path_t* path);
 PLUTOVG_API plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path);
 PLUTOVG_API plutovg_path_t* plutovg_path_clone_flatten(const plutovg_path_t* path);
 PLUTOVG_API plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes);
+
+PLUTOVG_API int plutovg_path_parse(plutovg_path_t* path, const char* data, int length);
 
 typedef enum plutovg_text_encoding {
     PLUTOVG_TEXT_ENCODING_UTF8,
@@ -329,7 +333,7 @@ PLUTOVG_API void plutovg_canvas_map_rect(const plutovg_canvas_t* canvas, const p
 
 PLUTOVG_API void plutovg_canvas_move_to(plutovg_canvas_t* canvas, float x, float y);
 PLUTOVG_API void plutovg_canvas_line_to(plutovg_canvas_t* canvas, float x, float y);
-PLUTOVG_API void plutovg_canvas_curve_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, float x3, float y3);
+PLUTOVG_API void plutovg_canvas_cubic_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, float x3, float y3);
 
 PLUTOVG_API void plutovg_canvas_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
 PLUTOVG_API void plutovg_canvas_round_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h, float rx, float ry);

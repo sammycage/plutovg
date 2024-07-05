@@ -263,8 +263,8 @@ static void glyph_traverse_func(void* closure, plutovg_path_command_t command, c
     case PLUTOVG_PATH_COMMAND_LINE_TO:
         plutovg_path_line_to(path, points[0].x, points[0].y);
         break;
-    case PLUTOVG_PATH_COMMAND_CURVE_TO:
-        plutovg_path_curve_to(path, points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+    case PLUTOVG_PATH_COMMAND_CUBIC_TO:
+        plutovg_path_cubic_to(path, points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
         break;
     case PLUTOVG_PATH_COMMAND_CLOSE:
         assert(false);
@@ -302,7 +302,7 @@ void plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, int 
             points[1].y = 2.f / 3.f * glyph->vertices[i].cy + 1.f / 3.f * glyph->vertices[i].y;
             points[2].x = glyph->vertices[i].x;
             points[2].y = glyph->vertices[i].y;
-            traverse_func(closure, PLUTOVG_PATH_COMMAND_CURVE_TO, points, 3);
+            traverse_func(closure, PLUTOVG_PATH_COMMAND_CUBIC_TO, points, 3);
             current_point = points[2];
             break;
         case STBTT_vcubic:
@@ -312,7 +312,7 @@ void plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, int 
             points[1].y = glyph->vertices[i].cy1;
             points[2].x = glyph->vertices[i].x;
             points[2].y = glyph->vertices[i].y;
-            traverse_func(closure, PLUTOVG_PATH_COMMAND_CURVE_TO, points, 3);
+            traverse_func(closure, PLUTOVG_PATH_COMMAND_CUBIC_TO, points, 3);
             current_point = points[2];
             break;
         default:

@@ -146,11 +146,11 @@ void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plu
 void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer);
 
-#define PLUTOVG_SQRT2 1.41421356237309504880
-#define PLUTOVG_PI 3.14159265358979323846
-#define PLUTOVG_TWO_PI 6.28318530717958647693
-#define PLUTOVG_HALF_PI 1.57079632679489661923
-#define PLUTOVG_KAPPA 0.55228474983079339840
+#define PLUTOVG_SQRT2 1.41421356237309504880f
+#define PLUTOVG_PI 3.14159265358979323846f
+#define PLUTOVG_TWO_PI 6.28318530717958647693f
+#define PLUTOVG_HALF_PI 1.57079632679489661923f
+#define PLUTOVG_KAPPA 0.55228474983079339840f
 
 #define plutovg_min(a, b) ((a) < (b) ? (a) : (b))
 #define plutovg_max(a, b) ((a) > (b) ? (a) : (b))

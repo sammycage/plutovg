@@ -269,7 +269,7 @@ static PVG_FT_Outline* ft_outline_convert(const plutovg_path_t* path, const plut
             plutovg_matrix_map_point(matrix, &points[0], &points[0]);
             ft_outline_line_to(outline, points[0].x, points[0].y);
             break;
-        case PLUTOVG_PATH_COMMAND_CURVE_TO:
+        case PLUTOVG_PATH_COMMAND_CUBIC_TO:
             plutovg_matrix_map_point(matrix, &points[0], &points[0]);
             plutovg_matrix_map_point(matrix, &points[1], &points[1]);
             plutovg_matrix_map_point(matrix, &points[2], &points[2]);
