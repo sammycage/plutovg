@@ -16,53 +16,53 @@ void plutovg_matrix_init_identity(plutovg_matrix_t* matrix)
     matrix->e = 0; matrix->f = 0;
 }
 
-void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float x, float y)
+void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float tx, float ty)
 {
-    plutovg_matrix_init(matrix, 1, 0, 0, 1, x, y);
+    plutovg_matrix_init(matrix, 1, 0, 0, 1, tx, ty);
 }
 
-void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float x, float y)
+void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float sx, float sy)
 {
-    plutovg_matrix_init(matrix, x, 0, 0, y, 0, 0);
+    plutovg_matrix_init(matrix, sx, 0, 0, sy, 0, 0);
 }
 
-void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float x, float y)
+void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float shx, float shy)
 {
-    plutovg_matrix_init(matrix, 1, tanf(y), tanf(x), 1, 0, 0);
+    plutovg_matrix_init(matrix, 1, tanf(shy), tanf(shx), 1, 0, 0);
 }
 
-void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float radians)
+void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float angle)
 {
-    float c = cosf(radians);
-    float s = sinf(radians);
+    float c = cosf(angle);
+    float s = sinf(angle);
     plutovg_matrix_init(matrix, c, s, -s, c, 0, 0);
 }
 
-void plutovg_matrix_translate(plutovg_matrix_t* matrix, float x, float y)
+void plutovg_matrix_translate(plutovg_matrix_t* matrix, float tx, float ty)
 {
     plutovg_matrix_t m;
-    plutovg_matrix_init_translate(&m, x, y);
+    plutovg_matrix_init_translate(&m, tx, ty);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 
-void plutovg_matrix_scale(plutovg_matrix_t* matrix, float x, float y)
+void plutovg_matrix_scale(plutovg_matrix_t* matrix, float sx, float sy)
 {
     plutovg_matrix_t m;
-    plutovg_matrix_init_scale(&m, x, y);
+    plutovg_matrix_init_scale(&m, sx, sy);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 
-void plutovg_matrix_shear(plutovg_matrix_t* matrix, float x, float y)
+void plutovg_matrix_shear(plutovg_matrix_t* matrix, float shx, float shy)
 {
     plutovg_matrix_t m;
-    plutovg_matrix_init_shear(&m, x, y);
+    plutovg_matrix_init_shear(&m, shx, shy);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 
-void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float radians)
+void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle)
 {
     plutovg_matrix_t m;
-    plutovg_matrix_init_rotate(&m, radians);
+    plutovg_matrix_init_rotate(&m, angle);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 

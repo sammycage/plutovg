@@ -64,14 +64,14 @@ typedef struct plutovg_matrix {
 
 PLUTOVG_API void plutovg_matrix_init(plutovg_matrix_t* matrix, float a, float b, float c, float d, float e, float f);
 PLUTOVG_API void plutovg_matrix_init_identity(plutovg_matrix_t* matrix);
-PLUTOVG_API void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float x, float y);
-PLUTOVG_API void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float x, float y);
-PLUTOVG_API void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float x, float y);
-PLUTOVG_API void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float radians);
-PLUTOVG_API void plutovg_matrix_translate(plutovg_matrix_t* matrix, float x, float y);
-PLUTOVG_API void plutovg_matrix_scale(plutovg_matrix_t* matrix, float x, float y);
-PLUTOVG_API void plutovg_matrix_shear(plutovg_matrix_t* matrix, float x, float y);
-PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float radians);
+PLUTOVG_API void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float tx, float ty);
+PLUTOVG_API void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float sx, float sy);
+PLUTOVG_API void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float shx, float shy);
+PLUTOVG_API void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float angle);
+PLUTOVG_API void plutovg_matrix_translate(plutovg_matrix_t* matrix, float tx, float ty);
+PLUTOVG_API void plutovg_matrix_scale(plutovg_matrix_t* matrix, float sx, float sy);
+PLUTOVG_API void plutovg_matrix_shear(plutovg_matrix_t* matrix, float shx, float shy);
+PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle);
 PLUTOVG_API void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg_matrix_t* left, const plutovg_matrix_t* right);
 PLUTOVG_API bool plutovg_matrix_invert(const plutovg_matrix_t* matrix, plutovg_matrix_t* inverse);
 PLUTOVG_API void plutovg_matrix_map(const plutovg_matrix_t* matrix, float x, float y, float* xx, float* yy);
@@ -97,8 +97,8 @@ typedef union plutovg_path_element {
 
 typedef struct plutovg_path_iterator {
     const plutovg_path_element_t* elements;
-    int nelements;
-    int element_index;
+    int size;
+    int index;
 } plutovg_path_iterator_t;
 
 PLUTOVG_API void plutovg_path_iterator_init(plutovg_path_iterator_t* it, const plutovg_path_t* path);
@@ -113,7 +113,7 @@ PLUTOVG_API void plutovg_path_cubic_to(plutovg_path_t* path, float x1, float y1,
 PLUTOVG_API void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, bool large_arc_flag, bool sweep_flag, float x, float y);
 PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
 PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y);
-PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int nelements);
+PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int count);
 PLUTOVG_API void plutovg_path_reset(plutovg_path_t* path);
 PLUTOVG_API void plutovg_path_add_rect(plutovg_path_t* path, float x, float y, float w, float h);
 PLUTOVG_API void plutovg_path_add_round_rect(plutovg_path_t* path, float x, float y, float w, float h, float rx, float ry);

@@ -7,18 +7,18 @@
 void plutovg_path_iterator_init(plutovg_path_iterator_t* it, const plutovg_path_t* path)
 {
     it->elements = path->elements.data;
-    it->nelements = path->elements.size;
-    it->element_index = 0;
+    it->size = path->elements.size;
+    it->index = 0;
 }
 
 bool plutovg_path_iterator_has_next(const plutovg_path_iterator_t* it)
 {
-    return it->element_index < it->nelements;
+    return it->index < it->size;
 }
 
 plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_iterator_t* it, plutovg_point_t points[3])
 {
-    const plutovg_path_element_t* elements = it->elements + it->element_index;
+    const plutovg_path_element_t* elements = it->elements + it->index;
     switch(elements[0].header.command) {
     case PLUTOVG_PATH_COMMAND_MOVE_TO:
     case PLUTOVG_PATH_COMMAND_LINE_TO:
@@ -32,7 +32,7 @@ plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_iterator_t* it, p
         break;
     }
 
-    it->element_index += elements[0].header.length;
+    it->index += elements[0].header.length;
     return elements[0].header.command;
 }
 
@@ -221,9 +221,9 @@ void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y)
     if(y) *y = yy;
 }
 
-void plutovg_path_reserve(plutovg_path_t* path, int nelements)
+void plutovg_path_reserve(plutovg_path_t* path, int count)
 {
-    plutovg_array_ensure(path->elements, nelements);
+    plutovg_array_ensure(path->elements, count);
 }
 
 void plutovg_path_reset(plutovg_path_t* path)

@@ -8,7 +8,7 @@
 
 static int plutovg_text_iterator_length(const void* data, int length, plutovg_text_encoding_t encoding)
 {
-    if(length >= 0)
+    if(length != -1)
         return length;
     length = 0;
     switch(encoding) {

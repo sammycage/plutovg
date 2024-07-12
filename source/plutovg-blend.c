@@ -7,8 +7,8 @@
 
 #define COLOR_TABLE_SIZE 1024
 typedef struct {
-    plutovg_spread_method_t spread;
     plutovg_matrix_t matrix;
+    plutovg_spread_method_t spread;
     uint32_t colortable[COLOR_TABLE_SIZE];
     union {
         struct {
@@ -723,6 +723,11 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
         return;
     plutovg_state_t* state = canvas->state;
     gradient_data_t data;
+    data.spread = gradient->spread;
+    data.matrix = gradient->matrix;
+    plutovg_matrix_multiply(&data.matrix, &data.matrix, &state->matrix);
+    if(!plutovg_matrix_invert(&data.matrix, &data.matrix))
+        return;
     int i, pos = 0, nstop = gradient->stops.size;
     const plutovg_gradient_stop_t *curr, *next, *start, *last;
     uint32_t curr_color, next_color, last_color;
@@ -767,11 +772,6 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
         data.colortable[pos] = last_color;
     }
 
-    data.spread = gradient->spread;
-    data.matrix = gradient->matrix;
-    plutovg_matrix_multiply(&data.matrix, &data.matrix, &state->matrix);
-    plutovg_matrix_invert(&data.matrix, &data.matrix);
-
     if(gradient->type == PLUTOVG_GRADIENT_TYPE_LINEAR) {
         data.values.linear.x1 = gradient->values[0];
         data.values.linear.y1 = gradient->values[1];
@@ -793,16 +793,16 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_textur
 {
     plutovg_state_t* state = canvas->state;
     texture_data_t data;
+    data.matrix = texture->matrix;
     data.data = texture->surface->data;
     data.width = texture->surface->width;
     data.height = texture->surface->height;
     data.stride = texture->surface->stride;
     data.const_alpha = (int)(state->opacity * texture->opacity * 256);
-    data.matrix = texture->matrix;
 
     plutovg_matrix_multiply(&data.matrix, &data.matrix, &state->matrix);
-    plutovg_matrix_invert(&data.matrix, &data.matrix);
-
+    if(!plutovg_matrix_invert(&data.matrix, &data.matrix))
+        return;
     const plutovg_matrix_t* matrix = &data.matrix;
     bool translating = (matrix->a == 1 && matrix->b == 0 && matrix->c == 0 && matrix->d == 1);
     if(translating) {
