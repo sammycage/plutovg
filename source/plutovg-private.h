@@ -29,30 +29,6 @@ struct plutovg_path {
 };
 
 typedef enum {
-    PLUTOVG_GRADIENT_TYPE_LINEAR,
-    PLUTOVG_GRADIENT_TYPE_RADIAL
-} plutovg_gradient_type_t;
-
-typedef struct {
-    plutovg_gradient_type_t type;
-    plutovg_spread_method_t spread;
-    plutovg_matrix_t matrix;
-    float values[6];
-    struct {
-        plutovg_gradient_stop_t* data;
-        int size;
-        int capacity;
-    } stops;
-} plutovg_gradient_t;
-
-typedef struct {
-    plutovg_texture_type_t type;
-    float opacity;
-    plutovg_matrix_t matrix;
-    plutovg_surface_t* surface;
-} plutovg_texture_t;
-
-typedef enum {
     PLUTOVG_PAINT_TYPE_COLOR,
     PLUTOVG_PAINT_TYPE_GRADIENT,
     PLUTOVG_PAINT_TYPE_TEXTURE
@@ -61,12 +37,36 @@ typedef enum {
 struct plutovg_paint {
     int ref_count;
     plutovg_paint_type_t type;
-    union {
-        plutovg_color_t color;
-        plutovg_gradient_t gradient;
-        plutovg_texture_t texture;
-    } data;
 };
+
+typedef struct {
+    plutovg_paint_t base;
+    plutovg_color_t color;
+} plutovg_solid_paint_t;
+
+typedef enum {
+    PLUTOVG_GRADIENT_TYPE_LINEAR,
+    PLUTOVG_GRADIENT_TYPE_RADIAL
+} plutovg_gradient_type_t;
+
+typedef struct {
+    plutovg_paint_t base;
+    plutovg_gradient_type_t type;
+    plutovg_spread_method_t spread;
+    plutovg_matrix_t matrix;
+    float values[6];
+    plutovg_gradient_stop_t embedded_stops[2];
+    plutovg_gradient_stop_t* stops;
+    int nstops;
+} plutovg_gradient_paint_t;
+
+typedef struct {
+    plutovg_paint_t base;
+    plutovg_texture_type_t type;
+    float opacity;
+    plutovg_matrix_t matrix;
+    plutovg_surface_t* surface;
+} plutovg_texture_paint_t;
 
 typedef struct {
     int x;
@@ -137,7 +137,7 @@ struct plutovg_canvas {
 
 void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer);
 void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer);
-void plutovg_span_buffer_finish(plutovg_span_buffer_t* span_buffer);
+void plutovg_span_buffer_destroy(plutovg_span_buffer_t* span_buffer);
 void plutovg_span_buffer_copy(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* source);
 void plutovg_span_buffer_extents(plutovg_span_buffer_t* span_buffer, plutovg_rect_t* extents);
 void plutovg_span_buffer_add_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height);
@@ -151,6 +151,16 @@ void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_b
 #define PLUTOVG_TWO_PI 6.28318530717958647693f
 #define PLUTOVG_HALF_PI 1.57079632679489661923f
 #define PLUTOVG_KAPPA 0.55228474983079339840f
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define PLUTOVG_THREAD_LOCAL _Thread_local
+#elif defined(_MSC_VER)
+#define PLUTOVG_THREAD_LOCAL __declspec(thread)
+#elif defined(__GNUC__)
+#define PLUTOVG_THREAD_LOCAL __thread
+#else
+#define PLUTOVG_THREAD_LOCAL
+#endif
 
 #define plutovg_min(a, b) ((a) < (b) ? (a) : (b))
 #define plutovg_max(a, b) ((a) > (b) ? (a) : (b))

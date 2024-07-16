@@ -12,23 +12,58 @@ const char* plutovg_version_string(void)
     return PLUTOVG_VERSION_STRING;
 }
 
+static void plutovg_stroke_data_reset(plutovg_stroke_data_t* stroke)
+{
+    plutovg_array_clear(stroke->dash.array);
+    stroke->dash.offset = 0.f;
+    stroke->style.width = 1.f;
+    stroke->style.cap = PLUTOVG_LINE_CAP_BUTT;
+    stroke->style.join = PLUTOVG_LINE_JOIN_MITER;
+    stroke->style.miter_limit = 10.f;
+}
+
+static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutovg_stroke_data_t* source)
+{
+    assert(stroke->dash.array.size == 0);
+    plutovg_array_append(stroke->dash.array, source->dash.array);
+    stroke->dash.offset = source->dash.offset;
+    stroke->style.width = source->style.width;
+    stroke->style.cap = source->style.cap;
+    stroke->style.join = source->style.join;
+    stroke->style.miter_limit = source->style.miter_limit;
+}
+
 static void plutovg_state_reset(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
-    plutovg_matrix_init_identity(&state->matrix);
-    plutovg_span_buffer_init(&state->clip_spans);
-    plutovg_array_clear(state->stroke.dash.array);
     plutovg_font_face_destroy(state->font_face);
+    plutovg_stroke_data_reset(&state->stroke);
+    plutovg_span_buffer_reset(&state->clip_spans);
+    plutovg_matrix_init_identity(&state->matrix);
     state->paint = NULL;
     state->color = PLUTOVG_BLACK_COLOR;
-    state->stroke.style = PLUTOVG_DEFAULT_STROKE_STYLE;
-    state->stroke.dash.offset = 0.f;
     state->font_face = NULL;
     state->font_size = 12.f;
     state->op = PLUTOVG_OPERATOR_SRC_OVER;
     state->winding = PLUTOVG_FILL_RULE_NON_ZERO;
     state->clipping = false;
     state->opacity = 1.f;
+}
+
+static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
+{
+    assert(state->paint == NULL && state->font_face == NULL);
+    plutovg_stroke_data_copy(&state->stroke, &source->stroke);
+    plutovg_span_buffer_copy(&state->clip_spans, &source->clip_spans);
+    state->paint = plutovg_paint_reference(source->paint);
+    state->font_face = plutovg_font_face_reference(source->font_face);
+    state->color = source->color;
+    state->matrix = source->matrix;
+    state->font_size = source->font_size;
+    state->op = source->op;
+    state->winding = source->winding;
+    state->clipping = source->clipping;
+    state->opacity = source->opacity;
 }
 
 static plutovg_state_t* plutovg_state_create(void)
@@ -38,29 +73,11 @@ static plutovg_state_t* plutovg_state_create(void)
     return state;
 }
 
-static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
-{
-    assert(state->paint == NULL && state->font_face == NULL && state->stroke.dash.array.size == 0);
-    plutovg_array_append(state->stroke.dash.array, source->stroke.dash.array);
-    plutovg_span_buffer_copy(&state->clip_spans, &source->clip_spans);
-    state->paint = plutovg_paint_reference(source->paint);
-    state->font_face = plutovg_font_face_reference(source->font_face);
-    state->color = source->color;
-    state->matrix = source->matrix;
-    state->stroke.style = source->stroke.style;
-    state->stroke.dash.offset = source->stroke.dash.offset;
-    state->font_size = source->font_size;
-    state->op = source->op;
-    state->winding = source->winding;
-    state->clipping = source->clipping;
-    state->opacity = source->opacity;
-}
-
 static void plutovg_state_destroy(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
     plutovg_array_destroy(state->stroke.dash.array);
-    plutovg_span_buffer_finish(&state->clip_spans);
+    plutovg_span_buffer_destroy(&state->clip_spans);
     free(state);
 }
 
@@ -106,8 +123,8 @@ void plutovg_canvas_destroy(plutovg_canvas_t* canvas)
             plutovg_state_destroy(state);
         }
 
-        plutovg_span_buffer_finish(&canvas->fill_spans);
-        plutovg_span_buffer_finish(&canvas->clip_spans);
+        plutovg_span_buffer_destroy(&canvas->fill_spans);
+        plutovg_span_buffer_destroy(&canvas->clip_spans);
         plutovg_surface_destroy(canvas->surface);
         plutovg_path_destroy(canvas->path);
         free(canvas);
@@ -169,6 +186,13 @@ void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_paint_t* paint)
     paint = plutovg_paint_reference(paint);
     plutovg_paint_destroy(canvas->state->paint);
     canvas->state->paint = paint;
+}
+
+plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas, plutovg_color_t* color)
+{
+    if(color && canvas->state->paint == NULL)
+        *color = canvas->state->color;
+    return canvas->state->paint;
 }
 
 void plutovg_canvas_set_font(plutovg_canvas_t* canvas, plutovg_font_face_t* face, float size)

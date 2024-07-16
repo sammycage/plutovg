@@ -717,9 +717,9 @@ static void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_color_t*
     }
 }
 
-static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradient_t* gradient, const plutovg_span_buffer_t* span_buffer)
+static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradient_paint_t* gradient, const plutovg_span_buffer_t* span_buffer)
 {
-    if(gradient->stops.size == 0)
+    if(gradient->nstops == 0)
         return;
     plutovg_state_t* state = canvas->state;
     gradient_data_t data;
@@ -728,14 +728,14 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
     plutovg_matrix_multiply(&data.matrix, &data.matrix, &state->matrix);
     if(!plutovg_matrix_invert(&data.matrix, &data.matrix))
         return;
-    int i, pos = 0, nstop = gradient->stops.size;
+    int i, pos = 0, nstops = gradient->nstops;
     const plutovg_gradient_stop_t *curr, *next, *start, *last;
     uint32_t curr_color, next_color, last_color;
     uint32_t dist, idist;
     float delta, t, incr, fpos;
     float opacity = state->opacity;
 
-    start = gradient->stops.data;
+    start = gradient->stops;
     curr = start;
     curr_color = combine_color_with_opacity(&curr->color, opacity);
 
@@ -749,7 +749,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
         fpos += incr;
     }
 
-    for(i = 0; i < nstop - 1; i++) {
+    for(i = 0; i < nstops - 1; i++) {
         curr = (start + i);
         next = (start + i + 1);
         delta = 1.f / (next->offset - curr->offset);
@@ -766,7 +766,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
         curr_color = next_color;
     }
 
-    last = start + nstop - 1;
+    last = start + nstops - 1;
     last_color = premultiply_color_with_opacity(&last->color, opacity);
     for(; pos < COLOR_TABLE_SIZE; ++pos) {
         data.colortable[pos] = last_color;
@@ -789,7 +789,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
     }
 }
 
-static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_texture_t* texture, const plutovg_span_buffer_t* span_buffer)
+static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_texture_paint_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
     plutovg_state_t* state = canvas->state;
     texture_data_t data;
@@ -829,12 +829,15 @@ void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_b
         return;
     }
 
-    plutovg_paint_t* source = canvas->state->paint;
-    if(source->type == PLUTOVG_PAINT_TYPE_COLOR) {
-        plutovg_blend_color(canvas, &source->data.color, span_buffer);
-    } else if(source->type == PLUTOVG_PAINT_TYPE_GRADIENT) {
-        plutovg_blend_gradient(canvas, &source->data.gradient, span_buffer);
+    plutovg_paint_t* paint = canvas->state->paint;
+    if(paint->type == PLUTOVG_PAINT_TYPE_COLOR) {
+        plutovg_solid_paint_t* solid = (plutovg_solid_paint_t*)(paint);
+        plutovg_blend_color(canvas, &solid->color, span_buffer);
+    } else if(paint->type == PLUTOVG_PAINT_TYPE_GRADIENT) {
+        plutovg_gradient_paint_t* gradient = (plutovg_gradient_paint_t*)(paint);
+        plutovg_blend_gradient(canvas, gradient, span_buffer);
     } else {
-        plutovg_blend_texture(canvas, &source->data.texture, span_buffer);
+        plutovg_texture_paint_t* texture = (plutovg_texture_paint_t*)(paint);
+        plutovg_blend_texture(canvas, texture, span_buffer);
     }
 }

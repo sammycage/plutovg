@@ -21,7 +21,7 @@ void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer)
     span_buffer->h = -1;
 }
 
-void plutovg_span_buffer_finish(plutovg_span_buffer_t* span_buffer)
+void plutovg_span_buffer_destroy(plutovg_span_buffer_t* span_buffer)
 {
     plutovg_array_destroy(span_buffer->spans);
 }
