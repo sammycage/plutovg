@@ -24,7 +24,7 @@ static void plutovg_stroke_data_reset(plutovg_stroke_data_t* stroke)
 
 static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutovg_stroke_data_t* source)
 {
-    assert(stroke->dash.array.size == 0);
+    plutovg_array_clear(stroke->dash.array);
     plutovg_array_append(stroke->dash.array, source->dash.array);
     stroke->dash.offset = source->dash.offset;
     stroke->style.width = source->style.width;
@@ -322,19 +322,24 @@ int plutovg_canvas_get_dash_array(const plutovg_canvas_t* canvas, const float** 
     return canvas->state->stroke.dash.array.size;
 }
 
-void plutovg_canvas_translate(plutovg_canvas_t* canvas, float x, float y)
+void plutovg_canvas_translate(plutovg_canvas_t* canvas, float tx, float ty)
 {
-    plutovg_matrix_translate(&canvas->state->matrix, x, y);
+    plutovg_matrix_translate(&canvas->state->matrix, tx, ty);
 }
 
-void plutovg_canvas_scale(plutovg_canvas_t* canvas, float x, float y)
+void plutovg_canvas_scale(plutovg_canvas_t* canvas, float sx, float sy)
 {
-    plutovg_matrix_scale(&canvas->state->matrix, x, y);
+    plutovg_matrix_scale(&canvas->state->matrix, sx, sy);
 }
 
-void plutovg_canvas_rotate(plutovg_canvas_t* canvas, float radians)
+void plutovg_canvas_shear(plutovg_canvas_t* canvas, float shx, float shy)
 {
-    plutovg_matrix_rotate(&canvas->state->matrix, radians);
+    plutovg_matrix_shear(&canvas->state->matrix, shx, shy);
+}
+
+void plutovg_canvas_rotate(plutovg_canvas_t* canvas, float angle)
+{
+    plutovg_matrix_rotate(&canvas->state->matrix, angle);
 }
 
 void plutovg_canvas_transform(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix)
@@ -382,9 +387,19 @@ void plutovg_canvas_line_to(plutovg_canvas_t* canvas, float x, float y)
     plutovg_path_line_to(canvas->path, x, y);
 }
 
+void plutovg_canvas_quad_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2)
+{
+    plutovg_path_quad_to(canvas->path, x1, y1, x2, y2);
+}
+
 void plutovg_canvas_cubic_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, float x3, float y3)
 {
     plutovg_path_cubic_to(canvas->path, x1, y1, x2, y2, x3, y3);
+}
+
+void plutovg_canvas_arc_to(plutovg_canvas_t* canvas, float rx, float ry, float angle, bool large_arc_flag, bool sweep_flag, float x, float y)
+{
+    plutovg_path_arc_to(canvas->path, rx, ry, angle, large_arc_flag, sweep_flag, x, y);
 }
 
 void plutovg_canvas_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h)

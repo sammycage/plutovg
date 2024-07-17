@@ -251,6 +251,10 @@ void plutovg_path_add_round_rect(plutovg_path_t* path, float x, float y, float w
 {
     rx = plutovg_min(rx, w * 0.5f);
     ry = plutovg_min(ry, h * 0.5f);
+    if(rx == 0.f && ry == 0.f) {
+        plutovg_path_add_rect(path, x, y, w, h);
+        return;
+    }
 
     float right = x + w;
     float bottom = y + h;
@@ -858,7 +862,7 @@ static inline bool parse_numbers(const char** begin, const char* end, float* num
 }
 
 #define IS_ALPHA(c) ((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z')
-int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
+bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
 {
     if(length == -1)
         length = strlen(data);
@@ -885,10 +889,10 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
         }
 
         if(!last_command && !(command == 'M' || command == 'm'))
-            break;
+            return false;
         if(command == 'M' || command == 'm') {
             if(!parse_numbers(&it, end, values, 0, 2))
-                break;
+                return false;
             if(command == 'm') {
                 values[0] += current_x;
                 values[1] += current_y;
@@ -900,7 +904,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             command = command == 'm' ? 'l' : 'L';
         } else if(command == 'L' || command == 'l') {
             if(!parse_numbers(&it, end, values, 0, 2))
-                break;
+                return false;
             if(command == 'l') {
                 values[0] += current_x;
                 values[1] += current_y;
@@ -911,7 +915,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             current_y = values[1];
         } else if(command == 'H' || command == 'h') {
             if(!parse_numbers(&it, end, values, 0, 1))
-                break;
+                return false;
             if(command == 'h') {
                 values[0] += current_x;
             }
@@ -920,7 +924,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             current_x = values[0];
         } else if(command == 'V' || command == 'v') {
             if(!parse_numbers(&it, end, values, 1, 1))
-                break;
+                return false;
             if(command == 'v') {
                 values[1] += current_y;
             }
@@ -929,7 +933,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             current_y = values[1];
         } else if(command == 'Q' || command == 'q') {
             if(!parse_numbers(&it, end, values, 0, 4))
-                break;
+                return false;
             if(command == 'q') {
                 values[0] += current_x;
                 values[1] += current_y;
@@ -944,7 +948,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             current_y = values[3];
         } else if(command == 'C' || command == 'c') {
             if(!parse_numbers(&it, end, values, 0, 6))
-                break;
+                return false;
             if(command == 'c') {
                 values[0] += current_x;
                 values[1] += current_y;
@@ -969,7 +973,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             }
 
             if(!parse_numbers(&it, end, values, 2, 2))
-                break;
+                return false;
             if(command == 't') {
                 values[2] += current_x;
                 values[3] += current_y;
@@ -990,7 +994,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             }
 
             if(!parse_numbers(&it, end, values, 2, 4))
-                break;
+                return false;
             if(command == 's') {
                 values[2] += current_x;
                 values[3] += current_y;
@@ -1008,7 +1012,7 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
                 || !parse_arc_flag(&it, end, &flags[0])
                 || !parse_arc_flag(&it, end, &flags[1])
                 || !parse_numbers(&it, end, values, 3, 2)) {
-                break;
+                return false;
             }
 
             if(command == 'a') {
@@ -1021,17 +1025,17 @@ int plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             current_y = values[4];
         } else if(command == 'Z' || command == 'z'){
             if(last_command == 'Z' || last_command == 'z')
-                break;
+                return false;
             plutovg_path_close(path);
             current_x = start_x;
             current_y = start_y;
         } else {
-            break;
+            return false;
         }
 
         skip_ws_comma(&it, end);
         last_command = command;
     }
 
-    return length - (it - data);
+    return true;
 }

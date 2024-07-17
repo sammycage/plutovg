@@ -82,14 +82,17 @@ bool plutovg_matrix_invert(const plutovg_matrix_t* matrix, plutovg_matrix_t* inv
     float det = (matrix->a * matrix->d - matrix->b * matrix->c);
     if(det == 0.f)
         return false;
-    float inv_det = 1.f / det;
-    float a = matrix->a * inv_det;
-    float b = matrix->b * inv_det;
-    float c = matrix->c * inv_det;
-    float d = matrix->d * inv_det;
-    float e = (matrix->c * matrix->f - matrix->d * matrix->e) * inv_det;
-    float f = (matrix->b * matrix->e - matrix->a * matrix->f) * inv_det;
-    plutovg_matrix_init(inverse, d, -b, -c, a, e, f);
+    if(inverse) {
+        float inv_det = 1.f / det;
+        float a = matrix->a * inv_det;
+        float b = matrix->b * inv_det;
+        float c = matrix->c * inv_det;
+        float d = matrix->d * inv_det;
+        float e = (matrix->c * matrix->f - matrix->d * matrix->e) * inv_det;
+        float f = (matrix->b * matrix->e - matrix->a * matrix->f) * inv_det;
+        plutovg_matrix_init(inverse, d, -b, -c, a, e, f);
+    }
+
     return true;
 }
 
