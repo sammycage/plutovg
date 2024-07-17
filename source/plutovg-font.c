@@ -147,10 +147,22 @@ plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int 
         return NULL;
     fseek(fp, 0, SEEK_END);
     long length = ftell(fp);
-    void* data = malloc(length);
+    void* data = NULL;
+    if(length != -1L)
+        data = malloc(length);
+    if(data == NULL) {
+        fclose(fp);
+        return NULL;
+    }
+
     fseek(fp, 0, SEEK_SET);
-    fread(data, 1, length, fp);
+    size_t nread = fread(data, 1, length, fp);
     fclose(fp);
+    if(length != nread) {
+        free(data);
+        return NULL;
+    }
+
     return plutovg_font_face_load_from_data(data, length, ttcindex, free, data);
 }
 

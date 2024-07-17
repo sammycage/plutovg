@@ -136,11 +136,11 @@ struct plutovg_canvas {
 };
 
 void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer);
+void plutovg_span_buffer_init_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height);
 void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer);
 void plutovg_span_buffer_destroy(plutovg_span_buffer_t* span_buffer);
 void plutovg_span_buffer_copy(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* source);
 void plutovg_span_buffer_extents(plutovg_span_buffer_t* span_buffer, plutovg_rect_t* extents);
-void plutovg_span_buffer_add_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height);
 void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* a, const plutovg_span_buffer_t* b);
 
 void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);

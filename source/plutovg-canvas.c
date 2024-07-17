@@ -490,8 +490,7 @@ void plutovg_canvas_paint(plutovg_canvas_t* canvas)
     if(state->clipping) {
         plutovg_blend(canvas, &state->clip_spans);
     } else {
-        plutovg_span_buffer_reset(&canvas->clip_spans);
-        plutovg_span_buffer_add_rect(&canvas->clip_spans, 0, 0, canvas->surface->width, canvas->surface->height);
+        plutovg_span_buffer_init_rect(&canvas->clip_spans, 0, 0, canvas->surface->width, canvas->surface->height);
         plutovg_blend(canvas, &canvas->clip_spans);
     }
 }

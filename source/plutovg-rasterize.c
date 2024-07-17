@@ -12,6 +12,25 @@ void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer)
     plutovg_span_buffer_reset(span_buffer);
 }
 
+void plutovg_span_buffer_init_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height)
+{
+    plutovg_array_clear(span_buffer->spans);
+    plutovg_array_ensure(span_buffer->spans, height);
+    plutovg_span_t* spans = span_buffer->spans.data;
+    for(int i = 0; i < height; i++) {
+        spans[i].x = x;
+        spans[i].y = y + i;
+        spans[i].len = width;
+        spans[i].coverage = 255;
+    }
+
+    span_buffer->x = x;
+    span_buffer->y = y;
+    span_buffer->w = width;
+    span_buffer->h = height;
+    span_buffer->spans.size = height;
+}
+
 void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer)
 {
     plutovg_array_clear(span_buffer->spans);
@@ -71,39 +90,6 @@ void plutovg_span_buffer_extents(plutovg_span_buffer_t* span_buffer, plutovg_rec
     extents->y = span_buffer->y;
     extents->w = span_buffer->w;
     extents->h = span_buffer->h;
-}
-
-void plutovg_span_buffer_add_rect(plutovg_span_buffer_t* span_buffer, int x, int y, int width, int height)
-{
-    plutovg_array_ensure(span_buffer->spans, height);
-    plutovg_span_t* spans = span_buffer->spans.data + span_buffer->spans.size;
-    for(int i = 0; i < height; i++) {
-        spans[i].x = x;
-        spans[i].y = y + i;
-        spans[i].len = width;
-        spans[i].coverage = 255;
-    }
-
-    if(span_buffer->spans.size == 0) {
-        span_buffer->x = x;
-        span_buffer->y = y;
-        span_buffer->w = width;
-        span_buffer->h = height;
-        span_buffer->spans.size = height;
-        return;
-    }
-
-    plutovg_span_buffer_update_extents(span_buffer);
-    int x1 = plutovg_min(x, span_buffer->x);
-    int y1 = plutovg_min(y, span_buffer->y);
-    int x2 = plutovg_max(x + width, span_buffer->x + span_buffer->w);
-    int y2 = plutovg_max(y + height, span_buffer->y + span_buffer->h);
-
-    span_buffer->x = x1;
-    span_buffer->y = y1;
-    span_buffer->w = x2 - x1;
-    span_buffer->h = y2 - y1;
-    span_buffer->spans.size += height;
 }
 
 void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* a, const plutovg_span_buffer_t* b)
