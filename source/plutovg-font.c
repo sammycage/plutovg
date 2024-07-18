@@ -169,7 +169,8 @@ plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int 
 plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned int length, int ttcindex, plutovg_destroy_func_t destroy_func, void* closure)
 {
     stbtt_fontinfo info;
-    if(!stbtt_InitFont(&info, data, ttcindex)) {
+    int offset = stbtt_GetFontOffsetForIndex(data, ttcindex);
+    if(offset == -1 || !stbtt_InitFont(&info, data, offset)) {
         if(destroy_func)
             destroy_func(closure);
         return NULL;
@@ -401,8 +402,8 @@ float plutovg_font_face_text_extents(const plutovg_font_face_t* face, float size
 
         float x1 = plutovg_min(text_extents->x, glyph_extents.x);
         float y1 = plutovg_min(text_extents->y, glyph_extents.y);
-        float x2 = plutovg_max(text_extents->x + extents->w, glyph_extents.x + glyph_extents.w);
-        float y2 = plutovg_max(text_extents->y + extents->y, glyph_extents.y + glyph_extents.h);
+        float x2 = plutovg_max(text_extents->x + text_extents->w, glyph_extents.x + glyph_extents.w);
+        float y2 = plutovg_max(text_extents->y + text_extents->h, glyph_extents.y + glyph_extents.h);
 
         text_extents->x = x1;
         text_extents->y = y1;
