@@ -129,7 +129,7 @@ struct plutovg_font_face {
     int ref_count;
     int ascent;
     int descent;
-    int linegap;
+    int line_gap;
     int x1;
     int y1;
     int x2;
@@ -178,7 +178,7 @@ plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned
     plutovg_font_face_t* face = malloc(sizeof(plutovg_font_face_t));
     face->ref_count = 1;
     face->info = info;
-    stbtt_GetFontVMetrics(&face->info, &face->ascent, &face->descent, &face->linegap);
+    stbtt_GetFontVMetrics(&face->info, &face->ascent, &face->descent, &face->line_gap);
     stbtt_GetFontBoundingBox(&face->info, &face->x1, &face->y1, &face->x2, &face->y2);
     memset(face->glyphs, 0, sizeof(face->glyphs));
     face->destroy_func = destroy_func;
@@ -234,6 +234,21 @@ float plutovg_font_face_get_scale(const plutovg_font_face_t* face, float size)
 float plutovg_font_face_get_kerning(const plutovg_font_face_t* face, int ch1, int ch2)
 {
     return stbtt_GetCodepointKernAdvance(&face->info, ch1, ch2);
+}
+
+float plutovg_font_face_get_ascent(const plutovg_font_face_t* face)
+{
+    return face->ascent;
+}
+
+float plutovg_font_face_get_descent(const plutovg_font_face_t* face)
+{
+    return face->descent;
+}
+
+float plutovg_font_face_get_line_gap(const plutovg_font_face_t* face)
+{
+    return face->line_gap;
 }
 
 void plutovg_font_face_get_extents(const plutovg_font_face_t* face, plutovg_rect_t* extents)

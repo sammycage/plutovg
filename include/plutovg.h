@@ -172,6 +172,9 @@ PLUTOVG_API int plutovg_font_face_get_reference_count(const plutovg_font_face_t*
 
 PLUTOVG_API float plutovg_font_face_get_scale(const plutovg_font_face_t* face, float size);
 PLUTOVG_API float plutovg_font_face_get_kerning(const plutovg_font_face_t* face, int ch1, int ch2);
+PLUTOVG_API float plutovg_font_face_get_ascent(const plutovg_font_face_t* face);
+PLUTOVG_API float plutovg_font_face_get_descent(const plutovg_font_face_t* face);
+PLUTOVG_API float plutovg_font_face_get_line_gap(const plutovg_font_face_t* face);
 PLUTOVG_API void plutovg_font_face_get_extents(const plutovg_font_face_t* face, plutovg_rect_t* extents);
 
 PLUTOVG_API void plutovg_font_face_get_glyph_path(const plutovg_font_face_t* face, int codepoint, plutovg_path_t* path);
