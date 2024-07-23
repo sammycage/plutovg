@@ -7,9 +7,10 @@ static void* plutovg_paint_create(plutovg_paint_type_t type, size_t size)
     plutovg_paint_t* paint = freed_paint[type];
     if(paint == NULL) {
         paint = malloc(size);
+    } else {
+        freed_paint[type] = NULL;
     }
 
-    freed_paint[type] = NULL;
     paint->ref_count = 1;
     paint->type = type;
     return paint;
@@ -23,10 +24,10 @@ plutovg_paint_t* plutovg_paint_create_rgb(float r, float g, float b)
 plutovg_paint_t* plutovg_paint_create_rgba(float r, float g, float b, float a)
 {
     plutovg_solid_paint_t* solid = plutovg_paint_create(PLUTOVG_PAINT_TYPE_COLOR, sizeof(plutovg_solid_paint_t));
-    solid->color.r = r;
-    solid->color.g = g;
-    solid->color.b = b;
-    solid->color.a = a;
+    solid->color.r = plutovg_clamp(r, 0.f, 1.f);
+    solid->color.g = plutovg_clamp(g, 0.f, 1.f);
+    solid->color.b = plutovg_clamp(b, 0.f, 1.f);
+    solid->color.a = plutovg_clamp(a, 0.f, 1.f);
     return &solid->base;
 }
 
@@ -43,7 +44,17 @@ static void plutovg_gradient_stops_init(plutovg_gradient_paint_t* gradient, cons
         gradient->stops = gradient->embedded_stops;
     }
 
-    memcpy(gradient->stops, stops, nstops * sizeof(plutovg_gradient_stop_t));
+    float prev_offset = 0.f;
+    for(int i = 0; i < nstops; ++i) {
+        const plutovg_gradient_stop_t* stop = stops + i;
+        gradient->stops[i].offset = plutovg_max(prev_offset, plutovg_clamp(stop->offset, 0.f, 1.f));
+        gradient->stops[i].color.r = plutovg_clamp(stop->color.r, 0.f, 1.f);
+        gradient->stops[i].color.g = plutovg_clamp(stop->color.g, 0.f, 1.f);
+        gradient->stops[i].color.b = plutovg_clamp(stop->color.b, 0.f, 1.f);
+        gradient->stops[i].color.a = plutovg_clamp(stop->color.a, 0.f, 1.f);
+        prev_offset = gradient->stops[i].offset;
+    }
+
     gradient->nstops = nstops;
 }
 
@@ -88,7 +99,7 @@ plutovg_paint_t* plutovg_paint_create_texture(plutovg_surface_t* surface, plutov
 {
     plutovg_texture_paint_t* texture = plutovg_paint_create(PLUTOVG_PAINT_TYPE_TEXTURE, sizeof(plutovg_texture_paint_t));
     texture->type = type;
-    texture->opacity = opacity;
+    texture->opacity = plutovg_clamp(opacity, 0.f, 1.f);
     texture->matrix = matrix ? *matrix : PLUTOVG_IDENTITY_MATRIX;
     texture->surface = plutovg_surface_reference(surface);
     return &texture->base;

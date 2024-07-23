@@ -248,17 +248,15 @@ static PVG_FT_Outline* ft_outline_convert(const plutovg_path_t* path, const plut
     while(plutovg_path_iterator_has_next(&it)) {
         switch(plutovg_path_iterator_next(&it, points)) {
         case PLUTOVG_PATH_COMMAND_MOVE_TO:
-            plutovg_matrix_map_point(matrix, &points[0], &points[0]);
+            plutovg_matrix_map_points(matrix, points, points, 1);
             ft_outline_move_to(outline, points[0].x, points[0].y);
             break;
         case PLUTOVG_PATH_COMMAND_LINE_TO:
-            plutovg_matrix_map_point(matrix, &points[0], &points[0]);
+            plutovg_matrix_map_points(matrix, points, points, 1);
             ft_outline_line_to(outline, points[0].x, points[0].y);
             break;
         case PLUTOVG_PATH_COMMAND_CUBIC_TO:
-            plutovg_matrix_map_point(matrix, &points[0], &points[0]);
-            plutovg_matrix_map_point(matrix, &points[1], &points[1]);
-            plutovg_matrix_map_point(matrix, &points[2], &points[2]);
+            plutovg_matrix_map_points(matrix, points, points, 3);
             ft_outline_cubic_to(outline, points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
             break;
         case PLUTOVG_PATH_COMMAND_CLOSE:

@@ -111,7 +111,6 @@ typedef struct {
 
 typedef struct plutovg_state {
     plutovg_paint_t* paint;
-    plutovg_color_t color;
     plutovg_matrix_t matrix;
     plutovg_stroke_data_t stroke;
     plutovg_operator_t op;

@@ -107,6 +107,13 @@ void plutovg_matrix_map_point(const plutovg_matrix_t* matrix, const plutovg_poin
     plutovg_matrix_map(matrix, src->x, src->y, &dst->x, &dst->y);
 }
 
+void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const plutovg_point_t* src, plutovg_point_t* dst, int count)
+{
+    for(int i = 0; i < count; ++i) {
+        plutovg_matrix_map_point(matrix, &src[i], &dst[i]);
+    }
+}
+
 void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst)
 {
     plutovg_point_t p[4];
@@ -118,11 +125,7 @@ void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_
     p[2].y = src->y + src->h;
     p[3].x = src->x;
     p[3].y = src->y + src->h;
-
-    plutovg_matrix_map_point(matrix, &p[0], &p[0]);
-    plutovg_matrix_map_point(matrix, &p[1], &p[1]);
-    plutovg_matrix_map_point(matrix, &p[2], &p[2]);
-    plutovg_matrix_map_point(matrix, &p[3], &p[3]);
+    plutovg_matrix_map_points(matrix, p, p, 4);
 
     float l = p[0].x;
     float t = p[0].y;

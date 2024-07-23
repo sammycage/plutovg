@@ -39,62 +39,11 @@ plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int widt
     return surface;
 }
 
-static void plutovg_surface_premultiply_rgba(const plutovg_surface_t* surface)
-{
-    unsigned char* data = plutovg_surface_get_data(surface);
-    int width = plutovg_surface_get_width(surface);
-    int height = plutovg_surface_get_height(surface);
-    int stride = plutovg_surface_get_stride(surface);
-    for(int y = 0; y < height; y++) {
-        uint32_t* p = (uint32_t*)(data + stride * y);
-        for(int x = 0; x < width; x++) {
-            uint32_t a = (p[x] >> 24) & 0xFF;
-            uint32_t b = (p[x] >> 16) & 0xFF;
-            uint32_t g = (p[x] >> 8) & 0xFF;
-            uint32_t r = (p[x] >> 0) & 0xFF;
-
-            uint32_t pr = (r * a) / 255;
-            uint32_t pg = (g * a) / 255;
-            uint32_t pb = (b * a) / 255;
-            p[x] = (a << 24) | (pr << 16) | (pg << 8) | pb;
-        }
-    }
-}
-
-static void plutovg_surface_unpremultiply_argb(const plutovg_surface_t* surface)
-{
-    unsigned char* data = plutovg_surface_get_data(surface);
-    int width = plutovg_surface_get_width(surface);
-    int height = plutovg_surface_get_height(surface);
-    int stride = plutovg_surface_get_stride(surface);
-    for(int y = 0; y < height; y++) {
-        uint32_t* p = (uint32_t*)(data + stride * y);
-        for(int x = 0; x < width; x++) {
-            uint32_t a = (p[x] >> 24) & 0xFF;
-            if(a == 0)
-                continue;
-            uint32_t pr = (p[x] >> 16) & 0xFF;
-            uint32_t pg = (p[x] >> 8) & 0xFF;
-            uint32_t pb = (p[x] >> 0) & 0xFF;
-
-            uint32_t r = (pr * 255) / a;
-            uint32_t g = (pg * 255) / a;
-            uint32_t b = (pb * 255) / a;
-            p[x] = (a << 24) | (b << 16) | (g << 8) | r;
-        }
-    }
-}
-
 static plutovg_surface_t* plutovg_surface_load_from_image(stbi_uc* image, int width, int height)
 {
     plutovg_surface_t* surface = plutovg_surface_create_uninitialized(width, height);
-    if(surface == NULL) {
-        stbi_image_free(image);
-        return NULL;
-    }
-
-    memcpy(surface->data, image, surface->height * surface->stride);
-    plutovg_surface_premultiply_rgba(surface);
+    if(surface)
+        plutovg_convert_argb_to_rgba(surface->data, image, surface->width, surface->height, surface->stride);
     stbi_image_free(image);
     return surface;
 }
@@ -161,34 +110,88 @@ int plutovg_surface_get_stride(const plutovg_surface_t* surface)
     return surface->stride;
 }
 
+static void plutovg_surface_write_begin(const plutovg_surface_t* surface)
+{
+    plutovg_convert_argb_to_rgba(surface->data, surface->data, surface->width, surface->height, surface->stride);
+}
+
+static void plutovg_surface_write_end(const plutovg_surface_t* surface)
+{
+    plutovg_convert_rgba_to_argb(surface->data, surface->data, surface->width, surface->height, surface->stride);
+}
+
 bool plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename)
 {
-    plutovg_surface_unpremultiply_argb(surface);
+    plutovg_surface_write_begin(surface);
     int success = stbi_write_png(filename, surface->width, surface->height, 4, surface->data, surface->stride);
-    plutovg_surface_premultiply_rgba(surface);
+    plutovg_surface_write_end(surface);
     return success;
 }
 
 bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* filename, int quality)
 {
-    plutovg_surface_unpremultiply_argb(surface);
+    plutovg_surface_write_begin(surface);
     int success = stbi_write_jpg(filename, surface->width, surface->height, 4, surface->data, quality);
-    plutovg_surface_premultiply_rgba(surface);
+    plutovg_surface_write_end(surface);
     return success;
 }
 
 bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure)
 {
-    plutovg_surface_unpremultiply_argb(surface);
+    plutovg_surface_write_begin(surface);
     int success = stbi_write_png_to_func(write_func, closure, surface->width, surface->height, 4, surface->data, surface->stride);
-    plutovg_surface_premultiply_rgba(surface);
+    plutovg_surface_write_end(surface);
     return success;
 }
 
 bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality)
 {
-    plutovg_surface_unpremultiply_argb(surface);
+    plutovg_surface_write_begin(surface);
     int success = stbi_write_jpg_to_func(write_func, closure, surface->width, surface->height, 4, surface->data, quality);
-    plutovg_surface_premultiply_rgba(surface);
+    plutovg_surface_write_end(surface);
     return success;
+}
+
+void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, int width, int height, int stride)
+{
+    for(int y = 0; y < height; y++) {
+        uint32_t* dst_row = (uint32_t*)(dst + stride * y);
+        uint32_t* src_row = (uint32_t*)(src + stride * y);
+        for(int x = 0; x < width; x++) {
+            uint32_t pixel = src_row[x];
+            uint8_t a = (pixel >> 24) & 0xFF;
+            uint8_t r = (pixel >> 16) & 0xFF;
+            uint8_t g = (pixel >> 8) & 0xFF;
+            uint8_t b = (pixel >> 0) & 0xFF;
+            if(a != 0 && a != 255) {
+                r = (r * 255) / a;
+                g = (g * 255) / a;
+                b = (b * 255) / a;
+            }
+
+            dst_row[x] = (a << 24) | (b << 16) | (g << 8) | r;
+        }
+    }
+}
+
+void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, int width, int height, int stride)
+{
+    for(int y = 0; y < height; y++) {
+        uint32_t* dst_row = (uint32_t*)(dst + stride * y);
+        uint32_t* src_row = (uint32_t*)(src + stride * y);
+        for(int x = 0; x < width; x++) {
+            uint32_t pixel = src_row[x];
+            uint8_t a = (pixel >> 24) & 0xFF;
+            uint8_t b = (pixel >> 16) & 0xFF;
+            uint8_t g = (pixel >> 8) & 0xFF;
+            uint8_t r = (pixel >> 0) & 0xFF;
+            if(a != 0 && a != 255) {
+                r = (r * a) / 255;
+                g = (g * a) / 255;
+                b = (b * a) / 255;
+            }
+
+            dst_row[x] = (a << 24) | (r << 16) | (g << 8) | b;
+        }
+    }
 }

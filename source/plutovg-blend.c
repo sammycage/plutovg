@@ -50,32 +50,32 @@ typedef struct {
 
 static inline uint32_t combine_color_with_opacity(const plutovg_color_t* color, float opacity)
 {
-    uint32_t a = (uint8_t)(color->a * opacity * 255);
-    uint32_t r = (uint8_t)(color->r * 255);
-    uint32_t g = (uint8_t)(color->g * 255);
-    uint32_t b = (uint8_t)(color->b * 255);
+    uint8_t a = lroundf(color->a * opacity * 255);
+    uint8_t r = lroundf(color->r * 255);
+    uint8_t g = lroundf(color->g * 255);
+    uint8_t b = lroundf(color->b * 255);
     return (a << 24) | (r << 16) | (g << 8) | (b);
 }
 
 static inline uint32_t premultiply_color_with_opacity(const plutovg_color_t* color, float opacity)
 {
-    uint32_t alpha = (uint8_t)(color->a * opacity * 255);
-    uint32_t pr = (uint8_t)(color->r * alpha);
-    uint32_t pg = (uint8_t)(color->g * alpha);
-    uint32_t pb = (uint8_t)(color->b * alpha);
+    uint8_t alpha = lroundf(color->a * opacity * 255);
+    uint8_t pr = lroundf(color->r * alpha);
+    uint8_t pg = lroundf(color->g * alpha);
+    uint8_t pb = lroundf(color->b * alpha);
     return (alpha << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
 static inline uint32_t premultiply_pixel(uint32_t color)
 {
-    uint32_t a = plutovg_alpha(color);
-    uint32_t r = plutovg_red(color);
-    uint32_t g = plutovg_green(color);
-    uint32_t b = plutovg_blue(color);
+    uint8_t a = plutovg_alpha(color);
+    uint8_t r = plutovg_red(color);
+    uint8_t g = plutovg_green(color);
+    uint8_t b = plutovg_blue(color);
 
-    uint32_t pr = (r * a) / 255;
-    uint32_t pg = (g * a) / 255;
-    uint32_t pb = (b * a) / 255;
+    uint8_t pr = (r * a) / 255;
+    uint8_t pg = (g * a) / 255;
+    uint8_t pb = (b * a) / 255;
     return (a << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
@@ -798,7 +798,7 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_textur
     data.width = texture->surface->width;
     data.height = texture->surface->height;
     data.stride = texture->surface->stride;
-    data.const_alpha = (int)(state->opacity * texture->opacity * 256);
+    data.const_alpha = lroundf(state->opacity * texture->opacity * 256);
 
     plutovg_matrix_multiply(&data.matrix, &data.matrix, &state->matrix);
     if(!plutovg_matrix_invert(&data.matrix, &data.matrix))
@@ -822,13 +822,8 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_textur
 
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer)
 {
-    if(span_buffer->spans.size == 0)
+    if(span_buffer->spans.size == 0 || canvas->state->paint == NULL)
         return;
-    if(canvas->state->paint == NULL) {
-        plutovg_blend_color(canvas, &canvas->state->color, span_buffer);
-        return;
-    }
-
     plutovg_paint_t* paint = canvas->state->paint;
     if(paint->type == PLUTOVG_PAINT_TYPE_COLOR) {
         plutovg_solid_paint_t* solid = (plutovg_solid_paint_t*)(paint);
