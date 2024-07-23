@@ -43,7 +43,7 @@ static plutovg_surface_t* plutovg_surface_load_from_image(stbi_uc* image, int wi
 {
     plutovg_surface_t* surface = plutovg_surface_create_uninitialized(width, height);
     if(surface)
-        plutovg_convert_argb_to_rgba(surface->data, image, surface->width, surface->height, surface->stride);
+        plutovg_convert_rgba_to_argb(surface->data, image, surface->width, surface->height, surface->stride);
     stbi_image_free(image);
     return surface;
 }
