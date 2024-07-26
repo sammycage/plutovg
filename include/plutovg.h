@@ -189,6 +189,7 @@ PLUTOVG_API plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* da
 
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename);
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, int length);
+PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_base64(const char* data, int length);
 
 PLUTOVG_API plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface);
 PLUTOVG_API void plutovg_surface_destroy(plutovg_surface_t* surface);
