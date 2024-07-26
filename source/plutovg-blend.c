@@ -791,6 +791,8 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
 
 static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_texture_paint_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
+    if(texture->surface == NULL)
+        return;
     plutovg_state_t* state = canvas->state;
     texture_data_t data;
     data.matrix = texture->matrix;

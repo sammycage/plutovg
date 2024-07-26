@@ -57,7 +57,7 @@ plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename)
     return plutovg_surface_load_from_image(image, width, height);
 }
 
-plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, unsigned int length)
+plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, int length)
 {
     int width, height, channels;
     stbi_uc* image = stbi_load_from_memory(data, length, &width, &height, &channels, STBI_rgb_alpha);
