@@ -185,6 +185,27 @@ void plutovg_canvas_set_color(plutovg_canvas_t* canvas, const plutovg_color_t* c
     plutovg_canvas_set_rgba(canvas, color->r, color->g, color->b, color->a);
 }
 
+void plutovg_canvas_set_linear_gradient(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix)
+{
+    plutovg_paint_t* paint = plutovg_paint_create_linear_gradient(x1, y1, x2, y2, spread, stops, nstops, matrix);
+    plutovg_canvas_set_paint(canvas, paint);
+    plutovg_paint_destroy(paint);
+}
+
+void plutovg_canvas_set_radial_gradient(plutovg_canvas_t* canvas, float cx, float cy, float cr, float fx, float fy, float fr, plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix)
+{
+    plutovg_paint_t* paint = plutovg_paint_create_radial_gradient(cx, cy, cr, fx, fy, fr, spread, stops, nstops, matrix);
+    plutovg_canvas_set_paint(canvas, paint);
+    plutovg_paint_destroy(paint);
+}
+
+void plutovg_canvas_set_texture(plutovg_canvas_t* canvas, plutovg_surface_t* surface, plutovg_texture_type_t type, float opacity, const plutovg_matrix_t* matrix)
+{
+    plutovg_paint_t* paint = plutovg_paint_create_texture(surface, type, opacity, matrix);
+    plutovg_canvas_set_paint(canvas, paint);
+    plutovg_paint_destroy(paint);
+}
+
 void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_paint_t* paint)
 {
     paint = plutovg_paint_reference(paint);
@@ -591,7 +612,7 @@ void plutovg_canvas_clip_path(plutovg_canvas_t* canvas, const plutovg_path_t* pa
     plutovg_canvas_clip(canvas);
 }
 
-float plutovg_canvas_add_glyph(plutovg_canvas_t* canvas, int codepoint, float x, float y)
+float plutovg_canvas_add_glyph(plutovg_canvas_t* canvas, plutovg_codepoint_t codepoint, float x, float y)
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f)
@@ -657,7 +678,7 @@ void plutovg_canvas_font_metrics(plutovg_canvas_t* canvas, float* ascent, float*
     }
 }
 
-void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, int codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents)
+void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, plutovg_codepoint_t codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents)
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f) {

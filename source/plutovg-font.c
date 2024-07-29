@@ -48,9 +48,9 @@ bool plutovg_text_iterator_has_next(const plutovg_text_iterator_t* it)
     return it->index < it->length;
 }
 
-int plutovg_text_iterator_next(plutovg_text_iterator_t* it)
+plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
 {
-    uint32_t codepoint = 0;
+    plutovg_codepoint_t codepoint = 0;
     switch(it->encoding) {
     case PLUTOVG_TEXT_ENCODING_UTF8: {
         static const int trailing[256] = {
@@ -246,7 +246,7 @@ void plutovg_font_face_get_metrics(const plutovg_font_face_t* face, float size, 
     }
 }
 
-static glyph_t* get_glyph(const plutovg_font_face_t* face, unsigned int codepoint)
+static glyph_t* get_glyph(const plutovg_font_face_t* face, plutovg_codepoint_t codepoint)
 {
     unsigned int msb = (codepoint >> 8) & 0xFF;
     if(face->glyphs[msb] == NULL) {
@@ -267,7 +267,7 @@ static glyph_t* get_glyph(const plutovg_font_face_t* face, unsigned int codepoin
     return (face->glyphs[msb][lsb] = glyph);
 }
 
-void plutovg_font_face_get_glyph_metrics(const plutovg_font_face_t* face, float size, int codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents)
+void plutovg_font_face_get_glyph_metrics(const plutovg_font_face_t* face, float size, plutovg_codepoint_t codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents)
 {
     float scale = plutovg_font_face_get_scale(face, size);
     glyph_t* glyph = get_glyph(face, codepoint);
@@ -299,12 +299,12 @@ static void glyph_traverse_func(void* closure, plutovg_path_command_t command, c
     }
 }
 
-float plutovg_font_face_get_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, int codepoint, plutovg_path_t* path)
+float plutovg_font_face_get_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_t* path)
 {
     return plutovg_font_face_traverse_glyph_path(face, size, x, y, codepoint, glyph_traverse_func, path);
 }
 
-float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, int codepoint, plutovg_path_traverse_func_t traverse_func, void* closure)
+float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_traverse_func_t traverse_func, void* closure)
 {
     float scale = plutovg_font_face_get_scale(face, size);
     plutovg_matrix_t matrix;
@@ -367,7 +367,7 @@ float plutovg_font_face_text_extents(const plutovg_font_face_t* face, float size
     plutovg_rect_t* text_extents = NULL;
     float total_advance_width = 0.f;
     while(plutovg_text_iterator_has_next(&it)) {
-        int codepoint = plutovg_text_iterator_next(&it);
+        plutovg_codepoint_t codepoint = plutovg_text_iterator_next(&it);
 
         float advance_width;
         if(extents == NULL) {
