@@ -19,16 +19,6 @@ plutovg_sources = [
     'source/plutovg-ft-math.c'
 ]
 
-plutovg_include_dirs = include_directories(
-    'include',
-    'source',
-    'stb'
-)
-
-plutovg_public_headers = [
-    'include/plutovg.h'
-]
-
 plutovg_compile_args = []
 if get_option('default_library') == 'static'
     plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
@@ -36,7 +26,7 @@ if get_option('default_library') == 'static'
 endif
 
 plutovg_lib = library('plutovg', plutovg_sources,
-    include_directories: plutovg_include_dirs,
+    include_directories: include_directories('include', 'source', 'stb'),
     version: meson.project_version(),
     c_args: ['-DPLUTOVG_BUILD'],
     cpp_args: ['-DPLUTOVG_BUILD'],
@@ -52,7 +42,7 @@ plutovg_dep = declare_dependency(
 )
 
 meson.override_dependency('plutovg', plutovg_dep)
-install_headers(plutovg_public_headers, subdir: 'plutovg')
+install_headers('include/plutovg.h', subdir: 'plutovg')
 
 if not get_option('examples').disabled()
     subdir('examples')

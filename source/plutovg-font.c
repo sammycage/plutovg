@@ -1,7 +1,5 @@
 #include "plutovg-private.h"
 
-#include <stdint.h>
-#include <string.h>
 #include <stdio.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"

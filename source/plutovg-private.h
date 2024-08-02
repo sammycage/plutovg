@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "plutovg.h"
@@ -12,7 +13,7 @@ struct plutovg_surface {
     int width;
     int height;
     int stride;
-    unsigned char* data;
+    uint8_t* data;
 };
 
 struct plutovg_path {
