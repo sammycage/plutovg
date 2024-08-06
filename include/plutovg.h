@@ -35,48 +35,192 @@ extern "C" {
 #define PLUTOVG_VERSION_STRINGIZE(major, minor, micro) PLUTOVG_VERSION_XSTRINGIZE(major, minor, micro)
 #define PLUTOVG_VERSION_STRING PLUTOVG_VERSION_STRINGIZE(PLUTOVG_VERSION_MAJOR, PLUTOVG_VERSION_MINOR, PLUTOVG_VERSION_MICRO)
 
+/**
+ * @brief Gets the version of the plutovg library.
+ * @return An integer representing the version of the plutovg library.
+ */
 PLUTOVG_API int plutovg_version(void);
+
+/**
+ * @brief Gets the version of the plutovg library as a string.
+ * @return A string representing the version of the plutovg library.
+ */
 PLUTOVG_API const char* plutovg_version_string(void);
 
+/**
+ * @brief A function pointer type for a cleanup callback.
+ * @param closure A pointer to the resource to be cleaned up.
+ */
 typedef void (*plutovg_destroy_func_t)(void* closure);
+
+/**
+ * @brief A function pointer type for a write callback.
+ * @param closure A pointer to user-defined data or context.
+ * @param data A pointer to the data to be written.
+ * @param size The size of the data in bytes.
+ */
 typedef void (*plutovg_write_func_t)(void* closure, void* data, int size);
 
+/**
+ * @brief A structure representing a point in 2D space.
+ */
 typedef struct plutovg_point {
-    float x;
-    float y;
+    float x; /**< The x-coordinate of the point. */
+    float y; /**< The y-coordinate of the point. */
 } plutovg_point_t;
 
+/**
+ * @brief A structure representing a rectangle in 2D space.
+ */
 typedef struct plutovg_rect {
-    float x;
-    float y;
-    float w;
-    float h;
+    float x; /**< The x-coordinate of the top-left corner of the rectangle. */
+    float y; /**< The y-coordinate of the top-left corner of the rectangle. */
+    float w; /**< The width of the rectangle. */
+    float h; /**< The height of the rectangle. */
 } plutovg_rect_t;
 
+/**
+ * @brief A structure representing a 2D transformation matrix.
+ */
 typedef struct plutovg_matrix {
-    float a;
-    float b;
-    float c;
-    float d;
-    float e;
-    float f;
+    float a; /**< The horizontal scaling factor. */
+    float b; /**< The vertical shearing factor. */
+    float c; /**< The horizontal shearing factor. */
+    float d; /**< The vertical scaling factor. */
+    float e; /**< The horizontal translation offset. */
+    float f; /**< The vertical translation offset. */
 } plutovg_matrix_t;
 
+/**
+ * @brief Initializes a 2D transformation matrix.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be initialized.
+ * @param a The horizontal scaling factor.
+ * @param b The vertical shearing factor.
+ * @param c The horizontal shearing factor.
+ * @param d The vertical scaling factor.
+ * @param e The horizontal translation offset.
+ * @param f The vertical translation offset.
+ */
 PLUTOVG_API void plutovg_matrix_init(plutovg_matrix_t* matrix, float a, float b, float c, float d, float e, float f);
+
+/**
+ * @brief Initializes a 2D transformation matrix to the identity matrix.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be initialized.
+ */
 PLUTOVG_API void plutovg_matrix_init_identity(plutovg_matrix_t* matrix);
+
+/**
+ * @brief Initializes a 2D transformation matrix for translation.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be initialized.
+ * @param tx The translation offset in the x-direction.
+ * @param ty The translation offset in the y-direction.
+ */
 PLUTOVG_API void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float tx, float ty);
+
+/**
+ * @brief Initializes a 2D transformation matrix for scaling.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be initialized.
+ * @param sx The scaling factor in the x-direction.
+ * @param sy The scaling factor in the y-direction.
+ */
 PLUTOVG_API void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float sx, float sy);
+
+/**
+ * @brief Initializes a 2D transformation matrix for shearing.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be initialized.
+ * @param shx The shearing factor in the x-direction.
+ * @param shy The shearing factor in the y-direction.
+ */
 PLUTOVG_API void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float shx, float shy);
+
+/**
+ * @brief Initializes a 2D transformation matrix for rotation.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be initialized.
+ * @param angle The rotation angle in radians.
+ */
 PLUTOVG_API void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float angle);
+
+/**
+ * @brief Adds a translation with offsets `tx` and `ty` to the matrix.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be modified.
+ * @param tx The translation offset in the x-direction.
+ * @param ty The translation offset in the y-direction.
+ */
 PLUTOVG_API void plutovg_matrix_translate(plutovg_matrix_t* matrix, float tx, float ty);
+
+/**
+ * @brief Scales the matrix by factors `sx` and `sy`
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be modified.
+ * @param sx The scaling factor in the x-direction.
+ * @param sy The scaling factor in the y-direction.
+ */
 PLUTOVG_API void plutovg_matrix_scale(plutovg_matrix_t* matrix, float sx, float sy);
+
+/**
+ * @brief Shears the matrix by factors `shx` and `shy`.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be modified.
+ * @param shx The shearing factor in the x-direction.
+ * @param shy The shearing factor in the y-direction.
+ */
 PLUTOVG_API void plutovg_matrix_shear(plutovg_matrix_t* matrix, float shx, float shy);
+
+/**
+ * @brief Rotates the matrix by the specified angle (in radians).
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to be modified.
+ * @param angle The rotation angle in radians.
+ */
 PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle);
+
+/**
+ * @brief Multiplies `left` and `right` matrices and stores the result in `matrix`.
+ * @param matrix A pointer to the `plutovg_matrix_t` structure to store the result.
+ * @param left A pointer to the first `plutovg_matrix_t` matrix.
+ * @param right A pointer to the second `plutovg_matrix_t` matrix.
+ */
 PLUTOVG_API void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg_matrix_t* left, const plutovg_matrix_t* right);
+
+/**
+ * @brief Calculates the inverse of `matrix` and stores it in `inverse`.
+ * @note If `inverse` is `NULL`, the function only checks if the matrix is invertible.
+ * @param matrix A pointer to the `plutovg_matrix_t` matrix to invert.
+ * @param inverse A pointer to the `plutovg_matrix_t` structure to store the result, or `NULL`.
+ * @return `true` if the matrix is invertible; `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_matrix_invert(const plutovg_matrix_t* matrix, plutovg_matrix_t* inverse);
+
+/**
+ * @brief Transforms the point `(x, y)` using `matrix` and stores the result in `(xx, yy)`.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ * @param x The x-coordinate of the point to transform.
+ * @param y The y-coordinate of the point to transform.
+ * @param xx A pointer to store the transformed x-coordinate.
+ * @param yy A pointer to store the transformed y-coordinate.
+ */
 PLUTOVG_API void plutovg_matrix_map(const plutovg_matrix_t* matrix, float x, float y, float* xx, float* yy);
+
+/**
+ * @brief Transforms the `src` point using `matrix` and stores the result in `dst`.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ * @param src A pointer to the `plutovg_point_t` point to transform.
+ * @param dst A pointer to the `plutovg_point_t` to store the transformed point.
+ */
 PLUTOVG_API void plutovg_matrix_map_point(const plutovg_matrix_t* matrix, const plutovg_point_t* src, plutovg_point_t* dst);
+
+/**
+ * @brief Transforms an array of `src` points using `matrix` and stores the results in `dst`.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ * @param src A pointer to the array of `plutovg_point_t` points to transform.
+ * @param dst A pointer to the array of `plutovg_point_t` to store the transformed points.
+ * @param count The number of points to transform.
+ */
 PLUTOVG_API void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const plutovg_point_t* src, plutovg_point_t* dst, int count);
+
+/**
+ * @brief Transforms the `src` rectangle using `matrix` and stores the result in `dst`.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ * @param src A pointer to the `plutovg_rect_t` rectangle to transform.
+ * @param dst A pointer to the `plutovg_rect_t` to store the transformed rectangle.
+ */
 PLUTOVG_API void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst);
 
 typedef struct plutovg_path plutovg_path_t;
@@ -328,17 +472,88 @@ PLUTOVG_API void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const f
 PLUTOVG_API float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas);
 PLUTOVG_API int plutovg_canvas_get_dash_array(const plutovg_canvas_t* canvas, const float** dashes);
 
+/**
+ * @brief Translates the current transformation matrix by offsets `tx` and `ty`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param tx The translation offset in the x-direction.
+ * @param ty The translation offset in the y-direction.
+ */
 PLUTOVG_API void plutovg_canvas_translate(plutovg_canvas_t* canvas, float tx, float ty);
+
+/**
+ * @brief Scales the current transformation matrix by factors `sx` and `sy`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param sx The scaling factor in the x-direction.
+ * @param sy The scaling factor in the y-direction.
+ */
 PLUTOVG_API void plutovg_canvas_scale(plutovg_canvas_t* canvas, float sx, float sy);
+
+/**
+ * @brief Shears the current transformation matrix by factors `shx` and `shy`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param shx The shearing factor in the x-direction.
+ * @param shy The shearing factor in the y-direction.
+ */
 PLUTOVG_API void plutovg_canvas_shear(plutovg_canvas_t* canvas, float shx, float shy);
+
+/**
+ * @brief Rotates the current transformation matrix by the specified angle (in radians).
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param angle The rotation angle in radians.
+ */
 PLUTOVG_API void plutovg_canvas_rotate(plutovg_canvas_t* canvas, float angle);
+
+/**
+ * @brief Multiplies the current transformation matrix with the specified `matrix`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ */
 PLUTOVG_API void plutovg_canvas_transform(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix);
+
+/**
+ * @brief Resets the current transformation matrix to the identity matrix.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ */
 PLUTOVG_API void plutovg_canvas_reset_matrix(plutovg_canvas_t* canvas);
+
+/**
+ * @brief Resets the current transformation matrix to the specified `matrix`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ */
 PLUTOVG_API void plutovg_canvas_set_matrix(plutovg_canvas_t* canvas, const plutovg_matrix_t* matrix);
+
+/**
+ * @brief Stores the current transformation matrix in `matrix`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param A pointer to the `plutovg_matrix_t` to store the matrix.
+ */
 PLUTOVG_API void plutovg_canvas_get_matrix(const plutovg_canvas_t* canvas, plutovg_matrix_t* matrix);
 
+/**
+ * @brief Transforms the point `(x, y)` using the current transformation matrix and stores the result in `(xx, yy)`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param x The x-coordinate of the point to transform.
+ * @param y The y-coordinate of the point to transform.
+ * @param xx A pointer to store the transformed x-coordinate.
+ * @param yy A pointer to store the transformed y-coordinate.
+ */
 PLUTOVG_API void plutovg_canvas_map(const plutovg_canvas_t* canvas, float x, float y, float* xx, float* yy);
+
+/**
+ * @brief Transforms the `src` point using the current transformation matrix and stores the result in `dst`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param src A pointer to the `plutovg_point_t` point to transform.
+ * @param dst A pointer to the `plutovg_point_t` to store the transformed point.
+ */
 PLUTOVG_API void plutovg_canvas_map_point(const plutovg_canvas_t* canvas, const plutovg_point_t* src, plutovg_point_t* dst);
+
+/**
+ * @brief Transforms the `src` rectangle using the current transformation matrix and stores the result in `dst`.
+ * @param canvas A pointer to the `plutovg_canvas_t` canvas.
+ * @param src A pointer to the `plutovg_rect_t` rectangle to transform.
+ * @param dst A pointer to the `plutovg_rect_t` to store the transformed rectangle.
+ */
 PLUTOVG_API void plutovg_canvas_map_rect(const plutovg_canvas_t* canvas, const plutovg_rect_t* src, plutovg_rect_t* dst);
 
 PLUTOVG_API void plutovg_canvas_move_to(plutovg_canvas_t* canvas, float x, float y);
