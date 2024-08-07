@@ -576,39 +576,151 @@ PLUTOVG_API void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_
  */
 PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix);
 
+/**
+ * @brief Callback function type for traversing a path.
+ *
+ * This function type defines a callback used to traverse path commands.
+ *
+ * @param closure A pointer to user-defined data passed to the callback.
+ * @param command The current path command.
+ * @param points An array of points associated with the command.
+ * @param npoints The number of points in the array.
+ */
 typedef void (*plutovg_path_traverse_func_t)(void* closure, plutovg_path_command_t command, const plutovg_point_t* points, int npoints);
 
+/**
+ * @brief Traverses the path and calls the callback for each segment.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param traverse_func The callback function for each segment.
+ * @param closure User-defined data passed to the callback.
+ */
 PLUTOVG_API void plutovg_path_traverse(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure);
+
+/**
+ * @brief Traverses the path with Bézier curves flattened to line segments.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param traverse_func The callback function for each segment.
+ * @param closure User-defined data passed to the callback.
+ */
 PLUTOVG_API void plutovg_path_traverse_flatten(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure);
+
+/**
+ * @brief Traverses the path with a dashed pattern and calls the callback for each segment.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param offset The starting offset into the dash pattern.
+ * @param dashes An array of dash lengths.
+ * @param ndashes The number of elements in the `dashes` array.
+ * @param traverse_func The callback function for each segment.
+ * @param closure User-defined data passed to the callback.
+ */
 PLUTOVG_API void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes, plutovg_path_traverse_func_t traverse_func, void* closure);
 
-PLUTOVG_API float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents);
-PLUTOVG_API float plutovg_path_length(const plutovg_path_t* path);
-
+/**
+ * @brief Creates a copy of the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object to clone.
+ * @return A pointer to the newly created path clone.
+ */
 PLUTOVG_API plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path);
+
+/**
+ * @brief Creates a copy of the path with Bézier curves flattened to line segments.
+ *
+ * @param path A pointer to the `plutovg_path_t` object to clone.
+ * @return A pointer to the newly created path clone with flattened curves.
+ */
 PLUTOVG_API plutovg_path_t* plutovg_path_clone_flatten(const plutovg_path_t* path);
+
+/**
+ * @brief Creates a copy of the path with a dashed pattern applied.
+ *
+ * @param path A pointer to the `plutovg_path_t` object to clone.
+ * @param offset The starting offset into the dash pattern.
+ * @param dashes An array of dash lengths.
+ * @param ndashes The number of elements in the `dashes` array.
+ * @return A pointer to the newly created path clone with dashed pattern.
+ */
 PLUTOVG_API plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes);
 
+/**
+ * @brief Computes the bounding box and total length of the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param extents A pointer to a `plutovg_rect_t` structure to store the bounding box.
+ * @return The total length of the path.
+ */
+PLUTOVG_API float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents);
+
+/**
+ * @brief Calculates the total length of the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @return The total length of the path.
+ */
+PLUTOVG_API float plutovg_path_length(const plutovg_path_t* path);
+
+/**
+ * @brief Parses SVG path data into a `plutovg_path_t` object.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param data The SVG path data string.
+ * @param length The length of `data` or `-1` for null-terminated data.
+ * @return `true` if successful, `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length);
 
+/**
+ * @brief Text encodings used for converting text data to code points.
+ */
 typedef enum plutovg_text_encoding {
-    PLUTOVG_TEXT_ENCODING_UTF8,
-    PLUTOVG_TEXT_ENCODING_UTF16,
-    PLUTOVG_TEXT_ENCODING_UTF32,
-    PLUTOVG_TEXT_ENCODING_LATIN1
+    PLUTOVG_TEXT_ENCODING_UTF8, ///< UTF-8 encoding
+    PLUTOVG_TEXT_ENCODING_UTF16, ///< UTF-16 encoding
+    PLUTOVG_TEXT_ENCODING_UTF32, ///< UTF-32 encoding
+    PLUTOVG_TEXT_ENCODING_LATIN1 ///< Latin-1 encoding
 } plutovg_text_encoding_t;
 
+/**
+ * @brief Iterator for traversing code points in text data.
+ */
 typedef struct plutovg_text_iterator {
-    const void* text;
-    int length;
-    plutovg_text_encoding_t encoding;
-    int index;
+    const void* text; ///< Pointer to the text data.
+    int length; ///< Length of the text data.
+    plutovg_text_encoding_t encoding; ///< Encoding format of the text data.
+    int index; ///< Current position in the text data.
 } plutovg_text_iterator_t;
 
+/**
+ * @brief Represents a Unicode code point.
+ */
 typedef unsigned int plutovg_codepoint_t;
 
+/**
+ * @brief Initializes a text iterator.
+ *
+ * @param it Pointer to the text iterator.
+ * @param text Pointer to the text data.
+ * @param length Length of the text data, or -1 if the data is null-terminated.
+ * @param encoding Encoding of the text data.
+ */
 PLUTOVG_API void plutovg_text_iterator_init(plutovg_text_iterator_t* it, const void* text, int length, plutovg_text_encoding_t encoding);
+
+/**
+ * @brief Checks if there are more code points to iterate.
+ *
+ * @param it Pointer to the text iterator.
+ * @return `true` if more code points are available; otherwise, `false`.
+ */
 PLUTOVG_API bool plutovg_text_iterator_has_next(const plutovg_text_iterator_t* it);
+
+/**
+ * @brief Retrieves the next code point and advances the iterator.
+ *
+ * @param it Pointer to the text iterator.
+ * @return The next code point.
+ */
 PLUTOVG_API plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it);
 
 typedef struct plutovg_font_face plutovg_font_face_t;

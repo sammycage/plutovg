@@ -631,6 +631,52 @@ void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, cons
     return plutovg_path_traverse_flatten(path, dash_traverse_func, &dasher);
 }
 
+plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path)
+{
+    plutovg_path_t* clone = plutovg_path_create();
+    plutovg_array_append(clone->elements, path->elements);
+    clone->start_point = path->start_point;
+    clone->num_contours = path->num_contours;
+    clone->num_points = path->num_points;
+    clone->num_curves = path->num_curves;
+    return clone;
+}
+
+static void clone_traverse_func(void* closure, plutovg_path_command_t command, const plutovg_point_t* points, int npoints)
+{
+    plutovg_path_t* path = (plutovg_path_t*)(closure);
+    switch(command) {
+    case PLUTOVG_PATH_COMMAND_MOVE_TO:
+        plutovg_path_move_to(path, points[0].x, points[0].y);
+        break;
+    case PLUTOVG_PATH_COMMAND_LINE_TO:
+        plutovg_path_line_to(path, points[0].x, points[0].y);
+        break;
+    case PLUTOVG_PATH_COMMAND_CUBIC_TO:
+        plutovg_path_cubic_to(path, points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+        break;
+    case PLUTOVG_PATH_COMMAND_CLOSE:
+        plutovg_path_close(path);
+        break;
+    }
+}
+
+plutovg_path_t* plutovg_path_clone_flatten(const plutovg_path_t* path)
+{
+    plutovg_path_t* clone = plutovg_path_create();
+    plutovg_path_reserve(clone, path->elements.size);
+    plutovg_path_traverse_flatten(path, clone_traverse_func, clone);
+    return clone;
+}
+
+plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes)
+{
+    plutovg_path_t* clone = plutovg_path_create();
+    plutovg_path_reserve(clone, path->elements.size);
+    plutovg_path_traverse_dashed(path, offset, dashes, ndashes, clone_traverse_func, clone);
+    return clone;
+}
+
 typedef struct {
     plutovg_point_t current_point;
     bool is_first_point;
@@ -684,52 +730,6 @@ float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents)
 float plutovg_path_length(const plutovg_path_t* path)
 {
     return plutovg_path_extents(path, NULL);
-}
-
-plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path)
-{
-    plutovg_path_t* clone = plutovg_path_create();
-    plutovg_array_append(clone->elements, path->elements);
-    clone->start_point = path->start_point;
-    clone->num_contours = path->num_contours;
-    clone->num_points = path->num_points;
-    clone->num_curves = path->num_curves;
-    return clone;
-}
-
-static void clone_traverse_func(void* closure, plutovg_path_command_t command, const plutovg_point_t* points, int npoints)
-{
-    plutovg_path_t* path = (plutovg_path_t*)(closure);
-    switch(command) {
-    case PLUTOVG_PATH_COMMAND_MOVE_TO:
-        plutovg_path_move_to(path, points[0].x, points[0].y);
-        break;
-    case PLUTOVG_PATH_COMMAND_LINE_TO:
-        plutovg_path_line_to(path, points[0].x, points[0].y);
-        break;
-    case PLUTOVG_PATH_COMMAND_CUBIC_TO:
-        plutovg_path_cubic_to(path, points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
-        break;
-    case PLUTOVG_PATH_COMMAND_CLOSE:
-        plutovg_path_close(path);
-        break;
-    }
-}
-
-plutovg_path_t* plutovg_path_clone_flatten(const plutovg_path_t* path)
-{
-    plutovg_path_t* clone = plutovg_path_create();
-    plutovg_path_reserve(clone, path->elements.size);
-    plutovg_path_traverse_flatten(path, clone_traverse_func, clone);
-    return clone;
-}
-
-plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes)
-{
-    plutovg_path_t* clone = plutovg_path_create();
-    plutovg_path_reserve(clone, path->elements.size);
-    plutovg_path_traverse_dashed(path, offset, dashes, ndashes, clone_traverse_func, clone);
-    return clone;
 }
 
 static inline bool parse_number(const char** begin, const char* end, float* number)
