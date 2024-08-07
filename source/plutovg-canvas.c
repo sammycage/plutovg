@@ -1,7 +1,5 @@
 #include "plutovg-private.h"
 
-#include <assert.h>
-
 int plutovg_version(void)
 {
     return PLUTOVG_VERSION;

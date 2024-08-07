@@ -225,53 +225,356 @@ PLUTOVG_API void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const p
 
 typedef struct plutovg_path plutovg_path_t;
 
+/**
+ * @brief Enumeration defining path commands
+ */
 typedef enum plutovg_path_command {
-    PLUTOVG_PATH_COMMAND_MOVE_TO,
-    PLUTOVG_PATH_COMMAND_LINE_TO,
-    PLUTOVG_PATH_COMMAND_CUBIC_TO,
-    PLUTOVG_PATH_COMMAND_CLOSE
+    PLUTOVG_PATH_COMMAND_MOVE_TO, /**< Moves the current point to a new position. */
+    PLUTOVG_PATH_COMMAND_LINE_TO, /**< Draws a straight line to a new point. */
+    PLUTOVG_PATH_COMMAND_CUBIC_TO, /**< Draws a cubic Bézier curve to a new point. */
+    PLUTOVG_PATH_COMMAND_CLOSE /**< Closes the current path by drawing a line to the starting point. */
 } plutovg_path_command_t;
 
+/**
+ * @brief Union representing a path element.
+ *
+ * A path element can be a command with a length or a coordinate point.
+ * Each command type in the path element array is followed by a specific number of points:
+ * - `PLUTOVG_PATH_COMMAND_MOVE_TO`: 1 point
+ * - `PLUTOVG_PATH_COMMAND_LINE_TO`: 1 point
+ * - `PLUTOVG_PATH_COMMAND_CUBIC_TO`: 3 points
+ * - `PLUTOVG_PATH_COMMAND_CLOSE`: 1 point
+ *
+ * @example
+ * const plutovg_path_element_t* elements;
+ * int count = plutovg_path_get_elements(path, &elements);
+ * for (int i = 0; i < count; i += elements[i].header.length) {
+ *     plutovg_path_command_t command = elements[i].header.command;
+ *     switch (command) {
+ *         case PLUTOVG_PATH_COMMAND_MOVE_TO:
+ *             printf("MoveTo: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
+ *             break;
+ *         case PLUTOVG_PATH_COMMAND_LINE_TO:
+ *             printf("LineTo: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
+ *             break;
+ *         case PLUTOVG_PATH_COMMAND_CUBIC_TO:
+ *             printf("CubicTo: %g %g %g %g %g %g\n",
+ *                    elements[i + 1].point.x, elements[i + 1].point.y,
+ *                    elements[i + 2].point.x, elements[i + 2].point.y,
+ *                    elements[i + 3].point.x, elements[i + 3].point.y);
+ *             break;
+ *         case PLUTOVG_PATH_COMMAND_CLOSE:
+ *             printf("Close: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
+ *             break;
+ *     }
+ * }
+ */
 typedef union plutovg_path_element {
     struct {
-        plutovg_path_command_t command;
-        int length;
-    } header;
-    plutovg_point_t point;
+        plutovg_path_command_t command; /**< The path command. */
+        int length; /**< Number of elements including the header. */
+    } header; /**< Header for path commands. */
+    plutovg_point_t point; /**< A coordinate point in the path. */
 } plutovg_path_element_t;
 
+/**
+ * @brief Iterator for traversing path elements in a path.
+ */
 typedef struct plutovg_path_iterator {
-    const plutovg_path_element_t* elements;
-    int size;
-    int index;
+    const plutovg_path_element_t* elements; /**< Pointer to the array of path elements. */
+    int size; /**< Total number of elements in the array. */
+    int index; /**< Current position in the array. */
 } plutovg_path_iterator_t;
 
+/**
+ * @brief Initializes the path iterator for a given path.
+ *
+ * @param it The path iterator to initialize.
+ * @param path The path to iterate over.
+ */
 PLUTOVG_API void plutovg_path_iterator_init(plutovg_path_iterator_t* it, const plutovg_path_t* path);
+
+/**
+ * @brief Checks if there are more elements to iterate over.
+ *
+ * @param it The path iterator.
+ * @return `true` if there are more elements; otherwise, `false`.
+ */
 PLUTOVG_API bool plutovg_path_iterator_has_next(const plutovg_path_iterator_t* it);
+
+/**
+ * @brief Retrieves the current command and its associated points, and advances the iterator.
+ *
+ * @param it The path iterator.
+ * @param points Array to store the points for the current command.
+ * @return The path command for the current element.
+ */
 PLUTOVG_API plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_iterator_t* it, plutovg_point_t points[3]);
 
+/**
+ * @brief Creates a new path object.
+ *
+ * Initializes and returns a pointer to a new `plutovg_path_t` object.
+ * The path object should be released using `plutovg_path_destroy()` when no longer needed.
+ *
+ * @return A pointer to the newly created path object.
+ */
 PLUTOVG_API plutovg_path_t* plutovg_path_create(void);
-PLUTOVG_API void plutovg_path_move_to(plutovg_path_t* path, float x, float y);
-PLUTOVG_API void plutovg_path_line_to(plutovg_path_t* path, float x, float y);
-PLUTOVG_API void plutovg_path_quad_to(plutovg_path_t* path, float x1, float y1, float x2, float y2);
-PLUTOVG_API void plutovg_path_cubic_to(plutovg_path_t* path, float x1, float y1, float x2, float y2, float x3, float y3);
-PLUTOVG_API void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, bool large_arc_flag, bool sweep_flag, float x, float y);
-PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
-PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y);
-PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int count);
-PLUTOVG_API void plutovg_path_reset(plutovg_path_t* path);
-PLUTOVG_API void plutovg_path_add_rect(plutovg_path_t* path, float x, float y, float w, float h);
-PLUTOVG_API void plutovg_path_add_round_rect(plutovg_path_t* path, float x, float y, float w, float h, float rx, float ry);
-PLUTOVG_API void plutovg_path_add_ellipse(plutovg_path_t* path, float cx, float cy, float rx, float ry);
-PLUTOVG_API void plutovg_path_add_circle(plutovg_path_t* path, float cx, float cy, float r);
-PLUTOVG_API void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, float r, float a0, float a1, bool ccw);
-PLUTOVG_API void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, const plutovg_matrix_t* matrix);
-PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix);
 
-PLUTOVG_API int plutovg_path_get_elements(const plutovg_path_t* path, const plutovg_path_element_t** elements);
+/**
+ * @brief Increases the reference count of a path object.
+ *
+ * This function increments the reference count of the given path object,
+ * ensuring that it remains valid as long as it is in use. The reference count
+ * should eventually be decremented using `plutovg_path_destroy()`.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @return A pointer to the same `plutovg_path_t` object.
+ */
 PLUTOVG_API plutovg_path_t* plutovg_path_reference(plutovg_path_t* path);
+
+/**
+ * @brief Decreases the reference count of a path object.
+ *
+ * This function decrements the reference count of the given path object. If
+ * the reference count reaches zero, the path object is destroyed and its
+ * resources are freed.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ */
 PLUTOVG_API void plutovg_path_destroy(plutovg_path_t* path);
+
+/**
+ * @brief Retrieves the reference count of a path object.
+ *
+ * This function returns the current reference count of the given path object.
+ * The reference count reflects how many references exist to the path object.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @return The current reference count of the path object.
+ */
 PLUTOVG_API int plutovg_path_get_reference_count(const plutovg_path_t* path);
+
+/**
+ * @brief Retrieves the elements of a path.
+ *
+ * This function provides access to the array of path elements.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param elements A pointer to a pointer that will be set to point to the array of path elements.
+ * @return The number of elements in the path.
+ */
+PLUTOVG_API int plutovg_path_get_elements(const plutovg_path_t* path, const plutovg_path_element_t** elements);
+
+/**
+ * @brief Moves the current point to a new position.
+ *
+ * This function moves the current point to the specified coordinates without
+ * drawing a line. This is equivalent to the `M` command in SVG path syntax.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x The x-coordinate of the new position.
+ * @param y The y-coordinate of the new position.
+ */
+PLUTOVG_API void plutovg_path_move_to(plutovg_path_t* path, float x, float y);
+
+/**
+ * @brief Adds a straight line segment to the path.
+ *
+ * This function adds a straight line segment from the current point to the
+ * specified coordinates. This is equivalent to the `L` command in SVG path syntax.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x The x-coordinate of the end point of the line segment.
+ * @param y The y-coordinate of the end point of the line segment.
+ */
+PLUTOVG_API void plutovg_path_line_to(plutovg_path_t* path, float x, float y);
+
+/**
+ * @brief Adds a quadratic Bézier curve to the path.
+ *
+ * This function adds a quadratic Bézier curve segment from the current point
+ * to the specified end point, using the given control point. This is equivalent
+ * to the `Q` command in SVG path syntax.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x1 The x-coordinate of the control point.
+ * @param y1 The y-coordinate of the control point.
+ * @param x2 The x-coordinate of the end point of the curve.
+ * @param y2 The y-coordinate of the end point of the curve.
+ */
+PLUTOVG_API void plutovg_path_quad_to(plutovg_path_t* path, float x1, float y1, float x2, float y2);
+
+/**
+ * @brief Adds a cubic Bézier curve to the path.
+ *
+ * This function adds a cubic Bézier curve segment from the current point
+ * to the specified end point, using the given two control points. This is
+ * equivalent to the `C` command in SVG path syntax.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x1 The x-coordinate of the first control point.
+ * @param y1 The y-coordinate of the first control point.
+ * @param x2 The x-coordinate of the second control point.
+ * @param y2 The y-coordinate of the second control point.
+ * @param x3 The x-coordinate of the end point of the curve.
+ * @param y3 The y-coordinate of the end point of the curve.
+ */
+PLUTOVG_API void plutovg_path_cubic_to(plutovg_path_t* path, float x1, float y1, float x2, float y2, float x3, float y3);
+
+/**
+ * @brief Adds an elliptical arc to the path.
+ *
+ * This function adds an elliptical arc segment from the current point to the
+ * specified end point. The arc is defined by the radii, rotation angle, and
+ * flags for large arc and sweep. This is equivalent to the `A` command in SVG
+ * path syntax.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param rx The x-radius of the ellipse.
+ * @param ry The y-radius of the ellipse.
+ * @param angle The rotation angle of the ellipse in radians.
+ * @param large_arc_flag If true, draw the large arc; otherwise, draw the small arc.
+ * @param sweep_flag If true, draw the arc in the positive-angle direction; otherwise, in the negative-angle direction.
+ * @param x The x-coordinate of the end point of the arc.
+ * @param y The y-coordinate of the end point of the arc.
+ */
+PLUTOVG_API void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, bool large_arc_flag, bool sweep_flag, float x, float y);
+
+/**
+ * @brief Closes the current sub-path.
+ *
+ * This function closes the current sub-path by drawing a straight line back to
+ * the start point of the sub-path. This is equivalent to the `Z` command in SVG
+ * path syntax.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ */
+PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
+
+/**
+ * @brief Retrieves the current point of the path.
+ *
+ * Gets the current point's coordinates in the path. This point is the last
+ * position used or the point where the path was last moved to.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x Output parameter for the x-coordinate of the current point.
+ * @param y Output parameter for the y-coordinate of the current point.
+ */
+PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y);
+
+/**
+ * @brief Reserves space for path elements.
+ *
+ * Reserves space for a specified number of elements in the path. This helps optimize
+ * memory allocation for future path operations.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param count The number of path elements to reserve space for.
+ */
+PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int count);
+
+/**
+ * @brief Resets the path.
+ *
+ * Clears all path data, effectively resetting the `plutovg_path_t` object to its initial state.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ */
+PLUTOVG_API void plutovg_path_reset(plutovg_path_t* path);
+
+/**
+ * @brief Adds a rectangle to the path.
+ *
+ * Adds a rectangle defined by the top-left corner (x, y) and dimensions (w, h) to the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x The x-coordinate of the rectangle's top-left corner.
+ * @param y The y-coordinate of the rectangle's top-left corner.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ */
+PLUTOVG_API void plutovg_path_add_rect(plutovg_path_t* path, float x, float y, float w, float h);
+
+/**
+ * @brief Adds a rounded rectangle to the path.
+ *
+ * Adds a rounded rectangle defined by the top-left corner (x, y), dimensions (w, h),
+ * and corner radii (rx, ry) to the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param x The x-coordinate of the rectangle's top-left corner.
+ * @param y The y-coordinate of the rectangle's top-left corner.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ * @param rx The x-radius of the rectangle's corners.
+ * @param ry The y-radius of the rectangle's corners.
+ */
+PLUTOVG_API void plutovg_path_add_round_rect(plutovg_path_t* path, float x, float y, float w, float h, float rx, float ry);
+
+/**
+ * @brief Adds an ellipse to the path.
+ *
+ * Adds an ellipse defined by the center (cx, cy) and radii (rx, ry) to the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param cx The x-coordinate of the ellipse's center.
+ * @param cy The y-coordinate of the ellipse's center.
+ * @param rx The x-radius of the ellipse.
+ * @param ry The y-radius of the ellipse.
+ */
+PLUTOVG_API void plutovg_path_add_ellipse(plutovg_path_t* path, float cx, float cy, float rx, float ry);
+
+/**
+ * @brief Adds a circle to the path.
+ *
+ * Adds a circle defined by its center (cx, cy) and radius (r) to the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param cx The x-coordinate of the circle's center.
+ * @param cy The y-coordinate of the circle's center.
+ * @param r The radius of the circle.
+ */
+PLUTOVG_API void plutovg_path_add_circle(plutovg_path_t* path, float cx, float cy, float r);
+
+/**
+ * @brief Adds an arc to the path.
+ *
+ * Adds an arc defined by the center (cx, cy), radius (r), start angle (a0), end angle (a1),
+ * and direction (ccw) to the path.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param cx The x-coordinate of the arc's center.
+ * @param cy The y-coordinate of the arc's center.
+ * @param r The radius of the arc.
+ * @param a0 The start angle of the arc in radians.
+ * @param a1 The end angle of the arc in radians.
+ * @param ccw If true, the arc is drawn counter-clockwise; if false, clockwise.
+ */
+PLUTOVG_API void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, float r, float a0, float a1, bool ccw);
+
+/**
+ * @brief Adds a sub-path to the path.
+ *
+ * Adds all elements from another path (`source`) to the current path, optionally
+ * applying a transformation matrix.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param source A pointer to the `plutovg_path_t` object to copy elements from.
+ * @param matrix A pointer to a `plutovg_matrix_t` transformation matrix, or `NULL` to apply no transformation.
+ */
+PLUTOVG_API void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, const plutovg_matrix_t* matrix);
+
+/**
+ * @brief Applies a transformation matrix to the path.
+ *
+ * Transforms the entire path using the provided transformation matrix.
+ *
+ * @param path A pointer to the `plutovg_path_t` object.
+ * @param matrix A pointer to the `plutovg_matrix_t` transformation matrix.
+ */
+PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix);
 
 typedef void (*plutovg_path_traverse_func_t)(void* closure, plutovg_path_command_t command, const plutovg_point_t* points, int npoints);
 
@@ -556,23 +859,198 @@ PLUTOVG_API void plutovg_canvas_map_point(const plutovg_canvas_t* canvas, const 
  */
 PLUTOVG_API void plutovg_canvas_map_rect(const plutovg_canvas_t* canvas, const plutovg_rect_t* src, plutovg_rect_t* dst);
 
+/**
+ * @brief Moves the current point to a new position.
+ *
+ * Moves the current point to the specified coordinates without adding a line.
+ * This operation is added to the current path. Equivalent to the SVG `M` command.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the new position.
+ * @param y The y-coordinate of the new position.
+ */
 PLUTOVG_API void plutovg_canvas_move_to(plutovg_canvas_t* canvas, float x, float y);
+
+/**
+ * @brief Adds a straight line segment to the current path.
+ *
+ * Adds a straight line from the current point to the specified coordinates.
+ * This segment is added to the current path. Equivalent to the SVG `L` command.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the end point of the line.
+ * @param y The y-coordinate of the end point of the line.
+ */
 PLUTOVG_API void plutovg_canvas_line_to(plutovg_canvas_t* canvas, float x, float y);
+
+/**
+ * @brief Adds a quadratic Bézier curve to the current path.
+ *
+ * Adds a quadratic Bézier curve from the current point to the specified end point,
+ * using the given control point. This curve is added to the current path. Equivalent to the SVG `Q` command.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x1 The x-coordinate of the control point.
+ * @param y1 The y-coordinate of the control point.
+ * @param x2 The x-coordinate of the end point of the curve.
+ * @param y2 The y-coordinate of the end point of the curve.
+ */
 PLUTOVG_API void plutovg_canvas_quad_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2);
+
+/**
+ * @brief Adds a cubic Bézier curve to the current path.
+ *
+ * Adds a cubic Bézier curve from the current point to the specified end point,
+ * using the given control points. This curve is added to the current path. Equivalent to the SVG `C` command.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x1 The x-coordinate of the first control point.
+ * @param y1 The y-coordinate of the first control point.
+ * @param x2 The x-coordinate of the second control point.
+ * @param y2 The y-coordinate of the second control point.
+ * @param x3 The x-coordinate of the end point of the curve.
+ * @param y3 The y-coordinate of the end point of the curve.
+ */
 PLUTOVG_API void plutovg_canvas_cubic_to(plutovg_canvas_t* canvas, float x1, float y1, float x2, float y2, float x3, float y3);
+
+/**
+ * @brief Adds an elliptical arc to the current path.
+ *
+ * Adds an elliptical arc from the current point to the specified end point,
+ * defined by radii, rotation angle, and flags for arc type and direction.
+ * This arc segment is added to the current path. Equivalent to the SVG `A` command.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param rx The x-radius of the ellipse.
+ * @param ry The y-radius of the ellipse.
+ * @param angle The rotation angle of the ellipse in degrees.
+ * @param large_arc_flag If true, add the large arc; otherwise, add the small arc.
+ * @param sweep_flag If true, add the arc in the positive-angle direction; otherwise, in the negative-angle direction.
+ * @param x The x-coordinate of the end point.
+ * @param y The y-coordinate of the end point.
+ */
 PLUTOVG_API void plutovg_canvas_arc_to(plutovg_canvas_t* canvas, float rx, float ry, float angle, bool large_arc_flag, bool sweep_flag, float x, float y);
 
+/**
+ * @brief Adds a rectangle to the current path.
+ *
+ * Adds a rectangle with the specified position and dimensions to the current path.
+ * Equivalent to the SVG `rect` command.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the rectangle's origin.
+ * @param y The y-coordinate of the rectangle's origin.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ */
 PLUTOVG_API void plutovg_canvas_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+
+/**
+ * @brief Adds a rounded rectangle to the current path.
+ *
+ * Adds a rectangle with rounded corners defined by the specified position,
+ * dimensions, and corner radii to the current path.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the rectangle's origin.
+ * @param y The y-coordinate of the rectangle's origin.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ * @param rx The x-radius of the corners.
+ * @param ry The y-radius of the corners.
+ */
 PLUTOVG_API void plutovg_canvas_round_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h, float rx, float ry);
+
+/**
+ * @brief Adds an ellipse to the current path.
+ *
+ * Adds an ellipse centered at the specified coordinates with the given radii to the current path.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param cx The x-coordinate of the ellipse's center.
+ * @param cy The y-coordinate of the ellipse's center.
+ * @param rx The x-radius of the ellipse.
+ * @param ry The y-radius of the ellipse.
+ */
 PLUTOVG_API void plutovg_canvas_ellipse(plutovg_canvas_t* canvas, float cx, float cy, float rx, float ry);
+
+/**
+ * @brief Adds a circle to the current path.
+ *
+ * Adds a circle centered at the specified coordinates with the given radius to the current path.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param cx The x-coordinate of the circle's center.
+ * @param cy The y-coordinate of the circle's center.
+ * @param r The radius of the circle.
+ */
 PLUTOVG_API void plutovg_canvas_circle(plutovg_canvas_t* canvas, float cx, float cy, float r);
+
+/**
+ * @brief Adds an arc to the current path.
+ *
+ * Adds an arc centered at the specified coordinates, with a given radius,
+ * starting and ending at the specified angles. The direction of the arc is
+ * determined by `ccw`. This arc segment is added to the current path.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param cx The x-coordinate of the arc's center.
+ * @param cy The y-coordinate of the arc's center.
+ * @param r The radius of the arc.
+ * @param a0 The starting angle of the arc in radians.
+ * @param a1 The ending angle of the arc in radians.
+ * @param ccw If true, add the arc counter-clockwise; otherwise, clockwise.
+ */
 PLUTOVG_API void plutovg_canvas_arc(plutovg_canvas_t* canvas, float cx, float cy, float r, float a0, float a1, bool ccw);
 
+/**
+ * @brief Adds a path to the current path.
+ *
+ * Appends the elements of the specified path to the current path.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param path A pointer to the `plutovg_path_t` object to be added.
+ */
 PLUTOVG_API void plutovg_canvas_add_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
+
+/**
+ * @brief Starts a new path on the canvas.
+ *
+ * Begins a new path, clearing any existing path data. The new path starts with no commands.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_new_path(plutovg_canvas_t* canvas);
+
+/**
+ * @brief Closes the current path.
+ *
+ * Closes the current path by adding a straight line back to the starting point.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_close_path(plutovg_canvas_t* canvas);
 
+/**
+ * @brief Retrieves the current point of the canvas.
+ *
+ * Gets the coordinates of the current point in the canvas, which is the last point
+ * added or moved to in the current path.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param x Output parameter for the x-coordinate of the current point.
+ * @param y Output parameter for the y-coordinate of the current point.
+ */
 PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas, float* x, float* y);
+
+/**
+ * @brief Gets the current path from the canvas.
+ *
+ * Retrieves the path object representing the sequence of path commands added to the canvas.
+ *
+ * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @return A pointer to the `plutovg_path_t` object representing the current path.
+ */
 PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas);
 
 PLUTOVG_API void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);

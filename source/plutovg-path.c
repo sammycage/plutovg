@@ -49,6 +49,38 @@ plutovg_path_t* plutovg_path_create(void)
     return path;
 }
 
+plutovg_path_t* plutovg_path_reference(plutovg_path_t* path)
+{
+    if(path == NULL)
+        return NULL;
+    ++path->ref_count;
+    return path;
+}
+
+void plutovg_path_destroy(plutovg_path_t* path)
+{
+    if(path == NULL)
+        return;
+    if(--path->ref_count == 0) {
+        plutovg_array_destroy(path->elements);
+        free(path);
+    }
+}
+
+int plutovg_path_get_reference_count(const plutovg_path_t* path)
+{
+    if(path)
+        return path->ref_count;
+    return 0;
+}
+
+int plutovg_path_get_elements(const plutovg_path_t* path, const plutovg_path_element_t** elements)
+{
+    if(elements)
+        *elements = path->elements.data;
+    return path->elements.size;
+}
+
 static plutovg_path_element_t* plutovg_path_add_command(plutovg_path_t* path, plutovg_path_command_t command, int npoints)
 {
     const int nelements = path->elements.size;
@@ -396,38 +428,6 @@ void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, c
             break;
         }
     }
-}
-
-int plutovg_path_get_elements(const plutovg_path_t* path, const plutovg_path_element_t** elements)
-{
-    if(elements)
-        *elements = path->elements.data;
-    return path->elements.size;
-}
-
-plutovg_path_t* plutovg_path_reference(plutovg_path_t* path)
-{
-    if(path == NULL)
-        return NULL;
-    ++path->ref_count;
-    return path;
-}
-
-void plutovg_path_destroy(plutovg_path_t* path)
-{
-    if(path == NULL)
-        return;
-    if(--path->ref_count == 0) {
-        plutovg_array_destroy(path->elements);
-        free(path);
-    }
-}
-
-int plutovg_path_get_reference_count(const plutovg_path_t* path)
-{
-    if(path)
-        return path->ref_count;
-    return 0;
 }
 
 void plutovg_path_traverse(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure)
