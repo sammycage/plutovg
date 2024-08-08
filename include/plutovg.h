@@ -223,10 +223,13 @@ PLUTOVG_API void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const
  */
 PLUTOVG_API void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst);
 
+/**
+ * @brief Represents a 2D path for drawing operations.
+ */
 typedef struct plutovg_path plutovg_path_t;
 
 /**
- * @brief Enumeration defining path commands
+ * @brief Enumeration defining path commands.
  */
 typedef enum plutovg_path_command {
     PLUTOVG_PATH_COMMAND_MOVE_TO, /**< Moves the current point to a new position. */
@@ -248,24 +251,24 @@ typedef enum plutovg_path_command {
  * @example
  * const plutovg_path_element_t* elements;
  * int count = plutovg_path_get_elements(path, &elements);
- * for (int i = 0; i < count; i += elements[i].header.length) {
+ * for(int i = 0; i < count; i += elements[i].header.length) {
  *     plutovg_path_command_t command = elements[i].header.command;
- *     switch (command) {
- *         case PLUTOVG_PATH_COMMAND_MOVE_TO:
- *             printf("MoveTo: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
- *             break;
- *         case PLUTOVG_PATH_COMMAND_LINE_TO:
- *             printf("LineTo: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
- *             break;
- *         case PLUTOVG_PATH_COMMAND_CUBIC_TO:
- *             printf("CubicTo: %g %g %g %g %g %g\n",
- *                    elements[i + 1].point.x, elements[i + 1].point.y,
- *                    elements[i + 2].point.x, elements[i + 2].point.y,
- *                    elements[i + 3].point.x, elements[i + 3].point.y);
- *             break;
- *         case PLUTOVG_PATH_COMMAND_CLOSE:
- *             printf("Close: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
- *             break;
+ *     switch(command) {
+ *     case PLUTOVG_PATH_COMMAND_MOVE_TO:
+ *         printf("MoveTo: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
+ *         break;
+ *     case PLUTOVG_PATH_COMMAND_LINE_TO:
+ *         printf("LineTo: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
+ *         break;
+ *     case PLUTOVG_PATH_COMMAND_CUBIC_TO:
+ *         printf("CubicTo: %g %g %g %g %g %g\n",
+ *                elements[i + 1].point.x, elements[i + 1].point.y,
+ *                elements[i + 2].point.x, elements[i + 2].point.y,
+ *                elements[i + 3].point.x, elements[i + 3].point.y);
+ *         break;
+ *     case PLUTOVG_PATH_COMMAND_CLOSE:
+ *         printf("Close: %g %g\n", elements[i + 1].point.x, elements[i + 1].point.y);
+ *         break;
  *     }
  * }
  */
@@ -287,7 +290,7 @@ typedef struct plutovg_path_iterator {
 } plutovg_path_iterator_t;
 
 /**
- * @brief Initializes the path iterator for a given path.
+ * @brief Initializes a path iterator for a given path.
  *
  * @param it The path iterator to initialize.
  * @param path The path to iterate over.
@@ -303,10 +306,10 @@ PLUTOVG_API void plutovg_path_iterator_init(plutovg_path_iterator_t* it, const p
 PLUTOVG_API bool plutovg_path_iterator_has_next(const plutovg_path_iterator_t* it);
 
 /**
- * @brief Retrieves the current command and its associated points, and advances the iterator.
+ * @brief Retrieves the current command and its associated points, then advances the iterator.
  *
  * @param it The path iterator.
- * @param points Array to store the points for the current command.
+ * @param points An array to store the points for the current command.
  * @return The path command for the current element.
  */
 PLUTOVG_API plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_iterator_t* it, plutovg_point_t points[3]);
@@ -579,7 +582,7 @@ PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matr
 /**
  * @brief Callback function type for traversing a path.
  *
- * This function type defines a callback used to traverse path commands.
+ * This function type defines a callback used to traverse path elements.
  *
  * @param closure A pointer to user-defined data passed to the callback.
  * @param command The current path command.
@@ -589,10 +592,10 @@ PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matr
 typedef void (*plutovg_path_traverse_func_t)(void* closure, plutovg_path_command_t command, const plutovg_point_t* points, int npoints);
 
 /**
- * @brief Traverses the path and calls the callback for each segment.
+ * @brief Traverses the path and calls the callback for each element.
  *
  * @param path A pointer to the `plutovg_path_t` object.
- * @param traverse_func The callback function for each segment.
+ * @param traverse_func The callback function to be called for each element of the path.
  * @param closure User-defined data passed to the callback.
  */
 PLUTOVG_API void plutovg_path_traverse(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure);
@@ -601,7 +604,7 @@ PLUTOVG_API void plutovg_path_traverse(const plutovg_path_t* path, plutovg_path_
  * @brief Traverses the path with Bézier curves flattened to line segments.
  *
  * @param path A pointer to the `plutovg_path_t` object.
- * @param traverse_func The callback function for each segment.
+ * @param traverse_func The callback function to be called for each element of the path.
  * @param closure User-defined data passed to the callback.
  */
 PLUTOVG_API void plutovg_path_traverse_flatten(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure);
@@ -613,7 +616,7 @@ PLUTOVG_API void plutovg_path_traverse_flatten(const plutovg_path_t* path, pluto
  * @param offset The starting offset into the dash pattern.
  * @param dashes An array of dash lengths.
  * @param ndashes The number of elements in the `dashes` array.
- * @param traverse_func The callback function for each segment.
+ * @param traverse_func The callback function to be called for each element of the path.
  * @param closure User-defined data passed to the callback.
  */
 PLUTOVG_API void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, const float* dashes, int ndashes, plutovg_path_traverse_func_t traverse_func, void* closure);
@@ -665,10 +668,10 @@ PLUTOVG_API float plutovg_path_length(const plutovg_path_t* path);
 /**
  * @brief Parses SVG path data into a `plutovg_path_t` object.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to the `plutovg_path_t` object to populate.
  * @param data The SVG path data string.
- * @param length The length of `data` or `-1` for null-terminated data.
- * @return `true` if successful, `false` otherwise.
+ * @param length The length of `data`, or `-1` for null-terminated data.
+ * @return `true` if successful; `false` otherwise.
  */
 PLUTOVG_API bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length);
 
@@ -723,51 +726,289 @@ PLUTOVG_API bool plutovg_text_iterator_has_next(const plutovg_text_iterator_t* i
  */
 PLUTOVG_API plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it);
 
+/**
+ * @brief Represents a font face.
+ */
 typedef struct plutovg_font_face plutovg_font_face_t;
 
+/**
+ * @brief Loads a font face from a file.
+ *
+ * @param filename Path to the font file.
+ * @param ttcindex Index of the font face in a TrueType Collection (TTC) file.
+ * @return A pointer to the loaded `plutovg_font_face_t` object, or `NULL` on failure.
+ */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int ttcindex);
+
+/**
+ * @brief Loads a font face from memory.
+ *
+ * @param data Pointer to the font data.
+ * @param length Length of the font data.
+ * @param ttcindex Index of the font face in a TrueType Collection (TTC) file.
+ * @param destroy_func Function to free the font data when no longer needed.
+ * @param closure User-defined data passed to the `destroy_func`.
+ * @return A pointer to the loaded `plutovg_font_face_t` object, or `NULL` on failure.
+ */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned int length, int ttcindex, plutovg_destroy_func_t destroy_func, void* closure);
 
+/**
+ * @brief Increments the reference count of a font face.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @return A pointer to the `plutovg_font_face_t` object.
+ */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_reference(plutovg_font_face_t* face);
+
+/**
+ * @brief Decrements the reference count and potentially destroys the font face.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ */
 PLUTOVG_API void plutovg_font_face_destroy(plutovg_font_face_t* face);
+
+/**
+ * @brief Retrieves the current reference count of a font face.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @return The reference count of the font face.
+ */
 PLUTOVG_API int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face);
 
+/**
+ * @brief Retrieves the metrics for a font face at a specified size.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param size The font size in pixels.
+ * @param ascent Pointer to store the ascent metric.
+ * @param descent Pointer to store the descent metric.
+ * @param line_gap Pointer to store the line gap metric.
+ * @param extents Pointer to a `plutovg_rect_t` structure to store the font bounding box.
+ */
 PLUTOVG_API void plutovg_font_face_get_metrics(const plutovg_font_face_t* face, float size, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents);
+
+/**
+ * @brief Retrieves the metrics for a specific glyph at a specified size.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param size The font size in pixels.
+ * @param codepoint The Unicode code point of the glyph.
+ * @param advance_width Pointer to store the advance width of the glyph.
+ * @param left_side_bearing Pointer to store the left side bearing of the glyph.
+ * @param extents Pointer to a `plutovg_rect_t` structure to store the glyph bounding box.
+ */
 PLUTOVG_API void plutovg_font_face_get_glyph_metrics(const plutovg_font_face_t* face, float size, plutovg_codepoint_t codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents);
 
+/**
+ * @brief Retrieves the path of a glyph and its advance width.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param size The font size in pixels.
+ * @param x The x-coordinate for positioning the glyph.
+ * @param y The y-coordinate for positioning the glyph.
+ * @param codepoint The Unicode code point of the glyph.
+ * @param path Pointer to a `plutovg_path_t` structure to store the glyph path.
+ * @return The advance width of the glyph.
+ */
 PLUTOVG_API float plutovg_font_face_get_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_t* path);
+
+/**
+ * @brief Traverses the path of a glyph and calls a callback for each path element.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param size The font size in pixels.
+ * @param x The x-coordinate for positioning the glyph.
+ * @param y The y-coordinate for positioning the glyph.
+ * @param codepoint The Unicode code point of the glyph.
+ * @param traverse_func The callback function to be called for each path element.
+ * @param closure User-defined data passed to the callback function.
+ * @return The advance width of the glyph.
+ */
 PLUTOVG_API float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_traverse_func_t traverse_func, void* closure);
 
+/**
+ * @brief Computes the bounding box of a text string and its advance width.
+ *
+ * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param size The font size in pixels.
+ * @param text Pointer to the text data.
+ * @param length Length of the text data, or -1 if null-terminated.
+ * @param encoding Encoding of the text data.
+ * @param extents Pointer to a `plutovg_rect_t` structure to store the bounding box of the text.
+ * @return The total advance width of the text.
+ */
 PLUTOVG_API float plutovg_font_face_text_extents(const plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
 /**
- * @note plutovg_surface_t format is ARGB32_Premultiplied.
+ * @brief Represents an image surface for drawing operations.
+ *
+ * The pixel data is stored in a premultiplied 32-bit ARGB format (0xAARRGGBB).
+ * The red, green, and blue channels are multiplied by the alpha component divided by 255.
+ * Premultiplied ARGB32 is beneficial for faster operations such as alpha blending.
  */
 typedef struct plutovg_surface plutovg_surface_t;
 
+/**
+ * @brief Creates a new image surface with the specified dimensions.
+ *
+ * @param width The width of the surface in pixels.
+ * @param height The height of the surface in pixels.
+ * @return A pointer to the newly created `plutovg_surface_t` object.
+ */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_create(int width, int height);
+
+/**
+ * @brief Creates an image surface using existing pixel data.
+ *
+ * @param data Pointer to the pixel data.
+ * @param width The width of the surface in pixels.
+ * @param height The height of the surface in pixels.
+ * @param stride The number of bytes per row in the pixel data.
+ * @return A pointer to the newly created `plutovg_surface_t` object.
+ */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int width, int height, int stride);
 
+/**
+ * @brief Loads an image surface from a file.
+ *
+ * @param filename Path to the image file.
+ * @return Pointer to the surface or `NULL` on failure.
+ */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename);
+
+/**
+ * @brief Loads an image surface from raw image data.
+ *
+ * @param data Pointer to the image data.
+ * @param length Data length in bytes.
+ * @return Pointer to the surface or `NULL` on failure.
+ */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, int length);
+
+/**
+ * @brief Loads an image surface from base64-encoded data.
+ *
+ * @param data Pointer to base64 data.
+ * @param length Data length in bytes.
+ * @return Pointer to the surface or `NULL` on failure.
+ */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_base64(const char* data, int length);
 
+/**
+ * @brief Increments the reference count for a surface.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @return Pointer to the `plutovg_surface_t` object.
+ */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surface);
+
+/**
+ * @brief Decrements the reference count and destroys the surface if the count reaches zero.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ */
 PLUTOVG_API void plutovg_surface_destroy(plutovg_surface_t* surface);
+
+/**
+ * @brief Gets the current reference count of a surface.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @return The reference count of the surface.
+ */
 PLUTOVG_API int plutovg_surface_get_reference_count(const plutovg_surface_t* surface);
 
+/**
+ * @brief Gets the pixel data of the surface.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @return Pointer to the pixel data.
+ */
 PLUTOVG_API unsigned char* plutovg_surface_get_data(const plutovg_surface_t* surface);
+
+/**
+ * @brief Gets the width of the surface.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @return Width of the surface in pixels.
+ */
 PLUTOVG_API int plutovg_surface_get_width(const plutovg_surface_t* surface);
+
+/**
+ * @brief Gets the height of the surface.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @return Height of the surface in pixels.
+ */
 PLUTOVG_API int plutovg_surface_get_height(const plutovg_surface_t* surface);
+
+/**
+ * @brief Gets the stride of the surface.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @return Number of bytes per row.
+ */
 PLUTOVG_API int plutovg_surface_get_stride(const plutovg_surface_t* surface);
 
+/**
+ * @brief Writes the surface to a PNG file.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @param filename Path to the output PNG file.
+ * @return `true` if successful, `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename);
+
+/**
+ * @brief Writes the surface to a JPEG file.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @param filename Path to the output JPEG file.
+ * @param quality JPEG quality (0-100).
+ * @return `true` if successful, `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* filename, int quality);
 
+/**
+ * @brief Writes the surface to a PNG stream.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @param write_func Callback function for writing data.
+ * @param closure User-defined data passed to the callback.
+ * @return `true` if successful, `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure);
+
+/**
+ * @brief Writes the surface to a JPEG stream.
+ *
+ * @param surface Pointer to the `plutovg_surface_t` object.
+ * @param write_func Callback function for writing data.
+ * @param closure User-defined data passed to the callback.
+ * @param quality JPEG quality (0-100).
+ * @return `true` if successful, `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality);
 
+/**
+ * @brief Converts ARGB Premultiplied to RGBA Plain.
+ *
+ * @param dst Destination buffer (can be the same as `src`).
+ * @param src Source buffer (ARGB Premultiplied).
+ * @param width Image width in pixels.
+ * @param height Image height in pixels.
+ * @param stride Image stride in bytes.
+ */
 PLUTOVG_API void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, int width, int height, int stride);
+
+/**
+ * @brief Converts RGBA Plain to ARGB Premultiplied.
+ *
+ * @param dst Destination buffer (can be the same as `src`).
+ * @param src Source buffer (RGBA Plain).
+ * @param width Image width in pixels.
+ * @param height Image height in pixels.
+ * @param stride Image stride in bytes.
+ */
 PLUTOVG_API void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, int width, int height, int stride);
 
 typedef struct plutovg_color {
