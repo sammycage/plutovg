@@ -21,9 +21,8 @@ static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int he
 plutovg_surface_t* plutovg_surface_create(int width, int height)
 {
     plutovg_surface_t* surface = plutovg_surface_create_uninitialized(width, height);
-    if(surface == NULL)
-        return NULL;
-    memset(surface->data, 0, surface->height * surface->stride);
+    if(surface)
+        memset(surface->data, 0, surface->height * surface->stride);
     return surface;
 }
 

@@ -1081,6 +1081,8 @@ PLUTOVG_API plutovg_canvas_t* plutovg_canvas_reference(plutovg_canvas_t* canvas)
 PLUTOVG_API void plutovg_canvas_destroy(plutovg_canvas_t* canvas);
 PLUTOVG_API int plutovg_canvas_get_reference_count(const plutovg_canvas_t* canvas);
 
+PLUTOVG_API plutovg_surface_t* plutovg_canvas_get_surface(const plutovg_canvas_t* canvas);
+
 PLUTOVG_API void plutovg_canvas_save(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_restore(plutovg_canvas_t* canvas);
 

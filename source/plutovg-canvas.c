@@ -143,6 +143,11 @@ int plutovg_canvas_get_reference_count(const plutovg_canvas_t* canvas)
     return canvas->ref_count;
 }
 
+plutovg_surface_t* plutovg_canvas_get_surface(const plutovg_canvas_t* canvas)
+{
+    return canvas->surface;
+}
+
 void plutovg_canvas_save(plutovg_canvas_t* canvas)
 {
     plutovg_state_t* new_state = canvas->freed_state;
