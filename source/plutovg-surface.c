@@ -234,15 +234,15 @@ void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, 
         uint32_t* src_row = (uint32_t*)(src + stride * y);
         for(int x = 0; x < width; x++) {
             uint32_t pixel = src_row[x];
-            uint8_t a = (pixel >> 24) & 0xFF;
+            uint32_t a = (pixel >> 24) & 0xFF;
             if(a == 0) {
                 dst_row[x] = 0x00000000;
                 continue;
             }
 
-            uint8_t r = (pixel >> 16) & 0xFF;
-            uint8_t g = (pixel >> 8) & 0xFF;
-            uint8_t b = (pixel >> 0) & 0xFF;
+            uint32_t r = (pixel >> 16) & 0xFF;
+            uint32_t g = (pixel >> 8) & 0xFF;
+            uint32_t b = (pixel >> 0) & 0xFF;
             if(a != 255) {
                 r = (r * 255) / a;
                 g = (g * 255) / a;
@@ -261,15 +261,15 @@ void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, 
         uint32_t* src_row = (uint32_t*)(src + stride * y);
         for(int x = 0; x < width; x++) {
             uint32_t pixel = src_row[x];
-            uint8_t a = (pixel >> 24) & 0xFF;
+            uint32_t a = (pixel >> 24) & 0xFF;
             if(a == 0) {
                 dst_row[x] = 0x00000000;
                 continue;
             }
 
-            uint8_t b = (pixel >> 16) & 0xFF;
-            uint8_t g = (pixel >> 8) & 0xFF;
-            uint8_t r = (pixel >> 0) & 0xFF;
+            uint32_t b = (pixel >> 16) & 0xFF;
+            uint32_t g = (pixel >> 8) & 0xFF;
+            uint32_t r = (pixel >> 0) & 0xFF;
             if(a != 255) {
                 r = (r * a) / 255;
                 g = (g * a) / 255;

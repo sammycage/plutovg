@@ -49,32 +49,32 @@ typedef struct {
 
 static inline uint32_t combine_color_with_opacity(const plutovg_color_t* color, float opacity)
 {
-    uint8_t a = lroundf(color->a * opacity * 255);
-    uint8_t r = lroundf(color->r * 255);
-    uint8_t g = lroundf(color->g * 255);
-    uint8_t b = lroundf(color->b * 255);
+    uint32_t a = lroundf(color->a * opacity * 255);
+    uint32_t r = lroundf(color->r * 255);
+    uint32_t g = lroundf(color->g * 255);
+    uint32_t b = lroundf(color->b * 255);
     return (a << 24) | (r << 16) | (g << 8) | (b);
 }
 
 static inline uint32_t premultiply_color_with_opacity(const plutovg_color_t* color, float opacity)
 {
-    uint8_t alpha = lroundf(color->a * opacity * 255);
-    uint8_t pr = lroundf(color->r * alpha);
-    uint8_t pg = lroundf(color->g * alpha);
-    uint8_t pb = lroundf(color->b * alpha);
+    uint32_t alpha = lroundf(color->a * opacity * 255);
+    uint32_t pr = lroundf(color->r * alpha);
+    uint32_t pg = lroundf(color->g * alpha);
+    uint32_t pb = lroundf(color->b * alpha);
     return (alpha << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
 static inline uint32_t premultiply_pixel(uint32_t color)
 {
-    uint8_t a = plutovg_alpha(color);
-    uint8_t r = plutovg_red(color);
-    uint8_t g = plutovg_green(color);
-    uint8_t b = plutovg_blue(color);
+    uint32_t a = plutovg_alpha(color);
+    uint32_t r = plutovg_red(color);
+    uint32_t g = plutovg_green(color);
+    uint32_t b = plutovg_blue(color);
 
-    uint8_t pr = (r * a) / 255;
-    uint8_t pg = (g * a) / 255;
-    uint8_t pb = (b * a) / 255;
+    uint32_t pr = (r * a) / 255;
+    uint32_t pg = (g * a) / 255;
+    uint32_t pb = (b * a) / 255;
     return (a << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
