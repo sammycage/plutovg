@@ -7,7 +7,8 @@
 
 static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int height)
 {
-    plutovg_surface_t* surface = malloc(width * height * 4 + sizeof(plutovg_surface_t));
+    const size_t size = width * height * 4;
+    plutovg_surface_t* surface = malloc(size + sizeof(plutovg_surface_t));
     if(surface == NULL)
         return NULL;
     surface->ref_count = 1;

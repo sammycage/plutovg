@@ -195,6 +195,7 @@ PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle);
 
 /**
  * @brief Multiplies `left` and `right` matrices and stores the result in `matrix`.
+ * @note `matrix` can be identical to either `left` or `right`.
  * @param matrix A pointer to the `plutovg_matrix_t` object to store the result.
  * @param left A pointer to the first `plutovg_matrix_t` matrix.
  * @param right A pointer to the second `plutovg_matrix_t` matrix.
@@ -203,7 +204,10 @@ PLUTOVG_API void plutovg_matrix_multiply(plutovg_matrix_t* matrix, const plutovg
 
 /**
  * @brief Calculates the inverse of `matrix` and stores it in `inverse`.
- * @note If `inverse` is `NULL`, the function only checks if the matrix is invertible.
+ *
+ * If `inverse` is `NULL`, the function only checks if the matrix is invertible.
+ *
+ * @note `matrix` and `inverse` can be identical.
  * @param matrix A pointer to the `plutovg_matrix_t` object to invert.
  * @param inverse A pointer to the `plutovg_matrix_t` object to store the result, or `NULL`.
  * @return `true` if the matrix is invertible; `false` otherwise.
@@ -222,6 +226,7 @@ PLUTOVG_API void plutovg_matrix_map(const plutovg_matrix_t* matrix, float x, flo
 
 /**
  * @brief Transforms the `src` point using `matrix` and stores the result in `dst`.
+ * @note `src` and `dst` can be identical.
  * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param src A pointer to the `plutovg_point_t` object to transform.
  * @param dst A pointer to the `plutovg_point_t` to store the transformed point.
@@ -230,6 +235,7 @@ PLUTOVG_API void plutovg_matrix_map_point(const plutovg_matrix_t* matrix, const 
 
 /**
  * @brief Transforms an array of `src` points using `matrix` and stores the results in `dst`.
+ * @note `src` and `dst` can be identical.
  * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param src A pointer to the array of `plutovg_point_t` objects to transform.
  * @param dst A pointer to the array of `plutovg_point_t` to store the transformed points.
@@ -239,6 +245,7 @@ PLUTOVG_API void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const
 
 /**
  * @brief Transforms the `src` rectangle using `matrix` and stores the result in `dst`.
+ * @note `src` and `dst` can be identical.
  * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param src A pointer to the `plutovg_rect_t` object to transform.
  * @param dst A pointer to the `plutovg_rect_t` to store the transformed rectangle.
@@ -884,7 +891,7 @@ PLUTOVG_API plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* da
  * @brief Loads an image surface from a file.
  *
  * @param filename Path to the image file.
- * @return Pointer to the surface or `NULL` on failure.
+ * @return Pointer to the surface, or `NULL` on failure.
  */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename);
 
@@ -892,17 +899,17 @@ PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_file(const char* 
  * @brief Loads an image surface from raw image data.
  *
  * @param data Pointer to the image data.
- * @param length Data length in bytes.
- * @return Pointer to the surface or `NULL` on failure.
+ * @param length Length of the data in bytes.
+ * @return Pointer to the surface, or `NULL` on failure.
  */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, int length);
 
 /**
  * @brief Loads an image surface from base64-encoded data.
  *
- * @param data Pointer to base64 data.
- * @param length Data length in bytes.
- * @return Pointer to the surface or `NULL` on failure.
+ * @param data Pointer to the base64-encoded image data.
+ * @param length Length of the data in bytes, or `-1` if null-terminated.
+ * @return Pointer to the surface, or `NULL` on failure.
  */
 PLUTOVG_API plutovg_surface_t* plutovg_surface_load_from_image_base64(const char* data, int length);
 
@@ -1146,7 +1153,7 @@ PLUTOVG_API plutovg_paint_t* plutovg_paint_create_texture(plutovg_surface_t* sur
 PLUTOVG_API plutovg_paint_t* plutovg_paint_reference(plutovg_paint_t* paint);
 
 /**
- * @brief Decrements the reference count and potentially destroys the paint object.
+ * @brief Decrements the reference count and destroys the paint if the count reaches zero.
  *
  * @param paint A pointer to the `plutovg_paint_t` object.
  */
@@ -1592,6 +1599,7 @@ PLUTOVG_API void plutovg_canvas_map(const plutovg_canvas_t* canvas, float x, flo
 
 /**
  * @brief Transforms the `src` point using the current transformation matrix and stores the result in `dst`.
+ * @note `src` and `dst` can be identical.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param src A pointer to the `plutovg_point_t` point to transform.
  * @param dst A pointer to the `plutovg_point_t` to store the transformed point.
@@ -1600,6 +1608,7 @@ PLUTOVG_API void plutovg_canvas_map_point(const plutovg_canvas_t* canvas, const 
 
 /**
  * @brief Transforms the `src` rectangle using the current transformation matrix and stores the result in `dst`.
+ * @note `src` and `dst` can be identical.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param src A pointer to the `plutovg_rect_t` rectangle to transform.
  * @param dst A pointer to the `plutovg_rect_t` to store the transformed rectangle.
