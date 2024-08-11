@@ -212,7 +212,7 @@ PLUTOVG_API bool plutovg_matrix_invert(const plutovg_matrix_t* matrix, plutovg_m
 
 /**
  * @brief Transforms the point `(x, y)` using `matrix` and stores the result in `(xx, yy)`.
- * @param matrix A pointer to the `plutovg_matrix_t` object.
+ * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param x The x-coordinate of the point to transform.
  * @param y The y-coordinate of the point to transform.
  * @param xx A pointer to store the transformed x-coordinate.
@@ -222,7 +222,7 @@ PLUTOVG_API void plutovg_matrix_map(const plutovg_matrix_t* matrix, float x, flo
 
 /**
  * @brief Transforms the `src` point using `matrix` and stores the result in `dst`.
- * @param matrix A pointer to the `plutovg_matrix_t` object.
+ * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param src A pointer to the `plutovg_point_t` object to transform.
  * @param dst A pointer to the `plutovg_point_t` to store the transformed point.
  */
@@ -230,7 +230,7 @@ PLUTOVG_API void plutovg_matrix_map_point(const plutovg_matrix_t* matrix, const 
 
 /**
  * @brief Transforms an array of `src` points using `matrix` and stores the results in `dst`.
- * @param matrix A pointer to the `plutovg_matrix_t` object.
+ * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param src A pointer to the array of `plutovg_point_t` objects to transform.
  * @param dst A pointer to the array of `plutovg_point_t` to store the transformed points.
  * @param count The number of points to transform.
@@ -239,7 +239,7 @@ PLUTOVG_API void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const
 
 /**
  * @brief Transforms the `src` rectangle using `matrix` and stores the result in `dst`.
- * @param matrix A pointer to the `plutovg_matrix_t` object.
+ * @param matrix A pointer to a `plutovg_matrix_t` object.
  * @param src A pointer to the `plutovg_rect_t` object to transform.
  * @param dst A pointer to the `plutovg_rect_t` to store the transformed rectangle.
  */
@@ -339,8 +339,6 @@ PLUTOVG_API plutovg_path_command_t plutovg_path_iterator_next(plutovg_path_itera
 /**
  * @brief Creates a new path object.
  *
- * Initializes and returns a pointer to a new `plutovg_path_t` object.
- *
  * @return A pointer to the newly created path object.
  */
 PLUTOVG_API plutovg_path_t* plutovg_path_create(void);
@@ -348,11 +346,7 @@ PLUTOVG_API plutovg_path_t* plutovg_path_create(void);
 /**
  * @brief Increases the reference count of a path object.
  *
- * This function increments the reference count of the given path object,
- * ensuring that it remains valid as long as it is in use. The reference count
- * should eventually be decremented using `plutovg_path_destroy()`.
- *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @return A pointer to the same `plutovg_path_t` object.
  */
 PLUTOVG_API plutovg_path_t* plutovg_path_reference(plutovg_path_t* path);
@@ -371,10 +365,7 @@ PLUTOVG_API void plutovg_path_destroy(plutovg_path_t* path);
 /**
  * @brief Retrieves the reference count of a path object.
  *
- * This function returns the current reference count of the given path object.
- * The reference count reflects how many references exist to the path object.
- *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @return The current reference count of the path object.
  */
 PLUTOVG_API int plutovg_path_get_reference_count(const plutovg_path_t* path);
@@ -382,10 +373,10 @@ PLUTOVG_API int plutovg_path_get_reference_count(const plutovg_path_t* path);
 /**
  * @brief Retrieves the elements of a path.
  *
- * This function provides access to the array of path elements.
+ * Provides access to the array of path elements.
  *
- * @param path A pointer to the `plutovg_path_t` object.
- * @param elements A pointer to a pointer that will be set to point to the array of path elements.
+ * @param path A pointer to a `plutovg_path_t` object.
+ * @param elements A pointer to a pointer that will be set to the array of path elements.
  * @return The number of elements in the path.
  */
 PLUTOVG_API int plutovg_path_get_elements(const plutovg_path_t* path, const plutovg_path_element_t** elements);
@@ -396,7 +387,7 @@ PLUTOVG_API int plutovg_path_get_elements(const plutovg_path_t* path, const plut
  * This function moves the current point to the specified coordinates without
  * drawing a line. This is equivalent to the `M` command in SVG path syntax.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x The x-coordinate of the new position.
  * @param y The y-coordinate of the new position.
  */
@@ -408,7 +399,7 @@ PLUTOVG_API void plutovg_path_move_to(plutovg_path_t* path, float x, float y);
  * This function adds a straight line segment from the current point to the
  * specified coordinates. This is equivalent to the `L` command in SVG path syntax.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x The x-coordinate of the end point of the line segment.
  * @param y The y-coordinate of the end point of the line segment.
  */
@@ -421,7 +412,7 @@ PLUTOVG_API void plutovg_path_line_to(plutovg_path_t* path, float x, float y);
  * to the specified end point, using the given control point. This is equivalent
  * to the `Q` command in SVG path syntax.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x1 The x-coordinate of the control point.
  * @param y1 The y-coordinate of the control point.
  * @param x2 The x-coordinate of the end point of the curve.
@@ -436,7 +427,7 @@ PLUTOVG_API void plutovg_path_quad_to(plutovg_path_t* path, float x1, float y1, 
  * to the specified end point, using the given two control points. This is
  * equivalent to the `C` command in SVG path syntax.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x1 The x-coordinate of the first control point.
  * @param y1 The y-coordinate of the first control point.
  * @param x2 The x-coordinate of the second control point.
@@ -454,7 +445,7 @@ PLUTOVG_API void plutovg_path_cubic_to(plutovg_path_t* path, float x1, float y1,
  * flags for large arc and sweep. This is equivalent to the `A` command in SVG
  * path syntax.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param rx The x-radius of the ellipse.
  * @param ry The y-radius of the ellipse.
  * @param angle The rotation angle of the ellipse in radians.
@@ -472,7 +463,7 @@ PLUTOVG_API void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, f
  * the start point of the sub-path. This is equivalent to the `Z` command in SVG
  * path syntax.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  */
 PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
 
@@ -482,7 +473,7 @@ PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
  * Gets the current point's coordinates in the path. This point is the last
  * position used or the point where the path was last moved to.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x Output parameter for the x-coordinate of the current point.
  * @param y Output parameter for the y-coordinate of the current point.
  */
@@ -494,7 +485,7 @@ PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, 
  * Reserves space for a specified number of elements in the path. This helps optimize
  * memory allocation for future path operations.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param count The number of path elements to reserve space for.
  */
 PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int count);
@@ -504,7 +495,7 @@ PLUTOVG_API void plutovg_path_reserve(plutovg_path_t* path, int count);
  *
  * Clears all path data, effectively resetting the `plutovg_path_t` object to its initial state.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  */
 PLUTOVG_API void plutovg_path_reset(plutovg_path_t* path);
 
@@ -513,7 +504,7 @@ PLUTOVG_API void plutovg_path_reset(plutovg_path_t* path);
  *
  * Adds a rectangle defined by the top-left corner (x, y) and dimensions (w, h) to the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x The x-coordinate of the rectangle's top-left corner.
  * @param y The y-coordinate of the rectangle's top-left corner.
  * @param w The width of the rectangle.
@@ -527,7 +518,7 @@ PLUTOVG_API void plutovg_path_add_rect(plutovg_path_t* path, float x, float y, f
  * Adds a rounded rectangle defined by the top-left corner (x, y), dimensions (w, h),
  * and corner radii (rx, ry) to the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param x The x-coordinate of the rectangle's top-left corner.
  * @param y The y-coordinate of the rectangle's top-left corner.
  * @param w The width of the rectangle.
@@ -542,7 +533,7 @@ PLUTOVG_API void plutovg_path_add_round_rect(plutovg_path_t* path, float x, floa
  *
  * Adds an ellipse defined by the center (cx, cy) and radii (rx, ry) to the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param cx The x-coordinate of the ellipse's center.
  * @param cy The y-coordinate of the ellipse's center.
  * @param rx The x-radius of the ellipse.
@@ -555,7 +546,7 @@ PLUTOVG_API void plutovg_path_add_ellipse(plutovg_path_t* path, float cx, float 
  *
  * Adds a circle defined by its center (cx, cy) and radius (r) to the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param cx The x-coordinate of the circle's center.
  * @param cy The y-coordinate of the circle's center.
  * @param r The radius of the circle.
@@ -568,7 +559,7 @@ PLUTOVG_API void plutovg_path_add_circle(plutovg_path_t* path, float cx, float c
  * Adds an arc defined by the center (cx, cy), radius (r), start angle (a0), end angle (a1),
  * and direction (ccw) to the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param cx The x-coordinate of the arc's center.
  * @param cy The y-coordinate of the arc's center.
  * @param r The radius of the arc.
@@ -584,7 +575,7 @@ PLUTOVG_API void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, 
  * Adds all elements from another path (`source`) to the current path, optionally
  * applying a transformation matrix.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param source A pointer to the `plutovg_path_t` object to copy elements from.
  * @param matrix A pointer to a `plutovg_matrix_t` object, or `NULL` to apply no transformation.
  */
@@ -595,8 +586,8 @@ PLUTOVG_API void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_
  *
  * Transforms the entire path using the provided transformation matrix.
  *
- * @param path A pointer to the `plutovg_path_t` object.
- * @param matrix A pointer to the `plutovg_matrix_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
+ * @param matrix A pointer to a `plutovg_matrix_t` object.
  */
 PLUTOVG_API void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix);
 
@@ -615,7 +606,7 @@ typedef void (*plutovg_path_traverse_func_t)(void* closure, plutovg_path_command
 /**
  * @brief Traverses the path and calls the callback for each element.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param traverse_func The callback function to be called for each element of the path.
  * @param closure User-defined data passed to the callback.
  */
@@ -624,7 +615,7 @@ PLUTOVG_API void plutovg_path_traverse(const plutovg_path_t* path, plutovg_path_
 /**
  * @brief Traverses the path with Bézier curves flattened to line segments.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param traverse_func The callback function to be called for each element of the path.
  * @param closure User-defined data passed to the callback.
  */
@@ -633,7 +624,7 @@ PLUTOVG_API void plutovg_path_traverse_flatten(const plutovg_path_t* path, pluto
 /**
  * @brief Traverses the path with a dashed pattern and calls the callback for each segment.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param offset The starting offset into the dash pattern.
  * @param dashes An array of dash lengths.
  * @param ndashes The number of elements in the `dashes` array.
@@ -672,7 +663,7 @@ PLUTOVG_API plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path
 /**
  * @brief Computes the bounding box and total length of the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @param extents A pointer to a `plutovg_rect_t` object to store the bounding box.
  * @return The total length of the path.
  */
@@ -681,7 +672,7 @@ PLUTOVG_API float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_
 /**
  * @brief Calculates the total length of the path.
  *
- * @param path A pointer to the `plutovg_path_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
  * @return The total length of the path.
  */
 PLUTOVG_API float plutovg_path_length(const plutovg_path_t* path);
@@ -756,7 +747,7 @@ typedef struct plutovg_font_face plutovg_font_face_t;
  * @brief Loads a font face from a file.
  *
  * @param filename Path to the font file.
- * @param ttcindex Index of the font face in a TrueType Collection (TTC) file.
+ * @param ttcindex Index of the font face within a TrueType Collection (TTC).
  * @return A pointer to the loaded `plutovg_font_face_t` object, or `NULL` on failure.
  */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int ttcindex);
@@ -766,9 +757,9 @@ PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_file(const char* fi
  *
  * @param data Pointer to the font data.
  * @param length Length of the font data.
- * @param ttcindex Index of the font face in a TrueType Collection (TTC) file.
+ * @param ttcindex Index of the font face within a TrueType Collection (TTC).
  * @param destroy_func Function to free the font data when no longer needed.
- * @param closure User-defined data passed to the `destroy_func`.
+ * @param closure User-defined data passed to `destroy_func`.
  * @return A pointer to the loaded `plutovg_font_face_t` object, or `NULL` on failure.
  */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned int length, int ttcindex, plutovg_destroy_func_t destroy_func, void* closure);
@@ -776,30 +767,30 @@ PLUTOVG_API plutovg_font_face_t* plutovg_font_face_load_from_data(const void* da
 /**
  * @brief Increments the reference count of a font face.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
- * @return A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
+ * @return A pointer to the same `plutovg_font_face_t` object with an incremented reference count.
  */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_reference(plutovg_font_face_t* face);
 
 /**
  * @brief Decrements the reference count and potentially destroys the font face.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  */
 PLUTOVG_API void plutovg_font_face_destroy(plutovg_font_face_t* face);
 
 /**
  * @brief Retrieves the current reference count of a font face.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  * @return The reference count of the font face.
  */
 PLUTOVG_API int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face);
 
 /**
- * @brief Retrieves the metrics for a font face at a specified size.
+ * @brief Retrieves metrics for a font face at a specified size.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  * @param size The font size in pixels.
  * @param ascent Pointer to store the ascent metric.
  * @param descent Pointer to store the descent metric.
@@ -809,9 +800,9 @@ PLUTOVG_API int plutovg_font_face_get_reference_count(const plutovg_font_face_t*
 PLUTOVG_API void plutovg_font_face_get_metrics(const plutovg_font_face_t* face, float size, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents);
 
 /**
- * @brief Retrieves the metrics for a specific glyph at a specified size.
+ * @brief Retrieves metrics for a specified glyph at a given size.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  * @param size The font size in pixels.
  * @param codepoint The Unicode code point of the glyph.
  * @param advance_width Pointer to store the advance width of the glyph.
@@ -823,7 +814,7 @@ PLUTOVG_API void plutovg_font_face_get_glyph_metrics(const plutovg_font_face_t* 
 /**
  * @brief Retrieves the path of a glyph and its advance width.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  * @param size The font size in pixels.
  * @param x The x-coordinate for positioning the glyph.
  * @param y The y-coordinate for positioning the glyph.
@@ -836,7 +827,7 @@ PLUTOVG_API float plutovg_font_face_get_glyph_path(const plutovg_font_face_t* fa
 /**
  * @brief Traverses the path of a glyph and calls a callback for each path element.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  * @param size The font size in pixels.
  * @param x The x-coordinate for positioning the glyph.
  * @param y The y-coordinate for positioning the glyph.
@@ -850,7 +841,7 @@ PLUTOVG_API float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_
 /**
  * @brief Computes the bounding box of a text string and its advance width.
  *
- * @param face A pointer to the `plutovg_font_face_t` object.
+ * @param face A pointer to a `plutovg_font_face_t` object.
  * @param size The font size in pixels.
  * @param text Pointer to the text data.
  * @param length Length of the text data, or -1 if null-terminated.
@@ -926,7 +917,7 @@ PLUTOVG_API plutovg_surface_t* plutovg_surface_reference(plutovg_surface_t* surf
 /**
  * @brief Decrements the reference count and destroys the surface if the count reaches zero.
  *
- * @param surface Pointer to the `plutovg_surface_t` object.
+ * @param surface Pointer to the `plutovg_surface_t` object .
  */
 PLUTOVG_API void plutovg_surface_destroy(plutovg_surface_t* surface);
 
@@ -984,7 +975,7 @@ PLUTOVG_API bool plutovg_surface_write_to_png(const plutovg_surface_t* surface, 
  *
  * @param surface Pointer to the `plutovg_surface_t` object.
  * @param filename Path to the output JPEG file.
- * @param quality JPEG quality (0-100).
+ * @param quality JPEG quality (0 to 100).
  * @return `true` if successful, `false` otherwise.
  */
 PLUTOVG_API bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* filename, int quality);
@@ -1005,7 +996,7 @@ PLUTOVG_API bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* su
  * @param surface Pointer to the `plutovg_surface_t` object.
  * @param write_func Callback function for writing data.
  * @param closure User-defined data passed to the callback.
- * @param quality JPEG quality (0-100).
+ * @param quality JPEG quality (0 to 100).
  * @return `true` if successful, `false` otherwise.
  */
 PLUTOVG_API bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality);
@@ -1047,7 +1038,7 @@ typedef struct plutovg_color {
  */
 typedef enum {
     PLUTOVG_TEXTURE_TYPE_PLAIN, ///< Plain texture.
-    PLUTOVG_TEXTURE_TYPE_TILED  ///< Tiled texture.
+    PLUTOVG_TEXTURE_TYPE_TILED ///< Tiled texture.
 } plutovg_texture_type_t;
 
 /**
@@ -1174,7 +1165,7 @@ PLUTOVG_API int plutovg_paint_get_reference_count(const plutovg_paint_t* paint);
  */
 typedef enum {
     PLUTOVG_FILL_RULE_NON_ZERO, ///< Non-zero winding fill rule.
-    PLUTOVG_FILL_RULE_EVEN_ODD  ///< Even-odd fill rule.
+    PLUTOVG_FILL_RULE_EVEN_ODD ///< Even-odd fill rule.
 } plutovg_fill_rule_t;
 
 /**
@@ -1213,7 +1204,7 @@ typedef struct plutovg_canvas plutovg_canvas_t;
 /**
  * @brief Creates a drawing context on a surface.
  *
- * @param surface A pointer to the `plutovg_surface_t` object.
+ * @param surface A pointer to a `plutovg_surface_t` object.
  * @return A pointer to the newly created `plutovg_canvas_t` object.
  */
 PLUTOVG_API plutovg_canvas_t* plutovg_canvas_create(plutovg_surface_t* surface);
@@ -1264,7 +1255,7 @@ PLUTOVG_API void plutovg_canvas_save(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_restore(plutovg_canvas_t* canvas);
 
 /**
- * @brief Sets the current paint to a color paint.
+ * @brief Sets the current paint to a solid color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param r The red component (0 to 1).
@@ -1274,7 +1265,7 @@ PLUTOVG_API void plutovg_canvas_restore(plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_set_rgb(plutovg_canvas_t* canvas, float r, float g, float b);
 
 /**
- * @brief Sets the current paint to a color paint.
+ * @brief Sets the current paint to a solid color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param r The red component (0 to 1).
@@ -1285,15 +1276,15 @@ PLUTOVG_API void plutovg_canvas_set_rgb(plutovg_canvas_t* canvas, float r, float
 PLUTOVG_API void plutovg_canvas_set_rgba(plutovg_canvas_t* canvas, float r, float g, float b, float a);
 
 /**
- * @brief Sets the current paint to a color paint.
+ * @brief Sets the current paint to a solid color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param color A pointer to the `plutovg_color_t` object.
+ * @param color A pointer to a `plutovg_color_t` object.
  */
 PLUTOVG_API void plutovg_canvas_set_color(plutovg_canvas_t* canvas, const plutovg_color_t* color);
 
 /**
- * @brief Sets the current paint to a linear gradient paint.
+ * @brief Sets the current paint to a linear gradient.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param x1 The x coordinate of the start point.
@@ -1309,7 +1300,7 @@ PLUTOVG_API void plutovg_canvas_set_linear_gradient(plutovg_canvas_t* canvas, fl
     plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix);
 
 /**
- * @brief Sets the current paint to a radial gradient paint.
+ * @brief Sets the current paint to a radial gradient.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param cx The x coordinate of the center.
@@ -1327,7 +1318,7 @@ PLUTOVG_API void plutovg_canvas_set_radial_gradient(plutovg_canvas_t* canvas, fl
     plutovg_spread_method_t spread, const plutovg_gradient_stop_t* stops, int nstops, const plutovg_matrix_t* matrix);
 
 /**
- * @brief Sets the current paint to a texture paint.
+ * @brief Sets the current paint to a texture.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param surface The texture surface.
@@ -1354,43 +1345,43 @@ PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_pain
 PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas);
 
 /**
- * @brief Sets the font face and size.
+ * @brief Sets the font face and size for text rendering on the canvas.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param face The font face.
- * @param size The font size.
+ * @param face A pointer to a `plutovg_font_face_t` object representing the font face to use.
+ * @param size The size of the font, in pixels. This determines the height of the rendered text.
  */
 PLUTOVG_API void plutovg_canvas_set_font(plutovg_canvas_t* canvas, plutovg_font_face_t* face, float size);
 
 /**
- * @brief Sets the font face.
+ * @brief Sets the font face for text rendering on the canvas.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param face The font face.
+ * @param face A pointer to a `plutovg_font_face_t` object representing the font face to use.
  */
 PLUTOVG_API void plutovg_canvas_set_font_face(plutovg_canvas_t* canvas, plutovg_font_face_t* face);
 
 /**
- * @brief Retrieves the current font face.
+ * @brief Retrieves the current font face used for text rendering on the canvas.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @return The current font face.
+ * @return A pointer to a `plutovg_font_face_t` object representing the current font face.
  */
 PLUTOVG_API plutovg_font_face_t* plutovg_canvas_get_font_face(const plutovg_canvas_t* canvas);
 
 /**
- * @brief Sets the font size.
+ * @brief Sets the font size for text rendering on the canvas.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param size The font size.
+ * @param size The size of the font, in pixels. This value defines the height of the rendered text.
  */
 PLUTOVG_API void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size);
 
 /**
- * @brief Retrieves the current font size.
+ * @brief Retrieves the current font size used for text rendering on the canvas.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @return The current font size.
+ * @return The current font size, in pixels. This value represents the height of the rendered text.
  */
 PLUTOVG_API float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas);
 
@@ -1808,26 +1799,155 @@ PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas
  */
 PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas);
 
+/**
+ * @brief Gets the bounding box of the filled region.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param extents A pointer to a `plutovg_rect_t` to store the bounding box of the filled region.
+ */
 PLUTOVG_API void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+
+/**
+ * @brief Gets the bounding box of the stroked region.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param extents A pointer to a `plutovg_rect_t` to store the bounding box of the stroked region.
+ */
 PLUTOVG_API void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+
+/**
+ * @brief Gets the bounding box of the clipped region.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param extents A pointer to a `plutovg_rect_t` to store the bounding box of the clipped region.
+ */
 PLUTOVG_API void plutovg_canvas_clip_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
+/**
+ * @brief A drawing operator that fills the current path according to the current fill rule.
+ *
+ * The current path will be cleared after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_fill(plutovg_canvas_t* canvas);
+
+/**
+ * @brief A drawing operator that strokes the current path according to the current stroke settings.
+ *
+ * The current path will be cleared after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_stroke(plutovg_canvas_t* canvas);
+
+/**
+ * @brief A drawing operator that intersects the current clipping region with the current path according to the current fill rule.
+ *
+ * The current path will be cleared after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_clip(plutovg_canvas_t* canvas);
+
+/**
+ * @brief A drawing operator that paints the current clipping region using the current paint.
+ *
+ * The current path will not be affected by this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_paint(plutovg_canvas_t* canvas);
 
+/**
+ * @brief A drawing operator that fills the current path according to the current fill rule.
+ *
+ * The current path will be preserved after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_fill_preserve(plutovg_canvas_t* canvas);
+
+/**
+ * @brief A drawing operator that strokes the current path according to the current stroke settings.
+ *
+ * The current path will be preserved after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_stroke_preserve(plutovg_canvas_t* canvas);
+
+/**
+ * @brief A drawing operator that intersects the current clipping region with the current path according to the current fill rule.
+ *
+ * The current path will be preserved after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_clip_preserve(plutovg_canvas_t* canvas);
 
+/**
+ * @brief Fills a rectangle according to the current fill rule.
+ *
+ * The current path will be cleared after this operation.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the rectangle's origin.
+ * @param y The y-coordinate of the rectangle's origin.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ */
 PLUTOVG_API void plutovg_canvas_fill_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+
+/**
+ * @brief Fills the area defined by a path according to the current fill rule.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_fill_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
+/**
+ * @brief Strokes the outline of a rectangle with the current stroke settings.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the rectangle's origin.
+ * @param y The y-coordinate of the rectangle's origin.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ */
 PLUTOVG_API void plutovg_canvas_stroke_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+
+/**
+ * @brief Strokes the outline of the area defined by a path with the current stroke settings.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param path A pointer to a `plutovg_path_t` object.
+ */
 PLUTOVG_API void plutovg_canvas_stroke_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
+/**
+ * @brief Intersects the current clipping region with a rectangle according to the current fill rule.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param x The x-coordinate of the rectangle's origin.
+ * @param y The y-coordinate of the rectangle's origin.
+ * @param w The width of the rectangle.
+ * @param h The height of the rectangle.
+ */
 PLUTOVG_API void plutovg_canvas_clip_rect(plutovg_canvas_t* canvas, float x, float y, float w, float h);
+
+/**
+ * @brief Intersects the current clipping region with the area defined by a path according to the current fill rule.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param path A pointer to a `plutovg_path_t` object defining the path for clipping.
+ */
 PLUTOVG_API void plutovg_canvas_clip_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
 PLUTOVG_API float plutovg_canvas_add_glyph(plutovg_canvas_t* canvas, plutovg_codepoint_t codepoint, float x, float y);
