@@ -1371,20 +1371,20 @@ PLUTOVG_API void plutovg_canvas_set_font(plutovg_canvas_t* canvas, plutovg_font_
 PLUTOVG_API void plutovg_canvas_set_font_face(plutovg_canvas_t* canvas, plutovg_font_face_t* face);
 
 /**
- * @brief Sets the font size.
- *
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param size The font size.
- */
-PLUTOVG_API void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size);
-
-/**
  * @brief Retrieves the current font face.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current font face.
  */
 PLUTOVG_API plutovg_font_face_t* plutovg_canvas_get_font_face(const plutovg_canvas_t* canvas);
+
+/**
+ * @brief Sets the font size.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param size The font size.
+ */
+PLUTOVG_API void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size);
 
 /**
  * @brief Retrieves the current font size.
@@ -1402,20 +1402,6 @@ PLUTOVG_API float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_fill_rule_t winding);
 
 /**
- * @brief Sets the compositing operator.
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param op The compositing operator.
- */
-PLUTOVG_API void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_operator_t op);
-
-/**
- * @brief Sets the global opacity.
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param opacity The opacity value (0 to 1).
- */
-PLUTOVG_API void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opacity);
-
-/**
  * @brief Retrieves the current fill rule.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current fill rule.
@@ -1423,11 +1409,25 @@ PLUTOVG_API void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opac
 PLUTOVG_API plutovg_fill_rule_t plutovg_canvas_get_fill_rule(const plutovg_canvas_t* canvas);
 
 /**
+ * @brief Sets the compositing operator.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param op The compositing operator.
+ */
+PLUTOVG_API void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_operator_t op);
+
+/**
  * @brief Retrieves the current compositing operator.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current compositing operator.
  */
 PLUTOVG_API plutovg_operator_t plutovg_canvas_get_operator(const plutovg_canvas_t* canvas);
+
+/**
+ * @brief Sets the global opacity.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param opacity The opacity value (0 to 1).
+ */
+PLUTOVG_API void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opacity);
 
 /**
  * @brief Retrieves the current global opacity.
@@ -1444,32 +1444,18 @@ PLUTOVG_API float plutovg_canvas_get_opacity(const plutovg_canvas_t* canvas);
 PLUTOVG_API void plutovg_canvas_set_line_width(plutovg_canvas_t* canvas, float line_width);
 
 /**
- * @brief Sets the line cap style.
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param line_cap The line cap style.
- */
-PLUTOVG_API void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_line_cap_t line_cap);
-
-/**
- * @brief Sets the line join style.
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param line_join The line join style.
- */
-PLUTOVG_API void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_line_join_t line_join);
-
-/**
- * @brief Sets the miter limit.
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param miter_limit The miter limit value.
- */
-PLUTOVG_API void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float miter_limit);
-
-/**
  * @brief Retrieves the current line width.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current line width.
  */
 PLUTOVG_API float plutovg_canvas_get_line_width(const plutovg_canvas_t* canvas);
+
+/**
+ * @brief Sets the line cap style.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param line_cap The line cap style.
+ */
+PLUTOVG_API void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_line_cap_t line_cap);
 
 /**
  * @brief Retrieves the current line cap style.
@@ -1479,11 +1465,25 @@ PLUTOVG_API float plutovg_canvas_get_line_width(const plutovg_canvas_t* canvas);
 PLUTOVG_API plutovg_line_cap_t plutovg_canvas_get_line_cap(const plutovg_canvas_t* canvas);
 
 /**
+ * @brief Sets the line join style.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param line_join The line join style.
+ */
+PLUTOVG_API void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_line_join_t line_join);
+
+/**
  * @brief Retrieves the current line join style.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current line join style.
  */
 PLUTOVG_API plutovg_line_join_t plutovg_canvas_get_line_join(const plutovg_canvas_t* canvas);
+
+/**
+ * @brief Sets the miter limit.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param miter_limit The miter limit value.
+ */
+PLUTOVG_API void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float miter_limit);
 
 /**
  * @brief Retrieves the current miter limit.
@@ -1509,19 +1509,19 @@ PLUTOVG_API void plutovg_canvas_set_dash(plutovg_canvas_t* canvas, float offset,
 PLUTOVG_API void plutovg_canvas_set_dash_offset(plutovg_canvas_t* canvas, float offset);
 
 /**
+ * @brief Retrieves the current dash offset.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @return The current dash offset.
+ */
+PLUTOVG_API float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas);
+
+/**
  * @brief Sets the dash pattern.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param dashes Array of dash lengths.
  * @param ndashes Number of dash lengths.
  */
 PLUTOVG_API void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const float* dashes, int ndashes);
-
-/**
- * @brief Retrieves the current dash offset.
- * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @return The current dash offset.
- */
-PLUTOVG_API float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas);
 
 /**
  * @brief Retrieves the current dash pattern.

@@ -234,14 +234,14 @@ void plutovg_canvas_set_font_face(plutovg_canvas_t* canvas, plutovg_font_face_t*
     canvas->state->font_face = face;
 }
 
-void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size)
-{
-    canvas->state->font_size = size;
-}
-
 plutovg_font_face_t* plutovg_canvas_get_font_face(const plutovg_canvas_t* canvas)
 {
     return canvas->state->font_face;
+}
+
+void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size)
+{
+    canvas->state->font_size = size;
 }
 
 float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas)
@@ -254,24 +254,24 @@ void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_fill_rule_t 
     canvas->state->winding = winding;
 }
 
-void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_operator_t op)
-{
-    canvas->state->op = op;
-}
-
-void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opacity)
-{
-    canvas->state->opacity = plutovg_clamp(opacity, 0.f, 1.f);
-}
-
 plutovg_fill_rule_t plutovg_canvas_get_fill_rule(const plutovg_canvas_t* canvas)
 {
     return canvas->state->winding;
 }
 
+void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_operator_t op)
+{
+    canvas->state->op = op;
+}
+
 plutovg_operator_t plutovg_canvas_get_operator(const plutovg_canvas_t* canvas)
 {
     return canvas->state->op;
+}
+
+void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opacity)
+{
+    canvas->state->opacity = plutovg_clamp(opacity, 0.f, 1.f);
 }
 
 float plutovg_canvas_get_opacity(const plutovg_canvas_t* canvas)
@@ -284,24 +284,14 @@ void plutovg_canvas_set_line_width(plutovg_canvas_t* canvas, float line_width)
     canvas->state->stroke.style.width = line_width;
 }
 
-void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_line_cap_t line_cap)
-{
-    canvas->state->stroke.style.cap = line_cap;
-}
-
-void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_line_join_t line_join)
-{
-    canvas->state->stroke.style.join = line_join;
-}
-
-void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float miter_limit)
-{
-    canvas->state->stroke.style.miter_limit = miter_limit;
-}
-
 float plutovg_canvas_get_line_width(const plutovg_canvas_t* canvas)
 {
     return canvas->state->stroke.style.width;
+}
+
+void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_line_cap_t line_cap)
+{
+    canvas->state->stroke.style.cap = line_cap;
 }
 
 plutovg_line_cap_t plutovg_canvas_get_line_cap(const plutovg_canvas_t* canvas)
@@ -309,9 +299,19 @@ plutovg_line_cap_t plutovg_canvas_get_line_cap(const plutovg_canvas_t* canvas)
     return canvas->state->stroke.style.cap;
 }
 
+void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_line_join_t line_join)
+{
+    canvas->state->stroke.style.join = line_join;
+}
+
 plutovg_line_join_t plutovg_canvas_get_line_join(const plutovg_canvas_t* canvas)
 {
     return canvas->state->stroke.style.join;
+}
+
+void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float miter_limit)
+{
+    canvas->state->stroke.style.miter_limit = miter_limit;
 }
 
 float plutovg_canvas_get_miter_limit(const plutovg_canvas_t* canvas)
@@ -330,15 +330,17 @@ void plutovg_canvas_set_dash_offset(plutovg_canvas_t* canvas, float offset)
     canvas->state->stroke.dash.offset = offset;
 }
 
-void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const float* dashes, int ndashes)
-{
-    plutovg_array_clear(canvas->state->stroke.dash.array);
-    plutovg_array_append_data(canvas->state->stroke.dash.array, dashes, ndashes);
-}
-
 float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas)
 {
     return canvas->state->stroke.dash.offset;
+}
+
+void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const float* dashes, int ndashes)
+{
+    plutovg_array_clear(canvas->state->stroke.dash.array);
+    if(dashes && ndashes > 0) {
+        plutovg_array_append_data(canvas->state->stroke.dash.array, dashes, ndashes);
+    }
 }
 
 int plutovg_canvas_get_dash_array(const plutovg_canvas_t* canvas, const float** dashes)
