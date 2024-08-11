@@ -240,7 +240,7 @@ void plutovg_path_close(plutovg_path_t* path)
     elements[0].point.y = path->start_point.y;
 }
 
-void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y)
+void plutovg_path_get_current_point(const plutovg_path_t* path, float* x, float* y)
 {
     float xx = 0.f;
     float yy = 0.f;

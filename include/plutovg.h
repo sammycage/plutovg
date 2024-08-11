@@ -474,10 +474,10 @@ PLUTOVG_API void plutovg_path_close(plutovg_path_t* path);
  * position used or the point where the path was last moved to.
  *
  * @param path A pointer to a `plutovg_path_t` object.
- * @param x Output parameter for the x-coordinate of the current point.
- * @param y Output parameter for the y-coordinate of the current point.
+ * @param x The x-coordinate of the current point.
+ * @param y The y-coordinate of the current point.
  */
-PLUTOVG_API void plutovg_path_get_current_point(plutovg_path_t* path, float* x, float* y);
+PLUTOVG_API void plutovg_path_get_current_point(const plutovg_path_t* path, float* x, float* y);
 
 /**
  * @brief Reserves space for path elements.
@@ -1243,7 +1243,7 @@ PLUTOVG_API plutovg_surface_t* plutovg_canvas_get_surface(const plutovg_canvas_t
 /**
  * @brief Saves the current state of the canvas.
  *
- * @param canvas A pointer to the `plutovg_canvas_t` object.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
  */
 PLUTOVG_API void plutovg_canvas_save(plutovg_canvas_t* canvas);
 
@@ -1784,8 +1784,8 @@ PLUTOVG_API void plutovg_canvas_close_path(plutovg_canvas_t* canvas);
  * added or moved to in the current path.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param x Output parameter for the x-coordinate of the current point.
- * @param y Output parameter for the y-coordinate of the current point.
+ * @param x The x-coordinate of the current point.
+ * @param y The y-coordinate of the current point.
  */
 PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas, float* x, float* y);
 
@@ -1795,7 +1795,7 @@ PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas
  * Retrieves the path object representing the sequence of path commands added to the canvas.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @return A pointer to the `plutovg_path_t` object representing the current path.
+ * @return The current path.
  */
 PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas);
 
@@ -1803,7 +1803,7 @@ PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canv
  * @brief Gets the bounding box of the filled region.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param extents A pointer to a `plutovg_rect_t` to store the bounding box of the filled region.
+ * @param extents The bounding box of the filled region.
  */
 PLUTOVG_API void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
@@ -1811,7 +1811,7 @@ PLUTOVG_API void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plu
  * @brief Gets the bounding box of the stroked region.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param extents A pointer to a `plutovg_rect_t` to store the bounding box of the stroked region.
+ * @param extents The bounding box of the stroked region.
  */
 PLUTOVG_API void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
@@ -1819,7 +1819,7 @@ PLUTOVG_API void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, p
  * @brief Gets the bounding box of the clipped region.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param extents A pointer to a `plutovg_rect_t` to store the bounding box of the clipped region.
+ * @param extents The bounding box of the clipped region.
  */
 PLUTOVG_API void plutovg_canvas_clip_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
@@ -1902,7 +1902,7 @@ PLUTOVG_API void plutovg_canvas_fill_rect(plutovg_canvas_t* canvas, float x, flo
  *
  * @note The current path will be cleared by this operation.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param path A pointer to a `plutovg_path_t` object.
+ * @param path The `plutovg_path_t` object.
  */
 PLUTOVG_API void plutovg_canvas_fill_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
@@ -1923,7 +1923,7 @@ PLUTOVG_API void plutovg_canvas_stroke_rect(plutovg_canvas_t* canvas, float x, f
  *
  * @note The current path will be cleared by this operation.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param path A pointer to a `plutovg_path_t` object.
+ * @param path The `plutovg_path_t` object.
  */
 PLUTOVG_API void plutovg_canvas_stroke_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
@@ -1944,7 +1944,7 @@ PLUTOVG_API void plutovg_canvas_clip_rect(plutovg_canvas_t* canvas, float x, flo
  *
  * @note The current path will be cleared by this operation.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param path A pointer to a `plutovg_path_t` object.
+ * @param path The `plutovg_path_t` object.
  */
 PLUTOVG_API void plutovg_canvas_clip_path(plutovg_canvas_t* canvas, const plutovg_path_t* path);
 
@@ -1963,8 +1963,8 @@ PLUTOVG_API float plutovg_canvas_add_glyph(plutovg_canvas_t* canvas, plutovg_cod
  * @brief Adds text to the current path at the specified origin.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param text A pointer to the text data.
- * @param length The length of the text data.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
  * @param encoding The encoding of the text data.
  * @param x The x-coordinate of the origin.
  * @param y The y-coordinate of the origin.
@@ -1972,12 +1972,83 @@ PLUTOVG_API float plutovg_canvas_add_glyph(plutovg_canvas_t* canvas, plutovg_cod
  */
 PLUTOVG_API float plutovg_canvas_add_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
 
+/**
+ * @brief Fills a text at the specified origin.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param x The x-coordinate of the origin.
+ * @param y The y-coordinate of the origin.
+ * @return The total advance width of the text.
+ */
 PLUTOVG_API float plutovg_canvas_fill_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
+
+/**
+ * @brief Strokes a text at the specified origin.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param x The x-coordinate of the origin.
+ * @param y The y-coordinate of the origin.
+ * @return The total advance width of the text.
+ */
 PLUTOVG_API float plutovg_canvas_stroke_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
+
+/**
+ * @brief Intersects the current clipping region with text at the specified origin.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param x The x-coordinate of the origin.
+ * @param y The y-coordinate of the origin.
+ * @return The total advance width of the text.
+ */
 PLUTOVG_API float plutovg_canvas_clip_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
 
+/**
+ * @brief Retrieves font metrics for the current font.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param ascent The ascent of the font.
+ * @param descent The descent of the font.
+ * @param line_gap The line gap of the font.
+ * @param extents The bounding box of the font.
+ */
 PLUTOVG_API void plutovg_canvas_font_metrics(plutovg_canvas_t* canvas, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents);
+
+/**
+ * @brief Retrieves metrics for a specific glyph.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param codepoint The glyph codepoint.
+ * @param advance_width The advance width of the glyph.
+ * @param left_side_bearing The left side bearing of the glyph.
+ * @param extents The bounding box of the glyph.
+ */
 PLUTOVG_API void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, plutovg_codepoint_t codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents);
+
+/**
+ * @brief Retrieves the extents of a text.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param extents The bounding box of the text.
+ * @return The total advance width of the text.
+ */
 PLUTOVG_API float plutovg_canvas_text_extents(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
 #ifdef __cplusplus
