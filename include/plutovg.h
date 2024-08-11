@@ -2017,7 +2017,6 @@ PLUTOVG_API float plutovg_canvas_clip_text(plutovg_canvas_t* canvas, const void*
 /**
  * @brief Retrieves font metrics for the current font.
  *
- * @note The current path will be cleared by this operation.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param ascent The ascent of the font.
  * @param descent The descent of the font.
@@ -2029,7 +2028,6 @@ PLUTOVG_API void plutovg_canvas_font_metrics(plutovg_canvas_t* canvas, float* as
 /**
  * @brief Retrieves metrics for a specific glyph.
  *
- * @note The current path will be cleared by this operation.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param codepoint The glyph codepoint.
  * @param advance_width The advance width of the glyph.
@@ -2041,7 +2039,6 @@ PLUTOVG_API void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, plutovg_
 /**
  * @brief Retrieves the extents of a text.
  *
- * @note The current path will be cleared by this operation.
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param text The text data.
  * @param length The length of the text data, or -1 if null-terminated.
