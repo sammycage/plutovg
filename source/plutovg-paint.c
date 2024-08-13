@@ -38,7 +38,7 @@ plutovg_paint_t* plutovg_paint_create_color(const plutovg_color_t* color)
 
 static void plutovg_gradient_stops_init(plutovg_gradient_paint_t* gradient, const plutovg_gradient_stop_t* stops, int nstops)
 {
-    if(nstops > 0) {
+    if(nstops > 2) {
         gradient->stops = malloc(nstops * sizeof(plutovg_gradient_stop_t));
     } else {
         gradient->stops = gradient->embedded_stops;
