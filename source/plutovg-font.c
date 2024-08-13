@@ -86,22 +86,19 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
         codepoint = text[it->index++];
         if(((codepoint) & 0xfffffc00) == 0xd800) {
             if(it->index < it->length && (((codepoint) & 0xfffffc00) == 0xdc00)) {
-                uint16_t trail = text[it->index];
+                uint16_t trail = text[it->index++];
                 codepoint = (codepoint << 10) + trail - ((0xD800u << 10) - 0x10000u + 0xDC00u);
-                it->index++;
             }
         }
 
         break;
     } case PLUTOVG_TEXT_ENCODING_UTF32: {
         const uint32_t* text = it->text;
-        codepoint = text[it->index];
-        it->index += 1;
+        codepoint = text[it->index++];
         break;
     } case PLUTOVG_TEXT_ENCODING_LATIN1: {
         const uint8_t* text = it->text;
-        codepoint = text[it->index];
-        it->index += 1;
+        codepoint = text[it->index++];
         break;
     } default:
         assert(false);
@@ -141,13 +138,18 @@ struct plutovg_font_face {
 plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int ttcindex)
 {
     FILE* fp = fopen(filename, "rb");
-    if(fp == NULL)
+    if(fp == NULL) {
         return NULL;
+    }
+
     fseek(fp, 0, SEEK_END);
     long length = ftell(fp);
-    void* data = NULL;
-    if(length != -1L)
-        data = malloc(length);
+    if(length == -1L) {
+        fclose(fp);
+        return NULL;
+    }
+
+    void* data = malloc(length);
     if(data == NULL) {
         fclose(fp);
         return NULL;
@@ -156,7 +158,8 @@ plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int 
     fseek(fp, 0, SEEK_SET);
     size_t nread = fread(data, 1, length, fp);
     fclose(fp);
-    if(length != nread) {
+
+    if(nread != length) {
         free(data);
         return NULL;
     }
