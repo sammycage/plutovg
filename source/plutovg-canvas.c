@@ -489,12 +489,21 @@ void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t*
 void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
 {
     plutovg_stroke_data_t* stroke = &canvas->state->stroke;
-    plutovg_canvas_fill_extents(canvas, extents);
-    float delta = stroke->style.width / 2.f;
+    float cap_limit = stroke->style.width / 2.f;
+    if(stroke->style.cap == PLUTOVG_LINE_CAP_SQUARE)
+        cap_limit *= PLUTOVG_SQRT2;
+    float join_limit = stroke->style.width / 2.f;
+    if(stroke->style.join == PLUTOVG_LINE_JOIN_MITER) {
+        join_limit *= stroke->style.miter_limit;
+    }
+
+    float delta = plutovg_max(cap_limit, join_limit);
+    plutovg_path_extents(canvas->path, extents);
     extents->x -= delta;
     extents->y -= delta;
     extents->w += delta * 2.f;
     extents->h += delta * 2.f;
+    plutovg_canvas_map_rect(canvas, extents, extents);
 }
 
 void plutovg_canvas_clip_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
