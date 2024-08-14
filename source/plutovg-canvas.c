@@ -33,12 +33,12 @@ static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutov
 
 static plutovg_paint_t* plutovg_paint_default(void)
 {
-    static PLUTOVG_THREAD_LOCAL plutovg_solid_paint_t black = {
+    static PLUTOVG_THREAD_LOCAL plutovg_solid_paint_t paint = {
         {1, PLUTOVG_PAINT_TYPE_COLOR},
-        {0.f, 0.f, 0.f, 1.f}
+        PLUTOVG_DEFAULT_COLOR
     };
 
-    return plutovg_paint_reference(&black.base);
+    return plutovg_paint_reference(&paint.base);
 }
 
 static void plutovg_state_reset(plutovg_state_t* state)

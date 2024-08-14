@@ -177,9 +177,9 @@ void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_b
 #define plutovg_green(c) (((c) >> 8) & 0xff)
 #define plutovg_blue(c) (((c) >> 0) & 0xff)
 
-#define PLUTOVG_DEFAULT_STROKE_STYLE ((plutovg_stroke_style_t){1, PLUTOVG_LINE_CAP_BUTT, PLUTOVG_LINE_JOIN_MITER, 10});
-#define PLUTOVG_IDENTITY_MATRIX ((plutovg_matrix_t){1, 0, 0, 1, 0, 0});
-#define PLUTOVG_BLACK_COLOR ((plutovg_color_t){0, 0, 0, 1});
+#define PLUTOVG_DEFAULT_STROKE_STYLE ((plutovg_stroke_style_t){1, PLUTOVG_LINE_CAP_BUTT, PLUTOVG_LINE_JOIN_MITER, 10})
+#define PLUTOVG_IDENTITY_MATRIX ((plutovg_matrix_t){1, 0, 0, 1, 0, 0})
+#define PLUTOVG_DEFAULT_COLOR ((plutovg_color_t){0, 0, 0, 1})
 
 #define plutovg_array_init(array) \
     do { \
