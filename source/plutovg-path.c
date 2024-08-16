@@ -336,7 +336,9 @@ void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, float r, flo
         da += PLUTOVG_TWO_PI * (ccw ? -1 : 1);
     }
 
-    int seg_n = (int)(ceilf(fabsf(da) / PLUTOVG_HALF_PI + 0.001f));
+    int seg_n = (int)(ceilf(fabsf(da) / PLUTOVG_HALF_PI));
+    if(seg_n == 0)
+        return;
     float a = a0;
     float ax = cx + cosf(a) * r;
     float ay = cy + sinf(a) * r;
