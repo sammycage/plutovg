@@ -6,30 +6,29 @@ project('plutovg', 'c',
 )
 
 plutovg_sources = [
-    'source/plutovg-paint.c',
-    'source/plutovg-matrix.c',
-    'source/plutovg-path.c',
-    'source/plutovg-font.c',
-    'source/plutovg-surface.c',
-    'source/plutovg-canvas.c',
-    'source/plutovg-rasterize.c',
     'source/plutovg-blend.c',
+    'source/plutovg-canvas.c',
+    'source/plutovg-font.c',
+    'source/plutovg-matrix.c',
+    'source/plutovg-paint.c',
+    'source/plutovg-path.c',
+    'source/plutovg-rasterize.c',
+    'source/plutovg-surface.c',
+    'source/plutovg-ft-math.c',
     'source/plutovg-ft-raster.c',
-    'source/plutovg-ft-stroker.c',
-    'source/plutovg-ft-math.c'
+    'source/plutovg-ft-stroker.c'
 ]
 
 plutovg_compile_args = []
 if get_option('default_library') == 'static'
     plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
-    add_project_arguments('-DPLUTOVG_BUILD_STATIC', language: ['c', 'cpp'])
 endif
 
 plutovg_lib = library('plutovg', plutovg_sources,
     include_directories: include_directories('include', 'source', 'stb'),
     version: meson.project_version(),
-    c_args: ['-DPLUTOVG_BUILD'],
-    cpp_args: ['-DPLUTOVG_BUILD'],
+    c_args: ['-DPLUTOVG_BUILD'] + plutovg_compile_args,
+    cpp_args: ['-DPLUTOVG_BUILD'] + plutovg_compile_args,
     link_args: ['-lm'],
     gnu_symbol_visibility: 'hidden',
     install: true

@@ -35,7 +35,7 @@ static plutovg_paint_t* plutovg_paint_default(void)
 {
     static PLUTOVG_THREAD_LOCAL plutovg_solid_paint_t paint = {
         {1, PLUTOVG_PAINT_TYPE_COLOR},
-        PLUTOVG_DEFAULT_COLOR
+        PLUTOVG_BLACK_COLOR
     };
 
     return plutovg_paint_reference(&paint.base);
@@ -44,10 +44,10 @@ static plutovg_paint_t* plutovg_paint_default(void)
 static void plutovg_state_reset(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
-    plutovg_font_face_destroy(state->font_face);
+    plutovg_matrix_init_identity(&state->matrix);
     plutovg_stroke_data_reset(&state->stroke);
     plutovg_span_buffer_reset(&state->clip_spans);
-    plutovg_matrix_init_identity(&state->matrix);
+    plutovg_font_face_destroy(state->font_face);
     state->paint = plutovg_paint_default();
     state->font_face = NULL;
     state->font_size = 12.f;
@@ -73,7 +73,8 @@ static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* so
 
 static plutovg_state_t* plutovg_state_create(void)
 {
-    plutovg_state_t* state = calloc(1, sizeof(plutovg_state_t));
+    plutovg_state_t* state = malloc(sizeof(plutovg_state_t));
+    memset(state, 0, sizeof(plutovg_state_t));
     plutovg_state_reset(state);
     return state;
 }
@@ -91,13 +92,10 @@ plutovg_canvas_t* plutovg_canvas_create(plutovg_surface_t* surface)
     plutovg_canvas_t* canvas = malloc(sizeof(plutovg_canvas_t));
     canvas->ref_count = 1;
     canvas->surface = plutovg_surface_reference(surface);
-    canvas->state = plutovg_state_create();
     canvas->path = plutovg_path_create();
+    canvas->state = plutovg_state_create();
     canvas->freed_state = NULL;
-    canvas->clip_rect.x = 0;
-    canvas->clip_rect.y = 0;
-    canvas->clip_rect.w = surface->width;
-    canvas->clip_rect.h = surface->height;
+    canvas->clip_rect = PLUTOVG_MAKE_RECT(0, 0, surface->width, surface->height);
     plutovg_span_buffer_init(&canvas->clip_spans);
     plutovg_span_buffer_init(&canvas->fill_spans);
     return canvas;

@@ -118,8 +118,6 @@ void plutovg_path_quad_to(plutovg_path_t* path, float x1, float y1, float x2, fl
 {
     float current_x, current_y;
     plutovg_path_get_current_point(path, &current_x, &current_y);
-    if(path->elements.size == 0)
-        plutovg_path_move_to(path, 0, 0);
     float cx = 2.f / 3.f * x1 + 1.f / 3.f * current_x;
     float cy = 2.f / 3.f * y1 + 1.f / 3.f * current_y;
     float cx1 = 2.f / 3.f * x1 + 1.f / 3.f * x2;
@@ -145,8 +143,6 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
 {
     float current_x, current_y;
     plutovg_path_get_current_point(path, &current_x, &current_y);
-    if(path->elements.size == 0)
-        plutovg_path_move_to(path, 0, 0);
     if(rx == 0.f || ry == 0.f || (current_x == x && current_y == y)) {
         plutovg_path_line_to(path, x, y);
         return;
@@ -201,12 +197,12 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
     float th2 = atan2f(y2 - cy1, x2 - cx1);
     float th_arc = th2 - th1;
     if(th_arc < 0 && sweep_flag)
-        th_arc += 2.f * PLUTOVG_PI;
+        th_arc += PLUTOVG_TWO_PI;
     else if(th_arc > 0 && !sweep_flag)
-        th_arc -= 2.f * PLUTOVG_PI;
+        th_arc -= PLUTOVG_TWO_PI;
     plutovg_matrix_init_rotate(&matrix, angle);
     plutovg_matrix_scale(&matrix, rx, ry);
-    int segments = ceilf(fabsf(th_arc / (PLUTOVG_PI * 0.5f + 0.001f)));
+    int segments = ceilf(fabsf(th_arc / (PLUTOVG_HALF_PI + 0.001f)));
     for(int i = 0; i < segments; i++) {
         float th_start = th1 + i * th_arc / segments;
         float th_end = th1 + (i + 1) * th_arc / segments;
@@ -215,19 +211,19 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
         float x3 = cosf(th_end) + cx1;
         float y3 = sinf(th_end) + cy1;
 
-        float x2 = x3 + t * sinf(th_end);
-        float y2 = y3 - t * cosf(th_end);
+        float cp2x = x3 + t * sinf(th_end);
+        float cp2y = y3 - t * cosf(th_end);
 
-        float x1 = cosf(th_start) - t * sinf(th_start);
-        float y1 = sinf(th_start) + t * cosf(th_start);
+        float cp1x = cosf(th_start) - t * sinf(th_start);
+        float cp1y = sinf(th_start) + t * cosf(th_start);
 
-        x1 += cx1;
-        y1 += cy1;
+        cp1x += cx1;
+        cp1y += cy1;
 
-        plutovg_matrix_map(&matrix, x1, y1, &x1, &y1);
-        plutovg_matrix_map(&matrix, x2, y2, &x2, &y2);
+        plutovg_matrix_map(&matrix, cp1x, cp1y, &cp1x, &cp1y);
+        plutovg_matrix_map(&matrix, cp2x, cp2y, &cp2x, &cp2y);
         plutovg_matrix_map(&matrix, x3, y3, &x3, &y3);
-        plutovg_path_cubic_to(path, x1, y1, x2, y2, x3, y3);
+        plutovg_path_cubic_to(path, cp1x, cp1y, cp2x, cp2y, x3, y3);
     }
 }
 
@@ -340,7 +336,7 @@ void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, float r, flo
         da += PLUTOVG_TWO_PI * (ccw ? -1 : 1);
     }
 
-    int seg_n = (int)(ceilf(fabsf(da) / PLUTOVG_HALF_PI));
+    int seg_n = (int)(ceilf(fabsf(da) / PLUTOVG_HALF_PI + 0.001f));
     float a = a0;
     float ax = cx + cosf(a) * r;
     float ay = cy + sinf(a) * r;
@@ -1015,7 +1011,7 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
                 values[4] += current_y;
             }
 
-            plutovg_path_arc_to(path, values[0], values[1], values[2] * PLUTOVG_PI / 180.f, flags[0], flags[1], values[3], values[4]);
+            plutovg_path_arc_to(path, values[0], values[1], PLUTOVG_DEG2RAD(values[2]), flags[0], flags[1], values[3], values[4]);
             current_x = values[3];
             current_y = values[4];
         } else if(command == 'Z' || command == 'z'){

@@ -83,6 +83,15 @@ typedef void (*plutovg_destroy_func_t)(void* closure);
  */
 typedef void (*plutovg_write_func_t)(void* closure, void* data, int size);
 
+#define PLUTOVG_PI      3.14159265358979323846f
+#define PLUTOVG_TWO_PI  6.28318530717958647693f
+#define PLUTOVG_HALF_PI 1.57079632679489661923f
+#define PLUTOVG_SQRT2   1.41421356237309504880f
+#define PLUTOVG_KAPPA   0.55228474983079339840f
+
+#define PLUTOVG_DEG2RAD(x) ((x) * (PLUTOVG_PI / 180.0f))
+#define PLUTOVG_RAD2DEG(x) ((x) * (180.0f / PLUTOVG_PI))
+
 /**
  * @brief A structure representing a point in 2D space.
  */
@@ -90,6 +99,8 @@ typedef struct plutovg_point {
     float x; ///< The x-coordinate of the point.
     float y; ///< The y-coordinate of the point.
 } plutovg_point_t;
+
+#define PLUTOVG_MAKE_POINT(x, y) ((plutovg_point_t){x, y})
 
 /**
  * @brief A structure representing a rectangle in 2D space.
@@ -100,6 +111,8 @@ typedef struct plutovg_rect {
     float w; ///< The width of the rectangle.
     float h; ///< The height of the rectangle.
 } plutovg_rect_t;
+
+#define PLUTOVG_MAKE_RECT(x, y, w, h) ((plutovg_rect_t){x, y, w, h})
 
 /**
  * @brief A structure representing a 2D transformation matrix.
@@ -112,6 +125,12 @@ typedef struct plutovg_matrix {
     float e; ///< The horizontal translation offset.
     float f; ///< The vertical translation offset.
 } plutovg_matrix_t;
+
+#define PLUTOVG_MAKE_MATRIX(a, b, c, d, e, f) ((plutovg_matrix_t){a, b, c, d, e, f})
+
+#define PLUTOVG_MAKE_SCALE(x, y) PLUTOVG_MAKE_MATRIX(x, 0, 0, y, 0, 0)
+#define PLUTOVG_MAKE_TRANSLATE(x, y) PLUTOVG_MAKE_MATRIX(1, 0, 0, 1, x, y)
+#define PLUTOVG_IDENTITY_MATRIX PLUTOVG_MAKE_MATRIX(1, 0, 0, 1, 0, 0)
 
 /**
  * @brief Initializes a 2D transformation matrix.
@@ -1039,6 +1058,17 @@ typedef struct plutovg_color {
     float b; ///< Blue component (0 to 1).
     float a; ///< Alpha (opacity) component (0 to 1).
 } plutovg_color_t;
+
+#define PLUTOVG_MAKE_COLOR(r, g, b, a) ((plutovg_color_t){r, g, b, a})
+
+#define PLUTOVG_BLACK_COLOR   PLUTOVG_MAKE_COLOR(0, 0, 0, 1)
+#define PLUTOVG_WHITE_COLOR   PLUTOVG_MAKE_COLOR(1, 1, 1, 1)
+#define PLUTOVG_RED_COLOR     PLUTOVG_MAKE_COLOR(1, 0, 0, 1)
+#define PLUTOVG_GREEN_COLOR   PLUTOVG_MAKE_COLOR(0, 1, 0, 1)
+#define PLUTOVG_BLUE_COLOR    PLUTOVG_MAKE_COLOR(0, 0, 1, 1)
+#define PLUTOVG_YELLOW_COLOR  PLUTOVG_MAKE_COLOR(1, 1, 0, 1)
+#define PLUTOVG_CYAN_COLOR    PLUTOVG_MAKE_COLOR(0, 1, 1, 1)
+#define PLUTOVG_MAGENTA_COLOR PLUTOVG_MAKE_COLOR(1, 0, 1, 1)
 
 /**
  * @brief Defines the type of texture, either plain or tiled.

@@ -127,12 +127,12 @@ typedef struct plutovg_state {
 struct plutovg_canvas {
     int ref_count;
     plutovg_surface_t* surface;
+    plutovg_path_t* path;
     plutovg_state_t* state;
     plutovg_state_t* freed_state;
     plutovg_rect_t clip_rect;
     plutovg_span_buffer_t clip_spans;
     plutovg_span_buffer_t fill_spans;
-    plutovg_path_t* path;
 };
 
 void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer);
@@ -145,12 +145,6 @@ void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plu
 
 void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer);
-
-#define PLUTOVG_SQRT2 1.41421356237309504880f
-#define PLUTOVG_PI 3.14159265358979323846f
-#define PLUTOVG_TWO_PI 6.28318530717958647693f
-#define PLUTOVG_HALF_PI 1.57079632679489661923f
-#define PLUTOVG_KAPPA 0.55228474983079339840f
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #define PLUTOVG_THREAD_LOCAL _Thread_local
@@ -176,10 +170,6 @@ void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_b
 #define plutovg_red(c) (((c) >> 16) & 0xff)
 #define plutovg_green(c) (((c) >> 8) & 0xff)
 #define plutovg_blue(c) (((c) >> 0) & 0xff)
-
-#define PLUTOVG_DEFAULT_STROKE_STYLE ((plutovg_stroke_style_t){1, PLUTOVG_LINE_CAP_BUTT, PLUTOVG_LINE_JOIN_MITER, 10})
-#define PLUTOVG_IDENTITY_MATRIX ((plutovg_matrix_t){1, 0, 0, 1, 0, 0})
-#define PLUTOVG_DEFAULT_COLOR ((plutovg_color_t){0, 0, 0, 1})
 
 #define plutovg_array_init(array) \
     do { \
