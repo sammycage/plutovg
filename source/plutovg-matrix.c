@@ -1,6 +1,5 @@
 #include "plutovg.h"
-
-#include <math.h>
+#include "plutovg-utils.h"
 
 void plutovg_matrix_init(plutovg_matrix_t* matrix, float a, float b, float c, float d, float e, float f)
 {
@@ -143,4 +142,84 @@ void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_
     dst->y = t;
     dst->w = r - l;
     dst->h = b - t;
+}
+
+static int parse_matrix_parameters(const char** begin, const char* end, int required, int optional, float values[6])
+{
+    if(!plutovg_skip_ws_and_delim(begin, end, '('))
+        return 0;
+    int i = 0;
+    int max_count = required + optional;
+    for(; i < max_count; ++i) {
+        if(!plutovg_parse_number(begin, end, values + i))
+            break;
+        plutovg_skip_ws_or_comma(begin, end);
+    }
+
+    if((i == required || i == max_count) && plutovg_skip_delim(begin, end, ')'))
+        return i;
+    return 0;
+}
+
+bool plutovg_matrix_parse(plutovg_matrix_t* matrix, const char* data, int length)
+{
+    plutovg_matrix_init_identity(matrix);
+    if(length == -1)
+        length = strlen(data);
+    const char* it = data;
+    const char* end = it + length;
+    plutovg_skip_ws(&it, end);
+    float values[6];
+    while(it < end) {
+        if(plutovg_skip_string(&it, end, "matrix")) {
+            int count = parse_matrix_parameters(&it, end, 6, 0, values);
+            if(count == 0)
+                return false;
+            plutovg_matrix_multiply(matrix, (plutovg_matrix_t*)(values), matrix);
+        } else if(plutovg_skip_string(&it, end, "translate")) {
+            int count = parse_matrix_parameters(&it, end, 1, 1, values);
+            if(count == 0)
+                return false;
+            if(count == 1) {
+                plutovg_matrix_translate(matrix, values[0], 0);
+            } else {
+                plutovg_matrix_translate(matrix, values[0], values[1]);
+            }
+        } else if(plutovg_skip_string(&it, end, "scale")) {
+            int count = parse_matrix_parameters(&it, end, 1, 1, values);
+            if(count == 0)
+                return false;
+            if(count == 1) {
+                plutovg_matrix_scale(matrix, values[0], values[0]);
+            } else {
+                plutovg_matrix_scale(matrix, values[0], values[1]);
+            }
+        } else if(plutovg_skip_string(&it, end, "rotate")) {
+            int count = parse_matrix_parameters(&it, end, 1, 2, values);
+            if(count == 0)
+                return false;
+            if(count == 3)
+                plutovg_matrix_translate(matrix, values[1], values[2]);
+            plutovg_matrix_rotate(matrix, PLUTOVG_DEG2RAD(values[0]));
+            if(count == 3) {
+                plutovg_matrix_translate(matrix, -values[1], -values[2]);
+            }
+        } else if(plutovg_skip_string(&it, end, "skewX")) {
+            int count = parse_matrix_parameters(&it, end, 1, 0, values);
+            if(count == 0)
+                return false;
+            plutovg_matrix_shear(matrix, PLUTOVG_DEG2RAD(values[0]), 0);
+        } else if(plutovg_skip_string(&it, end, "skewY")) {
+            int count = parse_matrix_parameters(&it, end, 1, 0, values);
+            if(count == 0)
+                return false;
+            plutovg_matrix_shear(matrix, 0, PLUTOVG_DEG2RAD(values[0]));
+        } else {
+            return false;
+        }
+
+        plutovg_skip_ws_or_comma(&it, end);
+    }
+
+    return true;
 }

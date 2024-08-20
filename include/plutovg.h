@@ -272,6 +272,15 @@ PLUTOVG_API void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const
 PLUTOVG_API void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst);
 
 /**
+ * @brief plutovg_matrix_parse
+ * @param matrix
+ * @param data
+ * @param length
+ * @return
+ */
+PLUTOVG_API bool plutovg_matrix_parse(plutovg_matrix_t* matrix, const char* data, int length);
+
+/**
  * @brief Represents a 2D path for drawing operations.
  */
 typedef struct plutovg_path plutovg_path_t;

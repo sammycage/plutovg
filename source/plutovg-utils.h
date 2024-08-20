@@ -148,6 +148,22 @@ static inline bool plutovg_skip_delim(const char** begin, const char* end, const
     return false;
 }
 
+static inline bool plutovg_skip_string(const char** begin, const char* end, const char* data)
+{
+    const char* it = *begin;
+    while(it < end && *data && *it == *data) {
+        ++data;
+        ++it;
+    }
+
+    if(*data == '\0') {
+        *begin = it;
+        return true;
+    }
+
+    return false;
+}
+
 static inline bool plutovg_skip_ws(const char** begin, const char* end)
 {
     const char* it = *begin;
