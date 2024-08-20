@@ -161,4 +161,22 @@ static inline bool plutovg_skip_ws_or_comma(const char** begin, const char* end)
     return plutovg_skip_ws_or_delim(begin, end, ',');
 }
 
+static inline bool plutovg_skip_ws_and_delim(const char** begin, const char* end, char delim)
+{
+    const char* it = *begin;
+    if(plutovg_skip_ws(&it, end)) {
+        if(!plutovg_skip_delim(&it, end, delim))
+            return false;
+        plutovg_skip_ws(&it, end);
+    }
+
+    *begin = it;
+    return it < end;
+}
+
+static inline bool plutovg_skip_ws_and_comma(const char** begin, const char* end)
+{
+    return plutovg_skip_ws_and_delim(begin, end, ',');
+}
+
 #endif // PLUTOVG_UTILS_H

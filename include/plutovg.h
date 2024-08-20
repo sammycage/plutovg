@@ -1070,6 +1070,20 @@ typedef struct plutovg_color {
 #define PLUTOVG_CYAN_COLOR    PLUTOVG_MAKE_COLOR(0, 1, 1, 1)
 #define PLUTOVG_MAGENTA_COLOR PLUTOVG_MAKE_COLOR(1, 0, 1, 1)
 
+PLUTOVG_API void plutovg_color_init_rgb(plutovg_color_t* color, float r, float g, float b);
+PLUTOVG_API void plutovg_color_init_rgba(plutovg_color_t* color, float r, float g, float b, float a);
+
+PLUTOVG_API void plutovg_color_init_rgb8(plutovg_color_t* color, int r, int g, int b);
+PLUTOVG_API void plutovg_color_init_rgba8(plutovg_color_t* color, int r, int g, int b, int a);
+
+PLUTOVG_API void plutovg_color_init_rgba32(plutovg_color_t* color, unsigned int value);
+PLUTOVG_API void plutovg_color_init_argb32(plutovg_color_t* color, unsigned int value);
+
+PLUTOVG_API unsigned int plutovg_color_to_rgba32(const plutovg_color_t* color);
+PLUTOVG_API unsigned int plutovg_color_to_argb32(const plutovg_color_t* color);
+
+PLUTOVG_API int plutovg_color_parse(plutovg_color_t* color, const char* data, int length);
+
 /**
  * @brief Defines the type of texture, either plain or tiled.
  */
