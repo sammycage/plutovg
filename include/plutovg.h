@@ -878,6 +878,41 @@ PLUTOVG_API float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_
 PLUTOVG_API float plutovg_font_face_text_extents(const plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
 /**
+ * @brief Represents a color with red, green, blue, and alpha components.
+ */
+typedef struct plutovg_color {
+    float r; ///< Red component (0 to 1).
+    float g; ///< Green component (0 to 1).
+    float b; ///< Blue component (0 to 1).
+    float a; ///< Alpha (opacity) component (0 to 1).
+} plutovg_color_t;
+
+#define PLUTOVG_MAKE_COLOR(r, g, b, a) ((plutovg_color_t){r, g, b, a})
+
+#define PLUTOVG_BLACK_COLOR   PLUTOVG_MAKE_COLOR(0, 0, 0, 1)
+#define PLUTOVG_WHITE_COLOR   PLUTOVG_MAKE_COLOR(1, 1, 1, 1)
+#define PLUTOVG_RED_COLOR     PLUTOVG_MAKE_COLOR(1, 0, 0, 1)
+#define PLUTOVG_GREEN_COLOR   PLUTOVG_MAKE_COLOR(0, 1, 0, 1)
+#define PLUTOVG_BLUE_COLOR    PLUTOVG_MAKE_COLOR(0, 0, 1, 1)
+#define PLUTOVG_YELLOW_COLOR  PLUTOVG_MAKE_COLOR(1, 1, 0, 1)
+#define PLUTOVG_CYAN_COLOR    PLUTOVG_MAKE_COLOR(0, 1, 1, 1)
+#define PLUTOVG_MAGENTA_COLOR PLUTOVG_MAKE_COLOR(1, 0, 1, 1)
+
+PLUTOVG_API void plutovg_color_init_rgb(plutovg_color_t* color, float r, float g, float b);
+PLUTOVG_API void plutovg_color_init_rgba(plutovg_color_t* color, float r, float g, float b, float a);
+
+PLUTOVG_API void plutovg_color_init_rgb8(plutovg_color_t* color, int r, int g, int b);
+PLUTOVG_API void plutovg_color_init_rgba8(plutovg_color_t* color, int r, int g, int b, int a);
+
+PLUTOVG_API void plutovg_color_init_rgba32(plutovg_color_t* color, unsigned int value);
+PLUTOVG_API void plutovg_color_init_argb32(plutovg_color_t* color, unsigned int value);
+
+PLUTOVG_API unsigned int plutovg_color_to_rgba32(const plutovg_color_t* color);
+PLUTOVG_API unsigned int plutovg_color_to_argb32(const plutovg_color_t* color);
+
+PLUTOVG_API int plutovg_color_parse(plutovg_color_t* color, const char* data, int length);
+
+/**
  * @brief Represents an image surface for drawing operations.
  *
  * The pixel data is stored in a premultiplied 32-bit ARGB format (0xAARRGGBB).
@@ -988,6 +1023,13 @@ PLUTOVG_API int plutovg_surface_get_height(const plutovg_surface_t* surface);
 PLUTOVG_API int plutovg_surface_get_stride(const plutovg_surface_t* surface);
 
 /**
+ * @brief plutovg_surface_clear
+ * @param surface
+ * @param color
+ */
+PLUTOVG_API void plutovg_surface_clear(plutovg_surface_t* surface, const plutovg_color_t* color);
+
+/**
  * @brief Writes the surface to a PNG file.
  *
  * @param surface Pointer to the `plutovg_surface_t` object.
@@ -1048,41 +1090,6 @@ PLUTOVG_API void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned
  * @param stride Image stride in bytes.
  */
 PLUTOVG_API void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, int width, int height, int stride);
-
-/**
- * @brief Represents a color with red, green, blue, and alpha components.
- */
-typedef struct plutovg_color {
-    float r; ///< Red component (0 to 1).
-    float g; ///< Green component (0 to 1).
-    float b; ///< Blue component (0 to 1).
-    float a; ///< Alpha (opacity) component (0 to 1).
-} plutovg_color_t;
-
-#define PLUTOVG_MAKE_COLOR(r, g, b, a) ((plutovg_color_t){r, g, b, a})
-
-#define PLUTOVG_BLACK_COLOR   PLUTOVG_MAKE_COLOR(0, 0, 0, 1)
-#define PLUTOVG_WHITE_COLOR   PLUTOVG_MAKE_COLOR(1, 1, 1, 1)
-#define PLUTOVG_RED_COLOR     PLUTOVG_MAKE_COLOR(1, 0, 0, 1)
-#define PLUTOVG_GREEN_COLOR   PLUTOVG_MAKE_COLOR(0, 1, 0, 1)
-#define PLUTOVG_BLUE_COLOR    PLUTOVG_MAKE_COLOR(0, 0, 1, 1)
-#define PLUTOVG_YELLOW_COLOR  PLUTOVG_MAKE_COLOR(1, 1, 0, 1)
-#define PLUTOVG_CYAN_COLOR    PLUTOVG_MAKE_COLOR(0, 1, 1, 1)
-#define PLUTOVG_MAGENTA_COLOR PLUTOVG_MAKE_COLOR(1, 0, 1, 1)
-
-PLUTOVG_API void plutovg_color_init_rgb(plutovg_color_t* color, float r, float g, float b);
-PLUTOVG_API void plutovg_color_init_rgba(plutovg_color_t* color, float r, float g, float b, float a);
-
-PLUTOVG_API void plutovg_color_init_rgb8(plutovg_color_t* color, int r, int g, int b);
-PLUTOVG_API void plutovg_color_init_rgba8(plutovg_color_t* color, int r, int g, int b, int a);
-
-PLUTOVG_API void plutovg_color_init_rgba32(plutovg_color_t* color, unsigned int value);
-PLUTOVG_API void plutovg_color_init_argb32(plutovg_color_t* color, unsigned int value);
-
-PLUTOVG_API unsigned int plutovg_color_to_rgba32(const plutovg_color_t* color);
-PLUTOVG_API unsigned int plutovg_color_to_argb32(const plutovg_color_t* color);
-
-PLUTOVG_API int plutovg_color_parse(plutovg_color_t* color, const char* data, int length);
 
 /**
  * @brief Defines the type of texture, either plain or tiled.

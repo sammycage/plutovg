@@ -2,6 +2,7 @@
 #define PLUTOVG_UTILS_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -27,6 +28,21 @@
 #define plutovg_red(c) (((c) >> 16) & 0xff)
 #define plutovg_green(c) (((c) >> 8) & 0xff)
 #define plutovg_blue(c) (((c) >> 0) & 0xff)
+
+static inline uint32_t plutovg_premultiply_argb(uint32_t color)
+{
+    uint32_t a = plutovg_alpha(color);
+    uint32_t r = plutovg_red(color);
+    uint32_t g = plutovg_green(color);
+    uint32_t b = plutovg_blue(color);
+    if(a != 255) {
+        r = (r * a) / 255;
+        g = (g * a) / 255;
+        b = (b * a) / 255;
+    }
+
+    return (a << 24) | (r << 16) | (g << 8) | (b);
+}
 
 #define plutovg_array_init(array) \
     do { \

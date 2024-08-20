@@ -1,7 +1,6 @@
 #include "plutovg-private.h"
 #include "plutovg-utils.h"
 
-#include <stdint.h>
 #include <ctype.h>
 
 void plutovg_color_init_rgb(plutovg_color_t* color, float r, float g, float b)
@@ -174,7 +173,7 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
                 || !parse_rgb_component(&it, end, &g)
                 || !plutovg_skip_ws_and_comma(&it, end)
                 || !parse_rgb_component(&it, end, &b)) {
-                return false;
+                return 0;
             }
 
             if(plutovg_skip_ws_and_comma(&it, end)

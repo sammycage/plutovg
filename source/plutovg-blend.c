@@ -3,7 +3,6 @@
 
 #include <assert.h>
 #include <limits.h>
-#include <stdint.h>
 
 #define COLOR_TABLE_SIZE 1024
 typedef struct {
@@ -64,19 +63,6 @@ static inline uint32_t premultiply_color_with_opacity(const plutovg_color_t* col
     uint32_t pg = lroundf(color->g * alpha);
     uint32_t pb = lroundf(color->b * alpha);
     return (alpha << 24) | (pr << 16) | (pg << 8) | (pb);
-}
-
-static inline uint32_t premultiply_pixel(uint32_t color)
-{
-    uint32_t a = plutovg_alpha(color);
-    uint32_t r = plutovg_red(color);
-    uint32_t g = plutovg_green(color);
-    uint32_t b = plutovg_blue(color);
-
-    uint32_t pr = (r * a) / 255;
-    uint32_t pg = (g * a) / 255;
-    uint32_t pb = (b * a) / 255;
-    return (a << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
 static inline uint32_t interpolate_pixel(uint32_t x, uint32_t a, uint32_t y, uint32_t b)
@@ -739,7 +725,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
     curr = start;
     curr_color = combine_color_with_opacity(&curr->color, opacity);
 
-    data.colortable[pos++] = premultiply_pixel(curr_color);
+    data.colortable[pos++] = plutovg_premultiply_argb(curr_color);
     incr = 1.f / COLOR_TABLE_SIZE;
     fpos = 1.5f * incr;
 
@@ -758,7 +744,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
             t = (fpos - curr->offset) * delta;
             dist = (uint32_t)(255 * t);
             idist = 255 - dist;
-            data.colortable[pos] = premultiply_pixel(interpolate_pixel(curr_color, idist, next_color, dist));
+            data.colortable[pos] = plutovg_premultiply_argb(interpolate_pixel(curr_color, idist, next_color, dist));
             ++pos;
             fpos += incr;
         }

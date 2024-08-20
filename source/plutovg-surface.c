@@ -1,7 +1,6 @@
 #include "plutovg-private.h"
 #include "plutovg-utils.h"
 
-#include <stdint.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -185,6 +184,17 @@ int plutovg_surface_get_height(const plutovg_surface_t* surface)
 int plutovg_surface_get_stride(const plutovg_surface_t* surface)
 {
     return surface->stride;
+}
+
+void plutovg_surface_clear(plutovg_surface_t* surface, const plutovg_color_t* color)
+{
+    uint32_t pixel = plutovg_premultiply_argb(plutovg_color_to_argb32(color));
+    for(int y = 0; y < surface->height; y++) {
+        uint32_t* pixels = (uint32_t*)(surface->data + surface->stride * y);
+        for(int x = 0; x < surface->width; x++) {
+            pixels[x] = pixel;
+        }
+    }
 }
 
 static void plutovg_surface_write_begin(const plutovg_surface_t* surface)
