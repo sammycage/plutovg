@@ -1,8 +1,9 @@
 #include "plutovg-private.h"
+#include "plutovg-utils.h"
 
 #include <assert.h>
 #include <limits.h>
-#include <math.h>
+#include <stdint.h>
 
 #define COLOR_TABLE_SIZE 1024
 typedef struct {
@@ -823,7 +824,7 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_textur
 
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer)
 {
-    if(span_buffer->spans.size == 0 || canvas->state->paint == NULL)
+    if(canvas->state->paint == NULL || span_buffer->spans.size == 0)
         return;
     plutovg_paint_t* paint = canvas->state->paint;
     if(paint->type == PLUTOVG_PAINT_TYPE_COLOR) {

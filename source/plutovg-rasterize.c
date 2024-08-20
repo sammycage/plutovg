@@ -1,9 +1,9 @@
 #include "plutovg-private.h"
+#include "plutovg-utils.h"
 
 #include "plutovg-ft-raster.h"
 #include "plutovg-ft-stroker.h"
 
-#include <math.h>
 #include <limits.h>
 
 void plutovg_span_buffer_init(plutovg_span_buffer_t* span_buffer)

@@ -1,4 +1,5 @@
 #include "plutovg-private.h"
+#include "plutovg-utils.h"
 
 static PLUTOVG_THREAD_LOCAL plutovg_paint_t* freed_paint[3];
 

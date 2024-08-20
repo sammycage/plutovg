@@ -1,8 +1,7 @@
 #include "plutovg-private.h"
+#include "plutovg-utils.h"
 
-#include <math.h>
 #include <assert.h>
-#include <float.h>
 
 void plutovg_path_iterator_init(plutovg_path_iterator_t* it, const plutovg_path_t* path)
 {
@@ -601,7 +600,7 @@ void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, cons
         dash_sum += dashes[i];
     if(ndashes % 2 == 1)
         dash_sum *= 2.f;
-    if(dash_sum == 0.f) {
+    if(dash_sum <= 0.f) {
         return plutovg_path_traverse(path, traverse_func, closure);
     }
 
@@ -730,115 +729,15 @@ float plutovg_path_length(const plutovg_path_t* path)
     return plutovg_path_extents(path, NULL);
 }
 
-static inline bool parse_number(const char** begin, const char* end, float* number)
-{
-    const char* it = *begin;
-    float fraction = 0;
-    float integer = 0;
-    float exponent = 0;
-    int sign = 1;
-    int expsign = 1;
-
-    if(it < end && *it == '+') {
-        ++it;
-    } else if(it < end && *it == '-') {
-        ++it;
-        sign = -1;
-    }
-
-    if(it >= end || (*it != '.' && !PLUTOVG_IS_NUM(*it)))
-        return false;
-    if(PLUTOVG_IS_NUM(*it)) {
-        do {
-            integer = 10.f * integer + (*it++ - '0');
-        } while(it < end && PLUTOVG_IS_NUM(*it));
-    }
-
-    if(it < end && *it == '.') {
-        ++it;
-        if(it >= end || !PLUTOVG_IS_NUM(*it))
-            return false;
-        float divisor = 1.f;
-        do {
-            fraction = 10.f * fraction + (*it++ - '0');
-            divisor *= 10.f;
-        } while(it < end && PLUTOVG_IS_NUM(*it));
-        fraction /= divisor;
-    }
-
-    if(it < end && (*it == 'e' || *it == 'E')) {
-        ++it;
-        if(it < end && *it == '+') {
-            ++it;
-        } else if(it < end && *it == '-') {
-            ++it;
-            expsign = -1;
-        }
-
-        if(it >= end || !PLUTOVG_IS_NUM(*it))
-            return false;
-        do {
-            exponent = 10 * exponent + (*it++ - '0');
-        } while(it < end && PLUTOVG_IS_NUM(*it));
-    }
-
-    *begin = it;
-    *number = sign * (integer + fraction);
-    if(exponent)
-        *number *= powf(10.f, expsign * exponent);
-    return *number >= -FLT_MAX && *number <= FLT_MAX;
-}
-
-static inline bool skip_ws(const char** begin, const char* end)
-{
-    const char* it = *begin;
-    while(it < end && PLUTOVG_IS_WS(*it))
-        ++it;
-    *begin = it;
-    return it < end;
-}
-
-static inline bool skip_ws_delim(const char** begin, const char* end, char delim)
-{
-    const char* it = *begin;
-    if(it < end && *it != delim && !PLUTOVG_IS_WS(*it))
-        return false;
-    if(skip_ws(&it, end)) {
-        if(it < end && *it == delim) {
-            ++it;
-            skip_ws(&it, end);
-        }
-    }
-
-    *begin = it;
-    return it < end;
-}
-
-static inline bool skip_ws_comma(const char** begin, const char* end)
-{
-    return skip_ws_delim(begin, end, ',');
-}
-
-static inline bool skip_delim(const char** begin, const char* end, const char delim)
-{
-    const char* it = *begin;
-    if(it < end && *it == delim) {
-        *begin = it + 1;
-        return true;
-    }
-
-    return false;
-}
-
 static inline bool parse_arc_flag(const char** begin, const char* end, bool* flag)
 {
-    if(skip_delim(begin, end, '0'))
+    if(plutovg_skip_delim(begin, end, '0'))
         *flag = 0;
-    else if(skip_delim(begin, end, '1'))
+    else if(plutovg_skip_delim(begin, end, '1'))
         *flag = 1;
     else
         return false;
-    skip_ws_comma(begin, end);
+    plutovg_skip_ws_or_comma(begin, end);
     return true;
 }
 
@@ -846,9 +745,9 @@ static inline bool parse_numbers(const char** begin, const char* end, float* num
 {
     const char* it = *begin;
     for(int i = 0; i < count; i++) {
-        if(!parse_number(&it, end, numbers + offset + i))
+        if(!plutovg_parse_number(&it, end, numbers + offset + i))
             return false;
-        skip_ws_comma(&it, end);
+        plutovg_skip_ws_or_comma(&it, end);
     }
 
     *begin = it;
@@ -874,11 +773,11 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
 
     char command = 0;
     char last_command = 0;
-    skip_ws(&it, end);
+    plutovg_skip_ws(&it, end);
     while(it < end) {
         if(PLUTOVG_IS_ALPHA(*it)) {
             command = *it++;
-            skip_ws(&it, end);
+            plutovg_skip_ws(&it, end);
         }
 
         if(!last_command && !(command == 'M' || command == 'm'))
@@ -1026,7 +925,7 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             return false;
         }
 
-        skip_ws_comma(&it, end);
+        plutovg_skip_ws_or_comma(&it, end);
         last_command = command;
     }
 

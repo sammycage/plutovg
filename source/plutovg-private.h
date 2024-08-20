@@ -1,11 +1,6 @@
 #ifndef PLUTOVG_PRIVATE_H
 #define PLUTOVG_PRIVATE_H
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
-
 #include "plutovg.h"
 
 struct plutovg_surface {
@@ -13,7 +8,7 @@ struct plutovg_surface {
     int width;
     int height;
     int stride;
-    uint8_t* data;
+    unsigned char* data;
 };
 
 struct plutovg_path {
@@ -145,59 +140,5 @@ void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plu
 
 void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer);
-
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define PLUTOVG_THREAD_LOCAL _Thread_local
-#elif defined(_MSC_VER)
-#define PLUTOVG_THREAD_LOCAL __declspec(thread)
-#elif defined(__GNUC__)
-#define PLUTOVG_THREAD_LOCAL __thread
-#else
-#define PLUTOVG_THREAD_LOCAL
-#endif
-
-#define PLUTOVG_IS_NUM(c) ((c) >= '0' && (c) <= '9')
-#define PLUTOVG_IS_ALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
-#define PLUTOVG_IS_ALNUM(c) (PLUTOVG_IS_ALPHA(c) || PLUTOVG_IS_NUM(c))
-#define PLUTOVG_IS_WS(c) ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\r')
-
-#define plutovg_min(a, b) ((a) < (b) ? (a) : (b))
-#define plutovg_max(a, b) ((a) > (b) ? (a) : (b))
-#define plutovg_clamp(v, lo, hi) ((v) < (lo) ? (lo) : (hi) < (v) ? (hi) : (v))
-#define plutovg_div255(x) (((x) + ((x) >> 8) + 0x80) >> 8)
-
-#define plutovg_alpha(c) (((c) >> 24) & 0xff)
-#define plutovg_red(c) (((c) >> 16) & 0xff)
-#define plutovg_green(c) (((c) >> 8) & 0xff)
-#define plutovg_blue(c) (((c) >> 0) & 0xff)
-
-#define plutovg_array_init(array) \
-    do { \
-        (array).data = NULL; \
-        (array).size = 0; \
-        (array).capacity = 0; \
-    } while(0)
-
-#define plutovg_array_ensure(array, count) \
-    do { \
-        if((array).data == NULL || ((array).size + (count) > (array).capacity)) { \
-            int capacity = (array).size + (count); \
-            int newcapacity = (array).capacity == 0 ? 8 : (array).capacity; \
-            while(newcapacity < capacity) { newcapacity *= 2; } \
-            (array).data = realloc((array).data, newcapacity * sizeof((array).data[0])); \
-            (array).capacity = newcapacity; \
-        } \
-    } while(0)
-
-#define plutovg_array_append_data(array, newdata, count) \
-    do { \
-        plutovg_array_ensure(array, count); \
-        memcpy((array).data + (array).size, newdata, (count) * sizeof((newdata)[0])); \
-        (array).size += count; \
-    } while(0)
-
-#define plutovg_array_append(array, other) plutovg_array_append_data(array, (other).data, (other).size)
-#define plutovg_array_clear(array) ((array).size = 0)
-#define plutovg_array_destroy(array) free((array).data)
 
 #endif // PLUTOVG_PRIVATE_H

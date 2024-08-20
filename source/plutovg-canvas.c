@@ -1,4 +1,5 @@
 #include "plutovg-private.h"
+#include "plutovg-utils.h"
 
 int plutovg_version(void)
 {
