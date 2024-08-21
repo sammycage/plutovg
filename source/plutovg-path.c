@@ -743,14 +743,12 @@ static inline bool parse_arc_flag(const char** begin, const char* end, bool* fla
 
 static inline bool parse_path_coordinates(const char** begin, const char* end, float values[6], int offset, int count)
 {
-    const char* it = *begin;
     for(int i = 0; i < count; i++) {
-        if(!plutovg_parse_number(&it, end, values + offset + i))
+        if(!plutovg_parse_number(begin, end, values + offset + i))
             return false;
-        plutovg_skip_ws_or_comma(&it, end);
+        plutovg_skip_ws_or_comma(begin, end);
     }
 
-    *begin = it;
     return true;
 }
 

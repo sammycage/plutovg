@@ -156,11 +156,11 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
 
         plutovg_color_init_rgba8(color, r, g, b, a);
     } else {
-        int length = 0;
+        int name_length = 0;
         char name[MAX_NAME + 1];
-        while(it < end && length < MAX_NAME && isalpha(*it))
-            name[length++] = tolower(*it++);
-        name[length] = '\0';
+        while(it < end && name_length < MAX_NAME && isalpha(*it))
+            name[name_length++] = tolower(*it++);
+        name[name_length] = '\0';
 
         if(strcmp(name, "transparent") == 0) {
             plutovg_color_init_rgba(color, 0, 0, 0, 0);
