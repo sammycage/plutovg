@@ -915,6 +915,7 @@ PVG_FT_END_STMNT
   {
     PVG_FT_Vector   bez_stack[16 * 3 + 1];  /* enough to accommodate bisections */
     PVG_FT_Vector*  arc = bez_stack;
+    PVG_FT_Vector*  limit = bez_stack + 45;
     TPos        dx, dy, dx_, dy_;
     TPos        dx1, dy1, dx2, dy2;
     TPos        L, s, s_limit;
@@ -997,6 +998,8 @@ PVG_FT_END_STMNT
       continue;
 
     Split:
+      if( arc == limit )
+        return;
       gray_split_cubic( arc );
       arc += 3;
     }
