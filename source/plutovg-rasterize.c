@@ -281,23 +281,16 @@ static PVG_FT_Outline* ft_outline_convert_dash(const plutovg_path_t* path, const
 
 static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_stroke_data_t* stroke_data)
 {
-    PVG_FT_Fixed ftWidth;
-    PVG_FT_Fixed ftMiterLimit;
+    double scale_x = sqrt(matrix->a * matrix->a + matrix->b * matrix->b);
+    double scale_y = sqrt(matrix->c * matrix->c + matrix->d * matrix->d);
 
-    plutovg_point_t p1 = {0, 0};
-    plutovg_point_t p2 = {PLUTOVG_SQRT2, PLUTOVG_SQRT2};
+    double scale = hypot(scale_x, scale_y) / PLUTOVG_SQRT2;
+    double width = stroke_data->style.width * scale;
 
-    plutovg_matrix_map_point(matrix, &p1, &p1);
-    plutovg_matrix_map_point(matrix, &p2, &p2);
-
-    float scale = hypotf(p2.x - p1.x, p2.y - p1.y) / 2.f;
-    float width = stroke_data->style.width * scale;
-
-    ftWidth = (PVG_FT_Fixed)(width * 0.5f * (1 << 6));
-    ftMiterLimit = (PVG_FT_Fixed)(stroke_data->style.miter_limit * (1 << 16));
+    PVG_FT_Fixed ftWidth = (PVG_FT_Fixed)(width * 0.5 * (1 << 6));
+    PVG_FT_Fixed ftMiterLimit = (PVG_FT_Fixed)(stroke_data->style.miter_limit * (1 << 16));
 
     PVG_FT_Stroker_LineCap ftCap;
-    PVG_FT_Stroker_LineJoin ftJoin;
     switch(stroke_data->style.cap) {
     case PLUTOVG_LINE_CAP_SQUARE:
         ftCap = PVG_FT_STROKER_LINECAP_SQUARE;
@@ -310,6 +303,7 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
         break;
     }
 
+    PVG_FT_Stroker_LineJoin ftJoin;
     switch(stroke_data->style.join) {
     case PLUTOVG_LINE_JOIN_BEVEL:
         ftJoin = PVG_FT_STROKER_LINEJOIN_BEVEL;
