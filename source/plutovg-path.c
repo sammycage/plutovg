@@ -688,6 +688,7 @@ static void extents_traverse_func(void* closure, plutovg_path_command_t command,
 {
     extents_calculator_t* calculator = (extents_calculator_t*)(closure);
     if(calculator->is_first_point) {
+        assert(command == PLUTOVG_PATH_COMMAND_MOVE_TO);
         calculator->is_first_point = false;
         calculator->current_point = points[0];
         calculator->x1 = points[0].x;
@@ -698,22 +699,26 @@ static void extents_traverse_func(void* closure, plutovg_path_command_t command,
         return;
     }
 
-    assert(command == PLUTOVG_PATH_COMMAND_MOVE_TO || command == PLUTOVG_PATH_COMMAND_LINE_TO || command == PLUTOVG_PATH_COMMAND_CLOSE);
-    if(command == PLUTOVG_PATH_COMMAND_LINE_TO || command == PLUTOVG_PATH_COMMAND_CLOSE) {
-        calculator->length += hypotf(points[0].x - calculator->current_point.x, points[0].y - calculator->current_point.y);
+    for(int i = 0; i < npoints; ++i) {
+        calculator->x1 = plutovg_min(calculator->x1, points[i].x);
+        calculator->y1 = plutovg_min(calculator->y1, points[i].y);
+        calculator->x2 = plutovg_max(calculator->x2, points[i].x);
+        calculator->y2 = plutovg_max(calculator->y2, points[i].y);
+        if(command != PLUTOVG_PATH_COMMAND_MOVE_TO)
+            calculator->length += hypotf(points[i].x - calculator->current_point.x, points[i].y - calculator->current_point.y);
+        calculator->current_point = points[i];
     }
-
-    calculator->x1 = plutovg_min(calculator->x1, points[0].x);
-    calculator->y1 = plutovg_min(calculator->y1, points[0].y);
-    calculator->x2 = plutovg_max(calculator->x2, points[0].x);
-    calculator->y2 = plutovg_max(calculator->y2, points[0].y);
-    calculator->current_point = points[0];
 }
 
-float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents)
+float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents, bool tight)
 {
     extents_calculator_t calculator = {{0, 0}, true, 0, 0, 0, 0, 0};
-    plutovg_path_traverse_flatten(path, extents_traverse_func, &calculator);
+    if(tight) {
+        plutovg_path_traverse_flatten(path, extents_traverse_func, &calculator);
+    } else {
+        plutovg_path_traverse(path, extents_traverse_func, &calculator);
+    }
+
     if(extents) {
         extents->x = calculator.x1;
         extents->y = calculator.y1;
@@ -726,7 +731,7 @@ float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents)
 
 float plutovg_path_length(const plutovg_path_t* path)
 {
-    return plutovg_path_extents(path, NULL);
+    return plutovg_path_extents(path, NULL, true);
 }
 
 static inline bool parse_arc_flag(const char** begin, const char* end, bool* flag)

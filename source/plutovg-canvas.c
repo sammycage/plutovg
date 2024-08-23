@@ -481,7 +481,7 @@ plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas)
 
 void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
 {
-    plutovg_path_extents(canvas->path, extents);
+    plutovg_path_extents(canvas->path, extents, true);
     plutovg_canvas_map_rect(canvas, extents, extents);
 }
 
@@ -497,7 +497,7 @@ void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_
     }
 
     float delta = plutovg_max(cap_limit, join_limit);
-    plutovg_path_extents(canvas->path, extents);
+    plutovg_path_extents(canvas->path, extents, true);
     extents->x -= delta;
     extents->y -= delta;
     extents->w += delta * 2.f;

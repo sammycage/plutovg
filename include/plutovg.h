@@ -700,9 +700,10 @@ PLUTOVG_API plutovg_path_t* plutovg_path_clone_dashed(const plutovg_path_t* path
  *
  * @param path A pointer to a `plutovg_path_t` object.
  * @param extents A pointer to a `plutovg_rect_t` object to store the bounding box.
+ * @param tight If `true`, computes a precise bounding box; otherwise, aligns to control points.
  * @return The total length of the path.
  */
-PLUTOVG_API float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents);
+PLUTOVG_API float plutovg_path_extents(const plutovg_path_t* path, plutovg_rect_t* extents, bool tight);
 
 /**
  * @brief Calculates the total length of the path.
