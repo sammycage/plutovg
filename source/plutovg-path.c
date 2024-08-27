@@ -201,7 +201,7 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
         th_arc -= PLUTOVG_TWO_PI;
     plutovg_matrix_init_rotate(&matrix, angle);
     plutovg_matrix_scale(&matrix, rx, ry);
-    int segments = ceilf(fabsf(th_arc / (PLUTOVG_HALF_PI + 0.001f)));
+    int segments = (int)(ceilf(fabsf(th_arc / (PLUTOVG_HALF_PI + 0.001f))));
     for(int i = 0; i < segments; i++) {
         float th_start = th1 + i * th_arc / segments;
         float th_end = th1 + (i + 1) * th_arc / segments;
@@ -482,7 +482,8 @@ static void split_bezier(const bezier_t* b, bezier_t* first, bezier_t* second)
 void plutovg_path_traverse_flatten(const plutovg_path_t* path, plutovg_path_traverse_func_t traverse_func, void* closure)
 {
     if(path->num_curves == 0) {
-        return plutovg_path_traverse(path, traverse_func, closure);
+        plutovg_path_traverse(path, traverse_func, closure);
+        return;
     }
 
     const float threshold = 0.25f;
@@ -601,7 +602,8 @@ void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, cons
     if(ndashes % 2 == 1)
         dash_sum *= 2.f;
     if(dash_sum <= 0.f) {
-        return plutovg_path_traverse(path, traverse_func, closure);
+        plutovg_path_traverse(path, traverse_func, closure);
+        return;
     }
 
     dasher_t dasher;
@@ -625,7 +627,7 @@ void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, cons
     dasher.current_point.y = 0;
     dasher.traverse_func = traverse_func;
     dasher.closure = closure;
-    return plutovg_path_traverse_flatten(path, dash_traverse_func, &dasher);
+    plutovg_path_traverse_flatten(path, dash_traverse_func, &dasher);
 }
 
 plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path)

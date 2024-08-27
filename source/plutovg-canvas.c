@@ -36,7 +36,7 @@ static plutovg_paint_t* plutovg_paint_default(void)
 {
     static PLUTOVG_THREAD_LOCAL plutovg_solid_paint_t paint = {
         {1, PLUTOVG_PAINT_TYPE_COLOR},
-        PLUTOVG_BLACK_COLOR
+        {0.f, 0.f, 0.f, 1.f}
     };
 
     return plutovg_paint_reference(&paint.base);
@@ -677,7 +677,8 @@ void plutovg_canvas_font_metrics(plutovg_canvas_t* canvas, float* ascent, float*
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f) {
-        return plutovg_font_face_get_metrics(state->font_face, state->font_size, ascent, descent, line_gap, extents);
+        plutovg_font_face_get_metrics(state->font_face, state->font_size, ascent, descent, line_gap, extents);
+        return;
     }
 
     if(ascent) *ascent = 0.f;
@@ -695,7 +696,8 @@ void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, plutovg_codepoint_t 
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f) {
-        return plutovg_font_face_get_glyph_metrics(state->font_face, state->font_size, codepoint, advance_width, left_side_bearing, extents);
+        plutovg_font_face_get_glyph_metrics(state->font_face, state->font_size, codepoint, advance_width, left_side_bearing, extents);
+        return;
     }
 
     if(advance_width) *advance_width = 0.f;
