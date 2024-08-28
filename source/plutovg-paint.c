@@ -106,8 +106,8 @@ static bool parse_rgb_component(const char** begin, const char* end, int* compon
         return false;
     if(plutovg_skip_delim(begin, end, '%'))
         value *= 2.55f;
+    value = plutovg_clamp(value, 0.f, 255.f);
     *component = lroundf(value);
-    *component = plutovg_clamp(*component, 0.f, 255.f);
     return true;
 }
 

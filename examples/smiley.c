@@ -1,4 +1,4 @@
-#include "plutovg.h"
+#include <plutovg.h>
 
 int main(void)
 {
