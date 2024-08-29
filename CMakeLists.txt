@@ -50,8 +50,9 @@ target_include_directories(plutovg PUBLIC
     $<INSTALL_INTERFACE:include/plutovg>
 )
 
-if(NOT WIN32)
-    target_link_libraries(plutovg PRIVATE m)
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+    target_link_libraries(plutovg PRIVATE ${MATH_LIBRARY})
 endif()
 
 target_compile_definitions(plutovg PRIVATE PLUTOVG_BUILD)
