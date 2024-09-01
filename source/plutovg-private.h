@@ -140,5 +140,6 @@ void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plu
 
 void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding);
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer);
+void plutovg_memfill32(unsigned int* dest, unsigned int value, int length);
 
 #endif // PLUTOVG_PRIVATE_H

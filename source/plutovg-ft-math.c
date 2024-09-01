@@ -30,15 +30,14 @@ static inline int clz(unsigned int x) {
 #define PVG_FT_MSB(x)  (31 - __builtin_clz(x))
 #else
 static inline int clz(unsigned int x) {
-    for (int i = 31; i >= 0; i--)
-    {
-        if (x >> i)
-        {
-            return 31 - i;
-        }
-    }
-
-    return 32;
+    int n = 0;
+    if (x == 0) return 32;
+    if (x <= 0x0000FFFFU) { n += 16; x <<= 16; }
+    if (x <= 0x00FFFFFFU) { n +=  8; x <<=  8; }
+    if (x <= 0x0FFFFFFFU) { n +=  4; x <<=  4; }
+    if (x <= 0x3FFFFFFFU) { n +=  2; x <<=  2; }
+    if (x <= 0x7FFFFFFFU) { n +=  1; }
+    return n;
 }
 #define PVG_FT_MSB(x)  (31 - clz(x))
 #endif

@@ -265,7 +265,7 @@ static glyph_t* get_glyph(const plutovg_font_face_t* face, plutovg_codepoint_t c
     glyph->nvertices = stbtt_GetGlyphShape(&face->info, glyph->index, &glyph->vertices);
     stbtt_GetGlyphHMetrics(&face->info, glyph->index, &glyph->advance_width, &glyph->left_side_bearing);
     if(!stbtt_GetGlyphBox(&face->info, glyph->index, &glyph->x1, &glyph->y1, &glyph->x2, &glyph->y2))
-        glyph->x1 = glyph->y1 = glyph->x2 = glyph->y2 = 0.f;
+        glyph->x1 = glyph->y1 = glyph->x2 = glyph->y2 = 0;
     return (face->glyphs[msb][lsb] = glyph);
 }
 

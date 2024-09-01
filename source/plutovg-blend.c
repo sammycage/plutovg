@@ -93,7 +93,7 @@ static inline uint32_t BYTE_MUL(uint32_t x, uint32_t a)
 
 #include <emmintrin.h>
 
-static void memfill32(uint32_t* dest, uint32_t value, int length)
+void plutovg_memfill32(unsigned int* dest, unsigned int value, int length)
 {
     __m128i vector_data = _mm_set_epi32(value, value, value, value);
     while(length && ((uintptr_t)dest & 0xf)) {
@@ -148,7 +148,7 @@ static void memfill32(uint32_t* dest, uint32_t value, int length)
 
 #else
 
-static inline void memfill32(uint32_t* dest, uint32_t value, int length)
+void plutovg_memfill32(unsigned int* dest, unsigned int value, int length)
 {
     while(length--) {
         *dest++ = value;
@@ -210,7 +210,7 @@ static void fetch_linear_gradient(uint32_t* buffer, const linear_gradient_values
 
     const uint32_t* end = buffer + length;
     if(inc > -1e-5f && inc < 1e-5f) {
-        memfill32(buffer, gradient_pixel_fixed(gradient, (int)(t * FIXPT_SIZE)), length);
+        plutovg_memfill32(buffer, gradient_pixel_fixed(gradient, (int)(t * FIXPT_SIZE)), length);
     } else {
         if(t + inc * length < (float)(INT_MAX >> (FIXPT_BITS + 1)) && t + inc * length > (float)(INT_MIN >> (FIXPT_BITS + 1))) {
             int t_fixed = (int)(t * FIXPT_SIZE);
@@ -233,7 +233,7 @@ static void fetch_linear_gradient(uint32_t* buffer, const linear_gradient_values
 static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values_t* v, const gradient_data_t* gradient, int y, int x, int length)
 {
     if(v->a == 0.f) {
-        memfill32(buffer, 0, length);
+        plutovg_memfill32(buffer, 0, length);
         return;
     }
 
@@ -298,7 +298,7 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
 static void composition_solid_source(uint32_t* dest, int length, uint32_t color, uint32_t const_alpha)
 {
     if(const_alpha == 255) {
-        memfill32(dest, color, length);
+        plutovg_memfill32(dest, color, length);
     } else {
         uint32_t ialpha = 255 - const_alpha;
         color = BYTE_MUL(color, const_alpha);
