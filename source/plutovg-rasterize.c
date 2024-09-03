@@ -236,7 +236,7 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
 
 static PVG_FT_Outline* ft_outline_convert(const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_stroke_data_t* stroke_data)
 {
-    if(stroke_data != NULL) {
+    if(stroke_data) {
         return ft_outline_convert_stroke(path, matrix, stroke_data);
     }
 

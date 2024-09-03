@@ -920,7 +920,7 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             plutovg_path_arc_to(path, values[0], values[1], PLUTOVG_DEG2RAD(values[2]), flags[0], flags[1], values[3], values[4]);
             current_x = values[3];
             current_y = values[4];
-        } else if(command == 'Z' || command == 'z'){
+        } else if(command == 'Z' || command == 'z') {
             if(last_command == 'Z' || last_command == 'z')
                 return false;
             plutovg_path_close(path);

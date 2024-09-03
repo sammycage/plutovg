@@ -172,7 +172,7 @@ void plutovg_canvas_restore(plutovg_canvas_t* canvas)
 
 void plutovg_canvas_set_rgb(plutovg_canvas_t* canvas, float r, float g, float b)
 {
-    plutovg_canvas_set_rgba(canvas, r, g, b, 1.0);
+    plutovg_canvas_set_rgba(canvas, r, g, b, 1.f);
 }
 
 void plutovg_canvas_set_rgba(plutovg_canvas_t* canvas, float r, float g, float b, float a)
