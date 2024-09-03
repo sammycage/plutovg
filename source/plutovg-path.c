@@ -614,7 +614,7 @@ void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, cons
         dasher.start_phase += dash_sum;
     dasher.start_index = 0;
     dasher.start_toggle = true;
-    while(dasher.start_phase >= dasher.dashes[dasher.start_index % dasher.ndashes]) {
+    while(dasher.start_phase > 0.f && dasher.start_phase >= dasher.dashes[dasher.start_index % dasher.ndashes]) {
         dasher.start_phase -= dashes[dasher.start_index % dasher.ndashes];
         dasher.start_toggle = !dasher.start_toggle;
         dasher.start_index++;
