@@ -272,11 +272,13 @@ PLUTOVG_API void plutovg_matrix_map_points(const plutovg_matrix_t* matrix, const
 PLUTOVG_API void plutovg_matrix_map_rect(const plutovg_matrix_t* matrix, const plutovg_rect_t* src, plutovg_rect_t* dst);
 
 /**
- * @brief plutovg_matrix_parse
- * @param matrix
- * @param data
- * @param length
- * @return
+ * @brief Parses an SVG transform string into a matrix.
+ * 
+ * @param matrix A pointer to a `plutovg_matrix_t` object to store the result.
+ * @param data Input SVG transform string.
+ * @param length Length of the string, or `-1` if null-terminated.
+ * 
+ * @return `true` on success, `false` on failure.
  */
 PLUTOVG_API bool plutovg_matrix_parse(plutovg_matrix_t* matrix, const char* data, int length);
 
@@ -908,18 +910,91 @@ typedef struct plutovg_color {
 #define PLUTOVG_CYAN_COLOR    PLUTOVG_MAKE_COLOR(0, 1, 1, 1)
 #define PLUTOVG_MAGENTA_COLOR PLUTOVG_MAKE_COLOR(1, 0, 1, 1)
 
+/**
+ * @brief Initializes a color using RGB components in the 0-1 range.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param r Red component (0 to 1).
+ * @param g Green component (0 to 1).
+ * @param b Blue component (0 to 1).
+ */
 PLUTOVG_API void plutovg_color_init_rgb(plutovg_color_t* color, float r, float g, float b);
+
+/**
+ * @brief Initializes a color using RGBA components in the 0-1 range.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param r Red component (0 to 1).
+ * @param g Green component (0 to 1).
+ * @param b Blue component (0 to 1).
+ * @param a Alpha component (0 to 1).
+ */
 PLUTOVG_API void plutovg_color_init_rgba(plutovg_color_t* color, float r, float g, float b, float a);
 
+/**
+ * @brief Initializes a color using RGB components in the 0-255 range.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param r Red component (0 to 255).
+ * @param g Green component (0 to 255).
+ * @param b Blue component (0 to 255).
+ */
 PLUTOVG_API void plutovg_color_init_rgb8(plutovg_color_t* color, int r, int g, int b);
+
+/**
+ * @brief Initializes a color using RGBA components in the 0-255 range.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param r Red component (0 to 255).
+ * @param g Green component (0 to 255).
+ * @param b Blue component (0 to 255).
+ * @param a Alpha component (0 to 255).
+ */
 PLUTOVG_API void plutovg_color_init_rgba8(plutovg_color_t* color, int r, int g, int b, int a);
 
+/**
+ * @brief Initializes a color from a 32-bit unsigned RGBA value.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param value 32-bit unsigned RGBA value.
+ */
 PLUTOVG_API void plutovg_color_init_rgba32(plutovg_color_t* color, unsigned int value);
+
+/**
+ * @brief Initializes a color from a 32-bit unsigned ARGB value.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param value 32-bit unsigned ARGB value.
+ */
 PLUTOVG_API void plutovg_color_init_argb32(plutovg_color_t* color, unsigned int value);
 
+/**
+ * @brief Converts a color to a 32-bit unsigned RGBA value.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * 
+ * @return 32-bit unsigned RGBA value.
+ */
 PLUTOVG_API unsigned int plutovg_color_to_rgba32(const plutovg_color_t* color);
+
+/**
+ * @brief Converts a color to a 32-bit unsigned ARGB value.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object.
+ * 
+ * @return 32-bit unsigned ARGB value.
+ */
 PLUTOVG_API unsigned int plutovg_color_to_argb32(const plutovg_color_t* color);
 
+/**
+ * @brief Parses a color from a string using CSS color syntax.
+ * 
+ * @param color A pointer to a `plutovg_color_t` object to store the parsed color.
+ * @param data A pointer to the input string containing the color data.
+ * @param length The length of the input string in bytes, or `-1` if the string is null-terminated.
+ * 
+ * @return The number of characters consumed on success (including leading/trailing spaces), or 0 on failure.
+ */
 PLUTOVG_API int plutovg_color_parse(plutovg_color_t* color, const char* data, int length);
 
 /**
