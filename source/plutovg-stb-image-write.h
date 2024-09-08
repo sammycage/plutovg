@@ -148,8 +148,8 @@ LICENSE
 
 */
 
-#ifndef INCLUDE_STB_IMAGE_WRITE_H
-#define INCLUDE_STB_IMAGE_WRITE_H
+#ifndef PLUTOVG_STB_IMAGE_WRITE_H
+#define PLUTOVG_STB_IMAGE_WRITE_H
 
 #include <stdlib.h>
 
@@ -194,9 +194,9 @@ STBIWDEF int stbi_write_jpg_to_func(stbi_write_func *func, void *context, int x,
 
 STBIWDEF void stbi_flip_vertically_on_write(int flip_boolean);
 
-#endif//INCLUDE_STB_IMAGE_WRITE_H
+#endif//PLUTOVG_STB_IMAGE_WRITE_H
 
-#ifdef STB_IMAGE_WRITE_IMPLEMENTATION
+#ifdef PLUTOVG_STB_IMAGE_WRITE_IMPLEMENTATION
 
 #ifdef _WIN32
    #ifndef _CRT_SECURE_NO_WARNINGS
@@ -1625,7 +1625,7 @@ STBIWDEF int stbi_write_jpg(char const *filename, int x, int y, int comp, const 
 }
 #endif
 
-#endif // STB_IMAGE_WRITE_IMPLEMENTATION
+#endif // PLUTOVG_STB_IMAGE_WRITE_IMPLEMENTATION
 
 /* Revision history
       1.16  (2021-07-11)

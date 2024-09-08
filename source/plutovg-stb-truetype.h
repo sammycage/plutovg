@@ -422,7 +422,7 @@ int main(int arg, char **argv)
 ////   of C library functions used by stb_truetype, e.g. if you don't
 ////   link with the C runtime library.
 
-#ifdef STB_TRUETYPE_IMPLEMENTATION
+#ifdef PLUTOVG_STB_TRUETYPE_IMPLEMENTATION
    // #define your own (u)stbtt_int8/16/32 before including to override this
    #ifndef stbtt_uint8
    typedef unsigned char   stbtt_uint8;
@@ -496,8 +496,8 @@ int main(int arg, char **argv)
 ////
 ////
 
-#ifndef __STB_INCLUDE_STB_TRUETYPE_H__
-#define __STB_INCLUDE_STB_TRUETYPE_H__
+#ifndef PLUTOVG_STB_TRUETYPE_H
+#define PLUTOVG_STB_TRUETYPE_H
 
 #ifdef STBTT_STATIC
 #define STBTT_DEF static
@@ -1094,7 +1094,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 }
 #endif
 
-#endif // __STB_INCLUDE_STB_TRUETYPE_H__
+#endif // PLUTOVG_STB_TRUETYPE_H
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -1103,7 +1103,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 ////
 ////
 
-#ifdef STB_TRUETYPE_IMPLEMENTATION
+#ifdef PLUTOVG_STB_TRUETYPE_IMPLEMENTATION
 
 #ifndef STBTT_MAX_OVERSAMPLE
 #define STBTT_MAX_OVERSAMPLE   8
@@ -4968,7 +4968,7 @@ STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1, const
 #pragma GCC diagnostic pop
 #endif
 
-#endif // STB_TRUETYPE_IMPLEMENTATION
+#endif // PLUTOVG_STB_TRUETYPE_IMPLEMENTATION
 
 
 // FULL VERSION HISTORY

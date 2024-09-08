@@ -1,10 +1,10 @@
 #include "plutovg-private.h"
 #include "plutovg-utils.h"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#define PLUTOVG_STB_IMAGE_WRITE_IMPLEMENTATION
+#include "plutovg-stb-image-write.h"
+#define PLUTOVG_STB_IMAGE_IMPLEMENTATION
+#include "plutovg-stb-image.h"
 
 static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int height)
 {

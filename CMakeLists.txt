@@ -27,6 +27,9 @@ set(plutovg_headers
     source/plutovg-ft-raster.h
     source/plutovg-ft-stroker.h
     source/plutovg-ft-types.h
+    source/plutovg-stb-image-write.h
+    source/plutovg-stb-image.h
+    source/plutovg-stb-truetype.h
 )
 
 add_library(plutovg ${plutovg_sources} ${plutovg_headers})
@@ -42,7 +45,6 @@ set_target_properties(plutovg PROPERTIES
 target_include_directories(plutovg PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/source
-    ${CMAKE_CURRENT_SOURCE_DIR}/stb
 )
 
 target_include_directories(plutovg PUBLIC

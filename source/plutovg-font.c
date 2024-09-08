@@ -2,8 +2,9 @@
 #include "plutovg-utils.h"
 
 #include <stdio.h>
-#define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
+#include <assert.h>
+#define PLUTOVG_STB_TRUETYPE_IMPLEMENTATION
+#include "plutovg-stb-truetype.h"
 
 static int plutovg_text_iterator_length(const void* data, int length, plutovg_text_encoding_t encoding)
 {

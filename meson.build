@@ -25,7 +25,7 @@ if get_option('default_library') == 'static'
 endif
 
 plutovg_lib = library('plutovg', plutovg_sources,
-    include_directories: include_directories('include', 'source', 'stb'),
+    include_directories: include_directories('include', 'source'),
     version: meson.project_version(),
     c_args: ['-DPLUTOVG_BUILD'] + plutovg_compile_args,
     cpp_args: ['-DPLUTOVG_BUILD'] + plutovg_compile_args,
