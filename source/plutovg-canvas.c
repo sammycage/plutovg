@@ -642,7 +642,7 @@ float plutovg_canvas_add_text(plutovg_canvas_t* canvas, const void* text, int le
     plutovg_text_iterator_init(&it, text, length, encoding);
     float advance_width = 0.f;
     while(plutovg_text_iterator_has_next(&it)) {
-        int codepoint = plutovg_text_iterator_next(&it);
+        plutovg_codepoint_t codepoint = plutovg_text_iterator_next(&it);
         advance_width += plutovg_font_face_get_glyph_path(state->font_face, state->font_size, x + advance_width, y, codepoint, canvas->path);
     }
 

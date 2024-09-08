@@ -52,7 +52,7 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
     plutovg_codepoint_t codepoint = 0;
     switch(it->encoding) {
     case PLUTOVG_TEXT_ENCODING_UTF8: {
-        static const int trailing[256] = {
+        static const uint8_t trailing[256] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
