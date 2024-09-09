@@ -5,6 +5,25 @@ project('plutovg', 'c',
     default_options: ['c_std=c99']
 )
 
+plutovg_deps = []
+plutovg_compile_args = []
+
+cc = meson.get_compiler('c')
+plutovg_c_args = ['-DPLUTOVG_BUILD']
+plutovg_c_args += cc.get_supported_arguments(
+    '-Wno-sign-compare',
+    '-Wno-unused-function'
+)
+
+math_dep = cc.find_library('m', required: false)
+if math_dep.found()
+    plutovg_deps += [math_dep]
+endif
+
+if get_option('default_library') == 'static'
+    plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
+endif
+
 plutovg_sources = [
     'source/plutovg-blend.c',
     'source/plutovg-canvas.c',
@@ -19,17 +38,11 @@ plutovg_sources = [
     'source/plutovg-ft-stroker.c'
 ]
 
-plutovg_compile_args = []
-if get_option('default_library') == 'static'
-    plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
-endif
-
 plutovg_lib = library('plutovg', plutovg_sources,
     include_directories: include_directories('include', 'source'),
+    dependencies: plutovg_deps,
     version: meson.project_version(),
-    c_args: ['-DPLUTOVG_BUILD'] + plutovg_compile_args,
-    cpp_args: ['-DPLUTOVG_BUILD'] + plutovg_compile_args,
-    link_args: ['-lm'],
+    c_args: plutovg_c_args,
     gnu_symbol_visibility: 'hidden',
     install: true
 )
