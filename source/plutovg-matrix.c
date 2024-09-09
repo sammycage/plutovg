@@ -25,16 +25,16 @@ void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float sx, float sy)
     plutovg_matrix_init(matrix, sx, 0, 0, sy, 0, 0);
 }
 
-void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float shx, float shy)
-{
-    plutovg_matrix_init(matrix, 1, tanf(shy), tanf(shx), 1, 0, 0);
-}
-
 void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float angle)
 {
     float c = cosf(angle);
     float s = sinf(angle);
     plutovg_matrix_init(matrix, c, s, -s, c, 0, 0);
+}
+
+void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float shx, float shy)
+{
+    plutovg_matrix_init(matrix, 1, tanf(shy), tanf(shx), 1, 0, 0);
 }
 
 void plutovg_matrix_translate(plutovg_matrix_t* matrix, float tx, float ty)
@@ -51,17 +51,17 @@ void plutovg_matrix_scale(plutovg_matrix_t* matrix, float sx, float sy)
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 
-void plutovg_matrix_shear(plutovg_matrix_t* matrix, float shx, float shy)
-{
-    plutovg_matrix_t m;
-    plutovg_matrix_init_shear(&m, shx, shy);
-    plutovg_matrix_multiply(matrix, &m, matrix);
-}
-
 void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle)
 {
     plutovg_matrix_t m;
     plutovg_matrix_init_rotate(&m, angle);
+    plutovg_matrix_multiply(matrix, &m, matrix);
+}
+
+void plutovg_matrix_shear(plutovg_matrix_t* matrix, float shx, float shy)
+{
+    plutovg_matrix_t m;
+    plutovg_matrix_init_shear(&m, shx, shy);
     plutovg_matrix_multiply(matrix, &m, matrix);
 }
 

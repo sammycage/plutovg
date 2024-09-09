@@ -242,26 +242,25 @@ bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, pluto
 void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, int width, int height, int stride)
 {
     for(int y = 0; y < height; y++) {
+        const uint32_t* src_row = (const uint32_t*)(src + stride * y);
         uint32_t* dst_row = (uint32_t*)(dst + stride * y);
-        uint32_t* src_row = (uint32_t*)(src + stride * y);
         for(int x = 0; x < width; x++) {
             uint32_t pixel = src_row[x];
             uint32_t a = (pixel >> 24) & 0xFF;
             if(a == 0) {
                 dst_row[x] = 0x00000000;
-                continue;
-            }
+            } else {
+                uint32_t r = (pixel >> 16) & 0xFF;
+                uint32_t g = (pixel >> 8) & 0xFF;
+                uint32_t b = (pixel >> 0) & 0xFF;
+                if(a != 255) {
+                    r = (r * 255) / a;
+                    g = (g * 255) / a;
+                    b = (b * 255) / a;
+                }
 
-            uint32_t r = (pixel >> 16) & 0xFF;
-            uint32_t g = (pixel >> 8) & 0xFF;
-            uint32_t b = (pixel >> 0) & 0xFF;
-            if(a != 255) {
-                r = (r * 255) / a;
-                g = (g * 255) / a;
-                b = (b * 255) / a;
+                dst_row[x] = (a << 24) | (b << 16) | (g << 8) | r;
             }
-
-            dst_row[x] = (a << 24) | (b << 16) | (g << 8) | r;
         }
     }
 }
@@ -269,26 +268,25 @@ void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, 
 void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, int width, int height, int stride)
 {
     for(int y = 0; y < height; y++) {
+        const uint32_t* src_row = (const uint32_t*)(src + stride * y);
         uint32_t* dst_row = (uint32_t*)(dst + stride * y);
-        uint32_t* src_row = (uint32_t*)(src + stride * y);
         for(int x = 0; x < width; x++) {
             uint32_t pixel = src_row[x];
             uint32_t a = (pixel >> 24) & 0xFF;
             if(a == 0) {
                 dst_row[x] = 0x00000000;
-                continue;
-            }
+            } else {
+                uint32_t b = (pixel >> 16) & 0xFF;
+                uint32_t g = (pixel >> 8) & 0xFF;
+                uint32_t r = (pixel >> 0) & 0xFF;
+                if(a != 255) {
+                    r = (r * a) / 255;
+                    g = (g * a) / 255;
+                    b = (b * a) / 255;
+                }
 
-            uint32_t b = (pixel >> 16) & 0xFF;
-            uint32_t g = (pixel >> 8) & 0xFF;
-            uint32_t r = (pixel >> 0) & 0xFF;
-            if(a != 255) {
-                r = (r * a) / 255;
-                g = (g * a) / 255;
-                b = (b * a) / 255;
+                dst_row[x] = (a << 24) | (r << 16) | (g << 8) | b;
             }
-
-            dst_row[x] = (a << 24) | (r << 16) | (g << 8) | b;
         }
     }
 }

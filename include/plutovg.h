@@ -167,19 +167,19 @@ PLUTOVG_API void plutovg_matrix_init_translate(plutovg_matrix_t* matrix, float t
 PLUTOVG_API void plutovg_matrix_init_scale(plutovg_matrix_t* matrix, float sx, float sy);
 
 /**
+ * @brief Initializes a 2D transformation matrix for rotation.
+ * @param matrix A pointer to the `plutovg_matrix_t` object to be initialized.
+ * @param angle The rotation angle in radians.
+ */
+PLUTOVG_API void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float angle);
+
+/**
  * @brief Initializes a 2D transformation matrix for shearing.
  * @param matrix A pointer to the `plutovg_matrix_t` object to be initialized.
  * @param shx The shearing factor in the x-direction.
  * @param shy The shearing factor in the y-direction.
  */
 PLUTOVG_API void plutovg_matrix_init_shear(plutovg_matrix_t* matrix, float shx, float shy);
-
-/**
- * @brief Initializes a 2D transformation matrix for rotation.
- * @param matrix A pointer to the `plutovg_matrix_t` object to be initialized.
- * @param angle The rotation angle in radians.
- */
-PLUTOVG_API void plutovg_matrix_init_rotate(plutovg_matrix_t* matrix, float angle);
 
 /**
  * @brief Adds a translation with offsets `tx` and `ty` to the matrix.
@@ -198,19 +198,19 @@ PLUTOVG_API void plutovg_matrix_translate(plutovg_matrix_t* matrix, float tx, fl
 PLUTOVG_API void plutovg_matrix_scale(plutovg_matrix_t* matrix, float sx, float sy);
 
 /**
+ * @brief Rotates the matrix by the specified angle (in radians).
+ * @param matrix A pointer to the `plutovg_matrix_t` object to be modified.
+ * @param angle The rotation angle in radians.
+ */
+PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle);
+
+/**
  * @brief Shears the matrix by factors `shx` and `shy`.
  * @param matrix A pointer to the `plutovg_matrix_t` object to be modified.
  * @param shx The shearing factor in the x-direction.
  * @param shy The shearing factor in the y-direction.
  */
 PLUTOVG_API void plutovg_matrix_shear(plutovg_matrix_t* matrix, float shx, float shy);
-
-/**
- * @brief Rotates the matrix by the specified angle (in radians).
- * @param matrix A pointer to the `plutovg_matrix_t` object to be modified.
- * @param angle The rotation angle in radians.
- */
-PLUTOVG_API void plutovg_matrix_rotate(plutovg_matrix_t* matrix, float angle);
 
 /**
  * @brief Multiplies `left` and `right` matrices and stores the result in `matrix`.
