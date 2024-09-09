@@ -544,7 +544,7 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
 ////   end header file   /////////////////////////////////////////////////////
 #endif // PLUTOVG_STB_IMAGE_H
 
-#ifdef PLUTOVG_STB_IMAGE_IMPLEMENTATION
+#ifdef STB_IMAGE_IMPLEMENTATION
 
 #if defined(STBI_ONLY_JPEG) || defined(STBI_ONLY_PNG) || defined(STBI_ONLY_BMP) \
   || defined(STBI_ONLY_TGA) || defined(STBI_ONLY_GIF) || defined(STBI_ONLY_PSD) \
@@ -7759,7 +7759,7 @@ STBIDEF int stbi_is_16_bit_from_callbacks(stbi_io_callbacks const *c, void *user
    return stbi__is_16_main(&s);
 }
 
-#endif // PLUTOVG_STB_IMAGE_IMPLEMENTATION
+#endif // STB_IMAGE_IMPLEMENTATION
 
 /*
    revision history:
