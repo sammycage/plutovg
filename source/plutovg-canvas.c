@@ -34,7 +34,7 @@ static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutov
 
 static plutovg_paint_t* plutovg_paint_default(void)
 {
-    static PLUTOVG_THREAD_LOCAL plutovg_solid_paint_t paint = {
+    static plutovg_solid_paint_t paint = {
         {1, PLUTOVG_PAINT_TYPE_COLOR},
         {0.f, 0.f, 0.f, 1.f}
     };

@@ -348,7 +348,7 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
     return it - data;
 }
 
-static PLUTOVG_THREAD_LOCAL plutovg_paint_t* freed_paint[3];
+static plutovg_paint_t* freed_paint[3];
 
 static void* plutovg_paint_create(plutovg_paint_type_t type, size_t size)
 {

@@ -9,16 +9,6 @@
 #include <float.h>
 #include <math.h>
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-#define PLUTOVG_THREAD_LOCAL _Thread_local
-#elif defined(_MSC_VER)
-#define PLUTOVG_THREAD_LOCAL __declspec(thread)
-#elif defined(__GNUC__)
-#define PLUTOVG_THREAD_LOCAL __thread
-#else
-#define PLUTOVG_THREAD_LOCAL
-#endif
-
 #define plutovg_min(a, b) ((a) < (b) ? (a) : (b))
 #define plutovg_max(a, b) ((a) > (b) ? (a) : (b))
 #define plutovg_clamp(v, lo, hi) ((v) < (lo) ? (lo) : (hi) < (v) ? (hi) : (v))
