@@ -32,16 +32,6 @@ static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutov
     stroke->style.miter_limit = source->style.miter_limit;
 }
 
-static plutovg_paint_t* plutovg_paint_default(void)
-{
-    static plutovg_solid_paint_t paint = {
-        {1, PLUTOVG_PAINT_TYPE_COLOR},
-        {0.f, 0.f, 0.f, 1.f}
-    };
-
-    return plutovg_paint_reference(&paint.base);
-}
-
 static void plutovg_state_reset(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
@@ -49,7 +39,8 @@ static void plutovg_state_reset(plutovg_state_t* state)
     plutovg_stroke_data_reset(&state->stroke);
     plutovg_span_buffer_reset(&state->clip_spans);
     plutovg_font_face_destroy(state->font_face);
-    state->paint = plutovg_paint_default();
+    state->paint = NULL;
+    state->color = PLUTOVG_BLACK_COLOR;
     state->font_face = NULL;
     state->font_size = 12.f;
     state->op = PLUTOVG_OPERATOR_SRC_OVER;
@@ -64,6 +55,7 @@ static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* so
     plutovg_span_buffer_copy(&state->clip_spans, &source->clip_spans);
     state->paint = plutovg_paint_reference(source->paint);
     state->font_face = plutovg_font_face_reference(source->font_face);
+    state->color = source->color;
     state->matrix = source->matrix;
     state->font_size = source->font_size;
     state->op = source->op;
@@ -177,9 +169,8 @@ void plutovg_canvas_set_rgb(plutovg_canvas_t* canvas, float r, float g, float b)
 
 void plutovg_canvas_set_rgba(plutovg_canvas_t* canvas, float r, float g, float b, float a)
 {
-    plutovg_paint_t* paint = plutovg_paint_create_rgba(r, g, b, a);
-    plutovg_canvas_set_paint(canvas, paint);
-    plutovg_paint_destroy(paint);
+    plutovg_color_init_rgba(&canvas->state->color, r, g, b, a);
+    plutovg_canvas_set_paint(canvas, NULL);
 }
 
 void plutovg_canvas_set_color(plutovg_canvas_t* canvas, const plutovg_color_t* color)
@@ -215,8 +206,10 @@ void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_paint_t* paint)
     canvas->state->paint = paint;
 }
 
-plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas)
+plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas, plutovg_color_t* color)
 {
+    if(color)
+        *color = canvas->state->color;
     return canvas->state->paint;
 }
 

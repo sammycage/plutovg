@@ -348,17 +348,9 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
     return it - data;
 }
 
-static plutovg_paint_t* freed_paint[3];
-
 static void* plutovg_paint_create(plutovg_paint_type_t type, size_t size)
 {
-    plutovg_paint_t* paint = freed_paint[type];
-    if(paint == NULL) {
-        paint = malloc(size);
-    } else {
-        freed_paint[type] = NULL;
-    }
-
+    plutovg_paint_t* paint = malloc(size);
     paint->ref_count = 1;
     paint->type = type;
     return paint;
@@ -474,8 +466,7 @@ void plutovg_paint_destroy(plutovg_paint_t* paint)
             plutovg_surface_destroy(texture->surface);
         }
 
-        free(freed_paint[paint->type]);
-        freed_paint[paint->type] = paint;
+        free(paint);
     }
 }
 

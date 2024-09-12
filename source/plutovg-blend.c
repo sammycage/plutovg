@@ -810,8 +810,13 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_textur
 
 void plutovg_blend(plutovg_canvas_t* canvas, const plutovg_span_buffer_t* span_buffer)
 {
-    if(canvas->state->paint == NULL || span_buffer->spans.size == 0)
+    if(span_buffer->spans.size == 0)
         return;
+    if(canvas->state->paint == NULL) {
+        plutovg_blend_color(canvas, &canvas->state->color, span_buffer);
+        return;
+    }
+
     plutovg_paint_t* paint = canvas->state->paint;
     if(paint->type == PLUTOVG_PAINT_TYPE_COLOR) {
         plutovg_solid_paint_t* solid = (plutovg_solid_paint_t*)(paint);

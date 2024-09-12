@@ -1483,9 +1483,10 @@ PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_pain
  * @brief Retrieves the current paint.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @return The current paint used for drawing operations.
+ * @param color A pointer to a `plutovg_color_t` object where the current color will be stored.
+ * @return The current `plutovg_paint_t` used for drawing operations. If no paint is set, `NULL` is returned.
  */
-PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas);
+PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas, plutovg_color_t* color);
 
 /**
  * @brief Sets the font face and size for text rendering on the canvas.
