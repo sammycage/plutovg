@@ -43,7 +43,7 @@ static inline uint32_t plutovg_premultiply_argb(uint32_t color)
 
 #define plutovg_array_ensure(array, count) \
     do { \
-        if((array).data == NULL || ((array).size + (count) > (array).capacity)) { \
+        if((array).size + (count) > (array).capacity) { \
             int capacity = (array).size + (count); \
             int newcapacity = (array).capacity == 0 ? 8 : (array).capacity; \
             while(newcapacity < capacity) { newcapacity *= 2; } \

@@ -458,7 +458,7 @@ typedef struct {
     float x4; float y4;
 } bezier_t;
 
-static void split_bezier(const bezier_t* b, bezier_t* first, bezier_t* second)
+static inline void split_bezier(const bezier_t* b, bezier_t* first, bezier_t* second)
 {
     float c = (b->x2 + b->x3) * 0.5f;
     first->x2 = (b->x1 + b->x2) * 0.5f;

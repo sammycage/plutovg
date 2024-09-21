@@ -19,7 +19,7 @@ int main(void)
     float eye_y = center_y - eye_offset_y;
 
     plutovg_canvas_save(canvas);
-    plutovg_canvas_arc(canvas, center_x, center_y, face_radius, 0, 2 * PLUTOVG_PI, 0);
+    plutovg_canvas_arc(canvas, center_x, center_y, face_radius, 0, PLUTOVG_TWO_PI, 0);
     plutovg_canvas_set_rgb(canvas, 1, 1, 0);
     plutovg_canvas_fill_preserve(canvas);
     plutovg_canvas_set_rgb(canvas, 0, 0, 0);
@@ -28,8 +28,8 @@ int main(void)
     plutovg_canvas_restore(canvas);
 
     plutovg_canvas_save(canvas);
-    plutovg_canvas_arc(canvas, eye_x, eye_y, eye_radius, 0, 2 * PLUTOVG_PI, 0);
-    plutovg_canvas_arc(canvas, center_x + eye_offset_x, eye_y, eye_radius, 0, 2 * PLUTOVG_PI, 0);
+    plutovg_canvas_arc(canvas, eye_x, eye_y, eye_radius, 0, PLUTOVG_TWO_PI, 0);
+    plutovg_canvas_arc(canvas, center_x + eye_offset_x, eye_y, eye_radius, 0, PLUTOVG_TWO_PI, 0);
     plutovg_canvas_set_rgb(canvas, 0, 0, 0);
     plutovg_canvas_fill(canvas);
     plutovg_canvas_restore(canvas);
