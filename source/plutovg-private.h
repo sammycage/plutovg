@@ -50,10 +50,9 @@ typedef struct {
     plutovg_gradient_type_t type;
     plutovg_spread_method_t spread;
     plutovg_matrix_t matrix;
-    float values[6];
-    plutovg_gradient_stop_t embedded_stops[2];
     plutovg_gradient_stop_t* stops;
     int nstops;
+    float values[6];
 } plutovg_gradient_paint_t;
 
 typedef struct {
