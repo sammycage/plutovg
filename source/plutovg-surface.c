@@ -1,6 +1,8 @@
 #include "plutovg-private.h"
 #include "plutovg-utils.h"
 
+#ifdef PLUTOVG_USE_STB_IMAGE
+
 #define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "plutovg-stb-image-write.h"
@@ -9,9 +11,17 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "plutovg-stb-image.h"
 
+#define PLUTOVG_SURFACE_MAX_DIMENSIONS STBI_MAX_DIMENSIONS
+
+#else
+
+#define PLUTOVG_SURFACE_MAX_DIMENSIONS (1 << 24)
+
+#endif
+
 static plutovg_surface_t* plutovg_surface_create_uninitialized(int width, int height)
 {
-    if(width > STBI_MAX_DIMENSIONS || height > STBI_MAX_DIMENSIONS)
+    if(width > PLUTOVG_SURFACE_MAX_DIMENSIONS || height > PLUTOVG_SURFACE_MAX_DIMENSIONS)
         return NULL;
     const size_t size = width * height * 4;
     plutovg_surface_t* surface = malloc(size + sizeof(plutovg_surface_t));
@@ -44,6 +54,7 @@ plutovg_surface_t* plutovg_surface_create_for_data(unsigned char* data, int widt
     return surface;
 }
 
+#ifdef PLUTOVG_USE_STB_IMAGE
 static plutovg_surface_t* plutovg_surface_load_from_image(stbi_uc* image, int width, int height)
 {
     plutovg_surface_t* surface = plutovg_surface_create_uninitialized(width, height);
@@ -52,23 +63,32 @@ static plutovg_surface_t* plutovg_surface_load_from_image(stbi_uc* image, int wi
     stbi_image_free(image);
     return surface;
 }
+#endif
 
 plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename)
 {
+#ifdef PLUTOVG_USE_STB_IMAGE
     int width, height, channels;
     stbi_uc* image = stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
     if(image == NULL)
         return NULL;
     return plutovg_surface_load_from_image(image, width, height);
+#else
+    return NULL;
+#endif
 }
 
 plutovg_surface_t* plutovg_surface_load_from_image_data(const void* data, int length)
 {
+#ifdef PLUTOVG_USE_STB_IMAGE
     int width, height, channels;
     stbi_uc* image = stbi_load_from_memory(data, length, &width, &height, &channels, STBI_rgb_alpha);
     if(image == NULL)
         return NULL;
     return plutovg_surface_load_from_image(image, width, height);
+#else
+    return NULL;
+#endif
 }
 
 static const uint8_t base64_table[128] = {
@@ -212,34 +232,50 @@ static void plutovg_surface_write_end(const plutovg_surface_t* surface)
 
 bool plutovg_surface_write_to_png(const plutovg_surface_t* surface, const char* filename)
 {
+#ifdef PLUTOVG_USE_STB_IMAGE
     plutovg_surface_write_begin(surface);
     int success = stbi_write_png(filename, surface->width, surface->height, 4, surface->data, surface->stride);
     plutovg_surface_write_end(surface);
     return success;
+#else
+    return false;
+#endif
 }
 
 bool plutovg_surface_write_to_jpg(const plutovg_surface_t* surface, const char* filename, int quality)
 {
+#ifdef PLUTOVG_USE_STB_IMAGE
     plutovg_surface_write_begin(surface);
     int success = stbi_write_jpg(filename, surface->width, surface->height, 4, surface->data, quality);
     plutovg_surface_write_end(surface);
     return success;
+#else
+    return false;
+#endif
 }
 
 bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure)
 {
+#ifdef PLUTOVG_USE_STB_IMAGE
     plutovg_surface_write_begin(surface);
     int success = stbi_write_png_to_func(write_func, closure, surface->width, surface->height, 4, surface->data, surface->stride);
     plutovg_surface_write_end(surface);
     return success;
+#else
+    return false;
+#endif
 }
 
 bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality)
 {
+#ifdef PLUTOVG_USE_STB_IMAGE
     plutovg_surface_write_begin(surface);
     int success = stbi_write_jpg_to_func(write_func, closure, surface->width, surface->height, 4, surface->data, quality);
     plutovg_surface_write_end(surface);
     return success;
+#else
+    return false;
+#endif
 }
 
 void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, int width, int height, int stride)

@@ -24,6 +24,10 @@ if get_option('default_library') == 'static'
     plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
 endif
 
+if get_option('use_stb_image')
+    plutovg_c_args += ['-DPLUTOVG_USE_STB_IMAGE']
+endif
+
 plutovg_sources = [
     'source/plutovg-blend.c',
     'source/plutovg-canvas.c',

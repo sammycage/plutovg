@@ -1,2 +1,3 @@
 option('examples', type : 'feature', value : 'auto')
 option('tests', type : 'feature', value : 'auto')
+option('use_stb_image', type : 'boolean', value : true)

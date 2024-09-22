@@ -57,6 +57,11 @@ if(MATH_LIBRARY)
     target_link_libraries(plutovg PRIVATE ${MATH_LIBRARY})
 endif()
 
+option(PLUTOVG_USE_STB_IMAGE "Use stb_image" ON)
+if(PLUTOVG_USE_STB_IMAGE)
+    target_compile_definitions(plutovg PUBLIC PLUTOVG_USE_STB_IMAGE)
+endif()
+
 target_compile_definitions(plutovg PRIVATE PLUTOVG_BUILD)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(plutovg PUBLIC PLUTOVG_BUILD_STATIC)
