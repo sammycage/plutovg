@@ -847,7 +847,7 @@ PLUTOVG_API void plutovg_font_face_get_metrics(const plutovg_font_face_t* face, 
  * @param left_side_bearing Pointer to store the left side bearing of the glyph.
  * @param extents Pointer to a `plutovg_rect_t` object to store the glyph bounding box.
  */
-PLUTOVG_API void plutovg_font_face_get_glyph_metrics(const plutovg_font_face_t* face, float size, plutovg_codepoint_t codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_font_face_get_glyph_metrics(plutovg_font_face_t* face, float size, plutovg_codepoint_t codepoint, float* advance_width, float* left_side_bearing, plutovg_rect_t* extents);
 
 /**
  * @brief Retrieves the path of a glyph and its advance width.
@@ -860,7 +860,7 @@ PLUTOVG_API void plutovg_font_face_get_glyph_metrics(const plutovg_font_face_t* 
  * @param path Pointer to a `plutovg_path_t` object to store the glyph path.
  * @return The advance width of the glyph.
  */
-PLUTOVG_API float plutovg_font_face_get_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_t* path);
+PLUTOVG_API float plutovg_font_face_get_glyph_path(plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_t* path);
 
 /**
  * @brief Traverses the path of a glyph and calls a callback for each path element.
@@ -874,7 +874,7 @@ PLUTOVG_API float plutovg_font_face_get_glyph_path(const plutovg_font_face_t* fa
  * @param closure User-defined data passed to the callback function.
  * @return The advance width of the glyph.
  */
-PLUTOVG_API float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_traverse_func_t traverse_func, void* closure);
+PLUTOVG_API float plutovg_font_face_traverse_glyph_path(plutovg_font_face_t* face, float size, float x, float y, plutovg_codepoint_t codepoint, plutovg_path_traverse_func_t traverse_func, void* closure);
 
 /**
  * @brief Computes the bounding box of a text string and its advance width.
@@ -887,7 +887,7 @@ PLUTOVG_API float plutovg_font_face_traverse_glyph_path(const plutovg_font_face_
  * @param extents Pointer to a `plutovg_rect_t` object to store the bounding box of the text.
  * @return The total advance width of the text.
  */
-PLUTOVG_API float plutovg_font_face_text_extents(const plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
+PLUTOVG_API float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
 /**
  * @brief Represents a color with red, green, blue, and alpha components.
@@ -2169,7 +2169,7 @@ PLUTOVG_API float plutovg_canvas_clip_text(plutovg_canvas_t* canvas, const void*
  * @param line_gap The line gap of the font.
  * @param extents The bounding box of the font.
  */
-PLUTOVG_API void plutovg_canvas_font_metrics(plutovg_canvas_t* canvas, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_canvas_font_metrics(const plutovg_canvas_t* canvas, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents);
 
 /**
  * @brief Retrieves metrics for a specific glyph.

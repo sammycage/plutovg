@@ -666,7 +666,7 @@ float plutovg_canvas_clip_text(plutovg_canvas_t* canvas, const void* text, int l
     return advance_width;
 }
 
-void plutovg_canvas_font_metrics(plutovg_canvas_t* canvas, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents)
+void plutovg_canvas_font_metrics(const plutovg_canvas_t* canvas, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents)
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f) {
