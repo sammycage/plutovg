@@ -130,6 +130,7 @@ void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plu
         int x = plutovg_max(ax1, bx1);
         int len = plutovg_min(ax2, bx2) - x;
         if(len) {
+            plutovg_array_ensure(span_buffer->spans, 1);
             plutovg_span_t* span = span_buffer->spans.data + span_buffer->spans.size;
             span->x = x;
             span->len = len;
