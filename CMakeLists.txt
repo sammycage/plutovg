@@ -23,6 +23,7 @@ set(plutovg_sources
 set(plutovg_headers
     include/plutovg.h
     source/plutovg-private.h
+    source/plutovg-utils.h
     source/plutovg-ft-math.h
     source/plutovg-ft-raster.h
     source/plutovg-ft-stroker.h
