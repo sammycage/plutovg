@@ -43,8 +43,7 @@ typedef struct {
     float dr;
     float sqrfr;
     float a;
-    float inv2a;
-    int extended;
+    bool extended;
 } radial_gradient_values_t;
 
 static inline uint32_t combine_color_with_opacity(const plutovg_color_t* color, float opacity)
@@ -239,6 +238,7 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
 
     float rx = gradient->matrix.c * (y + 0.5f) + gradient->matrix.e + gradient->matrix.a * (x + 0.5f);
     float ry = gradient->matrix.d * (y + 0.5f) + gradient->matrix.f + gradient->matrix.b * (x + 0.5f);
+
     rx -= gradient->values.radial.fx;
     ry -= gradient->values.radial.fy;
 
@@ -476,7 +476,6 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
     v.dr = gradient->values.radial.cr - gradient->values.radial.fr;
     v.sqrfr = gradient->values.radial.fr * gradient->values.radial.fr;
     v.a = v.dr * v.dr - v.dx * v.dx - v.dy * v.dy;
-    v.inv2a = 1.f / (2.f * v.a);
     v.extended = gradient->values.radial.fr != 0.f || v.a <= 0.f;
 
     int count = span_buffer->spans.size;
