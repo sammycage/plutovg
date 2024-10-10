@@ -9,6 +9,7 @@ plutovg_deps = []
 plutovg_compile_args = []
 
 cc = meson.get_compiler('c')
+
 plutovg_c_args = ['-DPLUTOVG_BUILD']
 plutovg_c_args += cc.get_supported_arguments(
     '-Wno-sign-compare',
@@ -50,7 +51,7 @@ plutovg_lib = library('plutovg', plutovg_sources,
 plutovg_dep = declare_dependency(
     link_with: plutovg_lib,
     include_directories: include_directories('include'),
-    compile_args: plutovg_compile_args,
+    compile_args: plutovg_compile_args
 )
 
 meson.override_dependency('plutovg', plutovg_dep)
