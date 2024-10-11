@@ -331,8 +331,8 @@ static PVG_FT_Error ft_stroke_border_lineto(PVG_FT_StrokeBorder border,
         /* move last point */
         border->points[border->num_points - 1] = *to;
     } else {
-        /* don't add zero-length lineto */
-        if (border->num_points > 0 &&
+        /* don't add zero-length lineto, but always add moveto */
+        if (border->num_points > border->start &&
             PVG_FT_IS_SMALL(border->points[border->num_points - 1].x - to->x) &&
             PVG_FT_IS_SMALL(border->points[border->num_points - 1].y - to->y))
             return error;
