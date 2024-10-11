@@ -9,6 +9,11 @@
 #include <float.h>
 #include <math.h>
 
+#define PLUTOVG_IS_NUM(c) ((c) >= '0' && (c) <= '9')
+#define PLUTOVG_IS_ALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
+#define PLUTOVG_IS_ALNUM(c) (PLUTOVG_IS_ALPHA(c) || PLUTOVG_IS_NUM(c))
+#define PLUTOVG_IS_WS(c) ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\r')
+
 #define plutovg_min(a, b) ((a) < (b) ? (a) : (b))
 #define plutovg_max(a, b) ((a) > (b) ? (a) : (b))
 #define plutovg_clamp(v, lo, hi) ((v) < (lo) ? (lo) : (hi) < (v) ? (hi) : (v))
@@ -18,21 +23,6 @@
 #define plutovg_red(c) (((c) >> 16) & 0xff)
 #define plutovg_green(c) (((c) >> 8) & 0xff)
 #define plutovg_blue(c) (((c) >> 0) & 0xff)
-
-static inline uint32_t plutovg_premultiply_argb(uint32_t color)
-{
-    uint32_t a = plutovg_alpha(color);
-    uint32_t r = plutovg_red(color);
-    uint32_t g = plutovg_green(color);
-    uint32_t b = plutovg_blue(color);
-    if(a != 255) {
-        r = (r * a) / 255;
-        g = (g * a) / 255;
-        b = (b * a) / 255;
-    }
-
-    return (a << 24) | (r << 16) | (g << 8) | (b);
-}
 
 #define plutovg_array_init(array) \
     do { \
@@ -63,10 +53,20 @@ static inline uint32_t plutovg_premultiply_argb(uint32_t color)
 #define plutovg_array_clear(array) ((array).size = 0)
 #define plutovg_array_destroy(array) free((array).data)
 
-#define PLUTOVG_IS_NUM(c) ((c) >= '0' && (c) <= '9')
-#define PLUTOVG_IS_ALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
-#define PLUTOVG_IS_ALNUM(c) (PLUTOVG_IS_ALPHA(c) || PLUTOVG_IS_NUM(c))
-#define PLUTOVG_IS_WS(c) ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\r')
+static inline uint32_t plutovg_premultiply_argb(uint32_t color)
+{
+    uint32_t a = plutovg_alpha(color);
+    uint32_t r = plutovg_red(color);
+    uint32_t g = plutovg_green(color);
+    uint32_t b = plutovg_blue(color);
+    if(a != 255) {
+        r = (r * a) / 255;
+        g = (g * a) / 255;
+        b = (b * a) / 255;
+    }
+
+    return (a << 24) | (r << 16) | (g << 8) | (b);
+}
 
 static inline bool plutovg_parse_number(const char** begin, const char* end, float* number)
 {
