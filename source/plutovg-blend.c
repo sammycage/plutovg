@@ -650,8 +650,8 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
         uint32_t* target = (uint32_t*)(surface->data + spans->y * surface->stride) + spans->x;
         const uint32_t* image_bits = (const uint32_t*)texture->data;
 
-        const float cx = spans->x + 0.5;
-        const float cy = spans->y + 0.5;
+        const float cx = spans->x + 0.5f;
+        const float cy = spans->y + 0.5f;
 
         int x = (int)((texture->matrix.c * cy + texture->matrix.a * cx + texture->matrix.e) * FIXED_SCALE);
         int y = (int)((texture->matrix.d * cy + texture->matrix.b * cx + texture->matrix.f) * FIXED_SCALE);
