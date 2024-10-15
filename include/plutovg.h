@@ -1315,10 +1315,18 @@ typedef enum {
  * @brief Defines compositing operations.
  */
 typedef enum {
-    PLUTOVG_OPERATOR_SRC, ///< Source replaces destination.
-    PLUTOVG_OPERATOR_SRC_OVER, ///< Source over destination.
-    PLUTOVG_OPERATOR_DST_IN, ///< Destination within source.
-    PLUTOVG_OPERATOR_DST_OUT ///< Destination outside source.
+    PLUTOVG_OPERATOR_CLEAR,       ///< Clears the destination (resulting in a fully transparent image).
+    PLUTOVG_OPERATOR_SRC,         ///< Source replaces destination.
+    PLUTOVG_OPERATOR_DST,         ///< Destination is kept, source is ignored.
+    PLUTOVG_OPERATOR_SRC_OVER,    ///< Source is composited over destination.
+    PLUTOVG_OPERATOR_DST_OVER,    ///< Destination is composited over source.
+    PLUTOVG_OPERATOR_SRC_IN,      ///< Source within destination (only the overlapping part of source is shown).
+    PLUTOVG_OPERATOR_DST_IN,      ///< Destination within source.
+    PLUTOVG_OPERATOR_SRC_OUT,     ///< Source outside destination (non-overlapping part of source is shown).
+    PLUTOVG_OPERATOR_DST_OUT,     ///< Destination outside source.
+    PLUTOVG_OPERATOR_SRC_ATOP,    ///< Source atop destination (source shown over destination but only in the destination's bounds).
+    PLUTOVG_OPERATOR_DST_ATOP,    ///< Destination atop source (destination shown over source but only in the source's bounds).
+    PLUTOVG_OPERATOR_XOR          ///< Source and destination are combined, but their overlapping regions are cleared.
 } plutovg_operator_t;
 
 /**

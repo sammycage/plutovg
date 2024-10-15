@@ -196,7 +196,7 @@ void plutovg_surface_clear(plutovg_surface_t* surface, const plutovg_color_t* co
     uint32_t pixel = plutovg_premultiply_argb(plutovg_color_to_argb32(color));
     for(int y = 0; y < surface->height; y++) {
         uint32_t* pixels = (uint32_t*)(surface->data + surface->stride * y);
-        plutovg_memfill32(pixels, pixel, surface->width);
+        plutovg_memfill32(pixels, surface->width, pixel);
     }
 }
 
