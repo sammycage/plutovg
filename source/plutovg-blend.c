@@ -919,8 +919,8 @@ static void plutovg_blend_color(plutovg_canvas_t* canvas, const plutovg_color_t*
 {
     plutovg_state_t* state = canvas->state;
     uint32_t solid = premultiply_color_with_opacity(color, state->opacity);
-
     uint32_t alpha = plutovg_alpha(solid);
+
     if(alpha == 255 && state->op == PLUTOVG_OPERATOR_SRC_OVER) {
         blend_solid(canvas->surface, PLUTOVG_OPERATOR_SRC, solid, span_buffer);
     } else {
