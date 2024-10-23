@@ -850,8 +850,11 @@ static void blend_untransformed_tiled_argb(plutovg_surface_t* surface, plutovg_o
             uint32_t* dest = (uint32_t*)(surface->data + spans->y * surface->stride) + x;
             func(dest, l, src, coverage);
             x += l;
+            sx += l;
             length -= l;
-            sx = 0;
+            if(sx >= image_width) {
+                sx = 0;
+            }
         }
 
         ++spans;
