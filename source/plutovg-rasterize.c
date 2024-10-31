@@ -368,8 +368,8 @@ void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t*
         }
     }
 
-    plutovg_span_buffer_reset(span_buffer);
     params.source = outline;
+    plutovg_span_buffer_reset(span_buffer);
     PVG_FT_Raster_Render(&params);
     ft_outline_destroy(outline);
 }
