@@ -46,15 +46,6 @@ typedef struct {
     bool extended;
 } radial_gradient_values_t;
 
-static inline uint32_t combine_color_with_opacity(const plutovg_color_t* color, float opacity)
-{
-    uint32_t a = lroundf(color->a * opacity * 255);
-    uint32_t r = lroundf(color->r * 255);
-    uint32_t g = lroundf(color->g * 255);
-    uint32_t b = lroundf(color->b * 255);
-    return (a << 24) | (r << 16) | (g << 8) | (b);
-}
-
 static inline uint32_t premultiply_color_with_opacity(const plutovg_color_t* color, float opacity)
 {
     uint32_t alpha = lroundf(color->a * opacity * 255);
@@ -951,9 +942,9 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
 
     start = gradient->stops;
     curr = start;
-    curr_color = combine_color_with_opacity(&curr->color, opacity);
+    curr_color = premultiply_color_with_opacity(&curr->color, opacity);
 
-    data.colortable[pos++] = plutovg_premultiply_argb(curr_color);
+    data.colortable[pos++] = curr_color;
     incr = 1.0f / COLOR_TABLE_SIZE;
     fpos = 1.5f * incr;
 
@@ -969,12 +960,12 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
         if(curr->offset == next->offset)
             continue;
         delta = 1.f / (next->offset - curr->offset);
-        next_color = combine_color_with_opacity(&next->color, opacity);
+        next_color = premultiply_color_with_opacity(&next->color, opacity);
         while(fpos < next->offset && pos < COLOR_TABLE_SIZE) {
             t = (fpos - curr->offset) * delta;
             dist = (uint32_t)(255 * t);
             idist = 255 - dist;
-            data.colortable[pos] = plutovg_premultiply_argb(INTERPOLATE_PIXEL(curr_color, idist, next_color, dist));
+            data.colortable[pos] = INTERPOLATE_PIXEL(curr_color, idist, next_color, dist);
             ++pos;
             fpos += incr;
         }
