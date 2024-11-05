@@ -713,6 +713,44 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
     }
 }
 
+static void blend_untransformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
+{
+    composition_function_t func = composition_table[op];
+
+    const int image_width = texture->width;
+    const int image_height = texture->height;
+
+    int xoff = (int)(texture->matrix.e);
+    int yoff = (int)(texture->matrix.f);
+
+    int count = span_buffer->spans.size;
+    const plutovg_span_t* spans = span_buffer->spans.data;
+    while(count--) {
+        int x = spans->x;
+        int length = spans->len;
+        int sx = xoff + x;
+        int sy = yoff + spans->y;
+        if(sy >= 0 && sy < image_height && sx < image_width) {
+            if(sx < 0) {
+                x -= sx;
+                length += sx;
+                sx = 0;
+            }
+
+            if(sx + length > image_width)
+                length = image_width - sx;
+            if(length > 0) {
+                const int coverage = (spans->coverage * texture->const_alpha) >> 8;
+                const uint32_t* src = (const uint32_t*)(texture->data + sy * texture->stride) + sx;
+                uint32_t* dest = (uint32_t*)(surface->data + spans->y * surface->stride) + x;
+                func(dest, length, src, coverage);
+            }
+        }
+
+        ++spans;
+    }
+}
+
 #define FIXED_SCALE (1 << 16)
 static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
 {
@@ -759,44 +797,6 @@ static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_
             func(target, l, buffer, coverage);
             target += l;
             length -= l;
-        }
-
-        ++spans;
-    }
-}
-
-static void blend_untransformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const texture_data_t* texture, const plutovg_span_buffer_t* span_buffer)
-{
-    composition_function_t func = composition_table[op];
-
-    const int image_width = texture->width;
-    const int image_height = texture->height;
-
-    int xoff = (int)(texture->matrix.e);
-    int yoff = (int)(texture->matrix.f);
-
-    int count = span_buffer->spans.size;
-    const plutovg_span_t* spans = span_buffer->spans.data;
-    while(count--) {
-        int x = spans->x;
-        int length = spans->len;
-        int sx = xoff + x;
-        int sy = yoff + spans->y;
-        if(sy >= 0 && sy < image_height && sx < image_width) {
-            if(sx < 0) {
-                x -= sx;
-                length += sx;
-                sx = 0;
-            }
-
-            if(sx + length > image_width)
-                length = image_width - sx;
-            if(length > 0) {
-                const int coverage = (spans->coverage * texture->const_alpha) >> 8;
-                const uint32_t* src = (const uint32_t*)(texture->data + sy * texture->stride) + sx;
-                uint32_t* dest = (uint32_t*)(surface->data + spans->y * surface->stride) + x;
-                func(dest, length, src, coverage);
-            }
         }
 
         ++spans;
@@ -1013,8 +1013,7 @@ static void plutovg_blend_texture(plutovg_canvas_t* canvas, const plutovg_textur
     if(!plutovg_matrix_invert(&data.matrix, &data.matrix))
         return;
     const plutovg_matrix_t* matrix = &data.matrix;
-    bool translating = (matrix->a == 1 && matrix->b == 0 && matrix->c == 0 && matrix->d == 1);
-    if(translating) {
+    if(matrix->a == 1 && matrix->b == 0 && matrix->c == 0 && matrix->d == 1) {
         if(texture->type == PLUTOVG_TEXTURE_TYPE_PLAIN) {
             blend_untransformed_argb(canvas->surface, state->op, &data, span_buffer);
         } else {

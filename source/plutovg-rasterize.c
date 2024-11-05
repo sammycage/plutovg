@@ -317,10 +317,11 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
         break;
     }
 
-    PVG_FT_Outline* outline = ft_outline_convert_dash(path, matrix, &stroke_data->dash);
     PVG_FT_Stroker stroker;
     PVG_FT_Stroker_New(&stroker);
     PVG_FT_Stroker_Set(stroker, ftWidth, ftCap, ftJoin, ftMiterLimit);
+
+    PVG_FT_Outline* outline = ft_outline_convert_dash(path, matrix, &stroke_data->dash);
     PVG_FT_Stroker_ParseOutline(stroker, outline);
 
     PVG_FT_UInt points;
@@ -329,6 +330,7 @@ static PVG_FT_Outline* ft_outline_convert_stroke(const plutovg_path_t* path, con
 
     PVG_FT_Outline* stroke_outline = ft_outline_create(points, contours);
     PVG_FT_Stroker_Export(stroker, stroke_outline);
+
     PVG_FT_Stroker_Done(stroker);
     ft_outline_destroy(outline);
     return stroke_outline;
