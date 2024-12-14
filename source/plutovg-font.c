@@ -234,7 +234,7 @@ int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face)
 
 static float plutovg_font_face_get_scale(const plutovg_font_face_t* face, float size)
 {
-    return stbtt_ScaleForPixelHeight(&face->info, size);
+    return stbtt_ScaleForMappingEmToPixels(&face->info, size);
 }
 
 void plutovg_font_face_get_metrics(const plutovg_font_face_t* face, float size, float* ascent, float* descent, float* line_gap, plutovg_rect_t* extents)
