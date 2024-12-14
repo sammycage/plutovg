@@ -330,9 +330,7 @@ float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas)
 void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const float* dashes, int ndashes)
 {
     plutovg_array_clear(canvas->state->stroke.dash.array);
-    if(dashes && ndashes > 0) {
-        plutovg_array_append_data(canvas->state->stroke.dash.array, dashes, ndashes);
-    }
+    plutovg_array_append_data(canvas->state->stroke.dash.array, dashes, ndashes);
 }
 
 int plutovg_canvas_get_dash_array(const plutovg_canvas_t* canvas, const float** dashes)

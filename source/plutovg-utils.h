@@ -43,9 +43,11 @@
 
 #define plutovg_array_append_data(array, newdata, count) \
     do { \
-        plutovg_array_ensure(array, count); \
-        memcpy((array).data + (array).size, newdata, (count) * sizeof((newdata)[0])); \
-        (array).size += count; \
+        if(newdata && count > 0) { \
+            plutovg_array_ensure(array, count); \
+            memcpy((array).data + (array).size, newdata, (count) * sizeof((newdata)[0])); \
+            (array).size += count; \
+        } \
     } while(0)
 
 #define plutovg_array_append(array, other) plutovg_array_append_data(array, (other).data, (other).size)
