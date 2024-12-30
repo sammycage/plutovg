@@ -1000,9 +1000,9 @@ PLUTOVG_API int plutovg_color_parse(plutovg_color_t* color, const char* data, in
 /**
  * @brief Represents an image surface for drawing operations.
  *
- * The pixel data is stored in a premultiplied 32-bit ARGB format (0xAARRGGBB).
- * The red, green, and blue channels are multiplied by the alpha component divided by 255.
- * Premultiplied ARGB32 is beneficial for faster operations such as alpha blending.
+ * Stores pixel data in a 32-bit premultiplied ARGB format (0xAARRGGBB),
+ * where red, green, and blue channels are multiplied by the alpha channel
+ * and divided by 255.
  */
 typedef struct plutovg_surface plutovg_surface_t;
 
@@ -1155,24 +1155,30 @@ PLUTOVG_API bool plutovg_surface_write_to_png_stream(const plutovg_surface_t* su
 PLUTOVG_API bool plutovg_surface_write_to_jpg_stream(const plutovg_surface_t* surface, plutovg_write_func_t write_func, void* closure, int quality);
 
 /**
- * @brief Converts ARGB Premultiplied to RGBA Plain.
+ * @brief Converts pixel data from premultiplied ARGB to RGBA format.
  *
- * @param dst Destination buffer (can be the same as `src`).
- * @param src Source buffer (ARGB Premultiplied).
+ * Transforms pixel data from native-endian 32-bit ARGB premultiplied format
+ * to a non-premultiplied RGBA byte sequence.
+ *
+ * @param dst Pointer to the destination buffer (can overlap with `src`).
+ * @param src Pointer to the source buffer in ARGB premultiplied format.
  * @param width Image width in pixels.
  * @param height Image height in pixels.
- * @param stride Image stride in bytes.
+ * @param stride Number of bytes per image row in the buffers.
  */
 PLUTOVG_API void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, int width, int height, int stride);
 
 /**
- * @brief Converts RGBA Plain to ARGB Premultiplied.
+ * @brief Converts pixel data from RGBA to premultiplied ARGB format.
  *
- * @param dst Destination buffer (can be the same as `src`).
- * @param src Source buffer (RGBA Plain).
+ * Transforms pixel data from a non-premultiplied RGBA byte sequence
+ * to a native-endian 32-bit ARGB premultiplied format.
+ *
+ * @param dst Pointer to the destination buffer (can overlap with `src`).
+ * @param src Pointer to the source buffer in RGBA format.
  * @param width Image width in pixels.
  * @param height Image height in pixels.
- * @param stride Image stride in bytes.
+ * @param stride Number of bytes per image row in the buffers.
  */
 PLUTOVG_API void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, int width, int height, int stride);
 
