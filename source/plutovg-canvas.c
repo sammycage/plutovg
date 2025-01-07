@@ -34,11 +34,11 @@ static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutov
 
 static void plutovg_state_reset(plutovg_state_t* state)
 {
-    plutovg_paint_destroy(state->paint);
     plutovg_matrix_init_identity(&state->matrix);
     plutovg_stroke_data_reset(&state->stroke);
     plutovg_span_buffer_reset(&state->clip_spans);
     plutovg_font_face_destroy(state->font_face);
+    plutovg_paint_destroy(state->paint);
     state->paint = NULL;
     state->color = PLUTOVG_BLACK_COLOR;
     state->font_face = NULL;

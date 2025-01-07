@@ -344,18 +344,6 @@ static void spans_generation_callback(int count, const PVG_FT_Span* spans, void*
 
 void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t* path, const plutovg_matrix_t* matrix, const plutovg_rect_t* clip_rect, const plutovg_stroke_data_t* stroke_data, plutovg_fill_rule_t winding)
 {
-    PVG_FT_Raster_Params params;
-    params.flags = PVG_FT_RASTER_FLAG_DIRECT | PVG_FT_RASTER_FLAG_AA;
-    params.gray_spans = spans_generation_callback;
-    params.user = span_buffer;
-    if(clip_rect) {
-        params.flags |= PVG_FT_RASTER_FLAG_CLIP;
-        params.clip_box.xMin = (PVG_FT_Pos)clip_rect->x;
-        params.clip_box.yMin = (PVG_FT_Pos)clip_rect->y;
-        params.clip_box.xMax = (PVG_FT_Pos)(clip_rect->x + clip_rect->w);
-        params.clip_box.yMax = (PVG_FT_Pos)(clip_rect->y + clip_rect->h);
-    }
-
     PVG_FT_Outline* outline = ft_outline_convert(path, matrix, stroke_data);
     if(stroke_data) {
         outline->flags = PVG_FT_OUTLINE_NONE;
@@ -370,7 +358,19 @@ void plutovg_rasterize(plutovg_span_buffer_t* span_buffer, const plutovg_path_t*
         }
     }
 
+    PVG_FT_Raster_Params params;
+    params.flags = PVG_FT_RASTER_FLAG_DIRECT | PVG_FT_RASTER_FLAG_AA;
+    params.gray_spans = spans_generation_callback;
+    params.user = span_buffer;
     params.source = outline;
+    if(clip_rect) {
+        params.flags |= PVG_FT_RASTER_FLAG_CLIP;
+        params.clip_box.xMin = (PVG_FT_Pos)clip_rect->x;
+        params.clip_box.yMin = (PVG_FT_Pos)clip_rect->y;
+        params.clip_box.xMax = (PVG_FT_Pos)(clip_rect->x + clip_rect->w);
+        params.clip_box.yMax = (PVG_FT_Pos)(clip_rect->y + clip_rect->h);
+    }
+
     plutovg_span_buffer_reset(span_buffer);
     PVG_FT_Raster_Render(&params);
     ft_outline_destroy(outline);

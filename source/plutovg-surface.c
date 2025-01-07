@@ -251,10 +251,10 @@ void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, 
             uint32_t pixel = src_row[x];
             uint32_t a = (pixel >> 24) & 0xFF;
             if(a == 0) {
-                dst_row[4 * x + 0] = 0;
-                dst_row[4 * x + 1] = 0;
-                dst_row[4 * x + 2] = 0;
-                dst_row[4 * x + 3] = 0;
+                *dst_row++ = 0;
+                *dst_row++ = 0;
+                *dst_row++ = 0;
+                *dst_row++ = 0;
             } else {
                 uint32_t r = (pixel >> 16) & 0xFF;
                 uint32_t g = (pixel >> 8) & 0xFF;
@@ -265,10 +265,10 @@ void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, 
                     b = (b * 255) / a;
                 }
 
-                dst_row[4 * x + 0] = r;
-                dst_row[4 * x + 1] = g;
-                dst_row[4 * x + 2] = b;
-                dst_row[4 * x + 3] = a;
+                *dst_row++ = r;
+                *dst_row++ = g;
+                *dst_row++ = b;
+                *dst_row++ = a;
             }
         }
     }
