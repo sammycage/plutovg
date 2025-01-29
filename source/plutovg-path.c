@@ -742,7 +742,7 @@ static inline bool parse_arc_flag(const char** begin, const char* end, bool* fla
         *flag = 1;
     else
         return false;
-    plutovg_skip_ws_or_comma(begin, end);
+    plutovg_skip_ws_or_comma(begin, end, NULL);
     return true;
 }
 
@@ -751,7 +751,7 @@ static inline bool parse_path_coordinates(const char** begin, const char* end, f
     for(int i = 0; i < count; i++) {
         if(!plutovg_parse_number(begin, end, values + offset + i))
             return false;
-        plutovg_skip_ws_or_comma(begin, end);
+        plutovg_skip_ws_or_comma(begin, end, NULL);
     }
 
     return true;
@@ -928,7 +928,6 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             return false;
         }
 
-        plutovg_skip_ws_or_comma(&it, end);
         last_command = command;
     }
 

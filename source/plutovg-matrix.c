@@ -150,14 +150,18 @@ static int parse_matrix_parameters(const char** begin, const char* end, float va
         return 0;
     int count = 0;
     int max_count = required + optional;
+    bool has_trailing_comma = false;
     for(; count < max_count; ++count) {
         if(!plutovg_parse_number(begin, end, values + count))
             break;
-        plutovg_skip_ws_or_comma(begin, end);
+        plutovg_skip_ws_or_comma(begin, end, &has_trailing_comma);
     }
 
-    if((count == required || count == max_count) && plutovg_skip_delim(begin, end, ')'))
+    if(!has_trailing_comma && (count == required || count == max_count)
+        && plutovg_skip_delim(begin, end, ')')) {
         return count;
+    }
+
     return 0;
 }
 
@@ -169,6 +173,7 @@ bool plutovg_matrix_parse(plutovg_matrix_t* matrix, const char* data, int length
         length = strlen(data);
     const char* it = data;
     const char* end = it + length;
+    bool has_trailing_comma = false;
     plutovg_skip_ws(&it, end);
     while(it < end) {
         if(plutovg_skip_string(&it, end, "matrix")) {
@@ -219,8 +224,8 @@ bool plutovg_matrix_parse(plutovg_matrix_t* matrix, const char* data, int length
             return false;
         }
 
-        plutovg_skip_ws_or_comma(&it, end);
+        plutovg_skip_ws_or_comma(&it, end, &has_trailing_comma);
     }
 
-    return true;
+    return !has_trailing_comma;
 }
