@@ -146,14 +146,11 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
         return;
     }
 
-    if(rx < 0) rx = -rx;
-    if(ry < 0) ry = -ry;
+    if(rx < 0.f) rx = -rx;
+    if(ry < 0.f) ry = -ry;
 
-    float dx = current_x - x;
-    float dy = current_y - y;
-
-    dx *= 0.5f;
-    dy *= 0.5f;
+    float dx = (current_x - x) * 0.5f;
+    float dy = (current_y - y) * 0.5f;
 
     plutovg_matrix_t matrix;
     plutovg_matrix_init_rotate(&matrix, -angle);
@@ -180,8 +177,8 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
     float dx1 = x2 - x1;
     float dy1 = y2 - y1;
     float d = dx1 * dx1 + dy1 * dy1;
-    float scale_sq = 1 / d - 0.25f;
-    if(scale_sq < 0) scale_sq = 0;
+    float scale_sq = 1.f / d - 0.25f;
+    if(scale_sq < 0.f) scale_sq = 0.f;
     float scale = sqrtf(scale_sq);
     if(sweep_flag == large_arc_flag)
         scale = -scale;
@@ -194,9 +191,9 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
     float th1 = atan2f(y1 - cy1, x1 - cx1);
     float th2 = atan2f(y2 - cy1, x2 - cx1);
     float th_arc = th2 - th1;
-    if(th_arc < 0 && sweep_flag)
+    if(th_arc < 0.f && sweep_flag)
         th_arc += PLUTOVG_TWO_PI;
-    else if(th_arc > 0 && !sweep_flag)
+    else if(th_arc > 0.f && !sweep_flag)
         th_arc -= PLUTOVG_TWO_PI;
     plutovg_matrix_init_rotate(&matrix, angle);
     plutovg_matrix_scale(&matrix, rx, ry);
@@ -772,10 +769,10 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
 
     float start_x = 0;
     float start_y = 0;
-    float last_control_x = 0;
-    float last_control_y = 0;
     float current_x = 0;
     float current_y = 0;
+    float last_control_x = 0;
+    float last_control_y = 0;
 
     char command = 0;
     char last_command = 0;
