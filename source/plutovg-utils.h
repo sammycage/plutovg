@@ -176,6 +176,8 @@ static inline bool plutovg_skip_ws_and_delim(const char** begin, const char* end
         if(!plutovg_skip_delim(&it, end, delim))
             return false;
         plutovg_skip_ws(&it, end);
+    } else {
+        return false;
     }
 
     *begin = it;
