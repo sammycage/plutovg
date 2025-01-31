@@ -106,13 +106,13 @@ typedef struct {
 
 typedef struct plutovg_state {
     plutovg_paint_t* paint;
+    plutovg_font_face_t* font_face;
     plutovg_color_t color;
     plutovg_matrix_t matrix;
     plutovg_stroke_data_t stroke;
-    plutovg_operator_t op;
-    plutovg_fill_rule_t winding;
     plutovg_span_buffer_t clip_spans;
-    plutovg_font_face_t* font_face;
+    plutovg_fill_rule_t winding;
+    plutovg_operator_t op;
     float font_size;
     float opacity;
     bool clipping;

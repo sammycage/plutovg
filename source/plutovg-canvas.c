@@ -11,70 +11,68 @@ const char* plutovg_version_string(void)
     return PLUTOVG_VERSION_STRING;
 }
 
-static void plutovg_stroke_data_reset(plutovg_stroke_data_t* stroke)
+#define PLUTOVG_DEFAULT_STROKE_STYLE ((plutovg_stroke_style_t){1.f, PLUTOVG_LINE_CAP_BUTT, PLUTOVG_LINE_JOIN_MITER, 10.f})
+static plutovg_state_t* plutovg_state_create(void)
 {
-    plutovg_array_clear(stroke->dash.array);
-    stroke->dash.offset = 0.f;
-    stroke->style.width = 1.f;
-    stroke->style.cap = PLUTOVG_LINE_CAP_BUTT;
-    stroke->style.join = PLUTOVG_LINE_JOIN_MITER;
-    stroke->style.miter_limit = 10.f;
-}
-
-static void plutovg_stroke_data_copy(plutovg_stroke_data_t* stroke, const plutovg_stroke_data_t* source)
-{
-    plutovg_array_clear(stroke->dash.array);
-    plutovg_array_append(stroke->dash.array, source->dash.array);
-    stroke->dash.offset = source->dash.offset;
-    stroke->style.width = source->style.width;
-    stroke->style.cap = source->style.cap;
-    stroke->style.join = source->style.join;
-    stroke->style.miter_limit = source->style.miter_limit;
+    plutovg_state_t* state = malloc(sizeof(plutovg_state_t));
+    state->paint = NULL;
+    state->font_face = NULL;
+    state->color = PLUTOVG_BLACK_COLOR;
+    state->matrix = PLUTOVG_IDENTITY_MATRIX;
+    state->stroke.style = PLUTOVG_DEFAULT_STROKE_STYLE;
+    state->stroke.dash.offset = 0.f;
+    plutovg_array_init(state->stroke.dash.array);
+    plutovg_span_buffer_init(&state->clip_spans);
+    state->winding = PLUTOVG_FILL_RULE_NON_ZERO;
+    state->op = PLUTOVG_OPERATOR_SRC_OVER;
+    state->font_size = 12.f;
+    state->opacity = 1.f;
+    state->clipping = false;
+    state->next = NULL;
+    return state;
 }
 
 static void plutovg_state_reset(plutovg_state_t* state)
 {
-    plutovg_matrix_init_identity(&state->matrix);
-    plutovg_stroke_data_reset(&state->stroke);
-    plutovg_span_buffer_reset(&state->clip_spans);
-    plutovg_font_face_destroy(state->font_face);
     plutovg_paint_destroy(state->paint);
+    plutovg_font_face_destroy(state->font_face);
     state->paint = NULL;
-    state->color = PLUTOVG_BLACK_COLOR;
     state->font_face = NULL;
-    state->font_size = 12.f;
-    state->op = PLUTOVG_OPERATOR_SRC_OVER;
+    state->color = PLUTOVG_BLACK_COLOR;
+    state->matrix = PLUTOVG_IDENTITY_MATRIX;
+    state->stroke.style = PLUTOVG_DEFAULT_STROKE_STYLE;
+    state->stroke.dash.offset = 0.f;
+    plutovg_array_clear(state->stroke.dash.array);
+    plutovg_span_buffer_reset(&state->clip_spans);
     state->winding = PLUTOVG_FILL_RULE_NON_ZERO;
-    state->clipping = false;
+    state->op = PLUTOVG_OPERATOR_SRC_OVER;
+    state->font_size = 12.f;
     state->opacity = 1.f;
+    state->clipping = false;
 }
 
 static void plutovg_state_copy(plutovg_state_t* state, const plutovg_state_t* source)
 {
-    plutovg_stroke_data_copy(&state->stroke, &source->stroke);
-    plutovg_span_buffer_copy(&state->clip_spans, &source->clip_spans);
     state->paint = plutovg_paint_reference(source->paint);
     state->font_face = plutovg_font_face_reference(source->font_face);
     state->color = source->color;
     state->matrix = source->matrix;
-    state->font_size = source->font_size;
-    state->op = source->op;
+    state->stroke.style = source->stroke.style;
+    state->stroke.dash.offset = source->stroke.dash.offset;
+    plutovg_array_clear(state->stroke.dash.array);
+    plutovg_array_append(state->stroke.dash.array, source->stroke.dash.array);
+    plutovg_span_buffer_copy(&state->clip_spans, &source->clip_spans);
     state->winding = source->winding;
-    state->clipping = source->clipping;
+    state->op = source->op;
+    state->font_size = source->font_size;
     state->opacity = source->opacity;
-}
-
-static plutovg_state_t* plutovg_state_create(void)
-{
-    plutovg_state_t* state = malloc(sizeof(plutovg_state_t));
-    memset(state, 0, sizeof(plutovg_state_t));
-    plutovg_state_reset(state);
-    return state;
+    state->clipping = source->clipping;
 }
 
 static void plutovg_state_destroy(plutovg_state_t* state)
 {
     plutovg_paint_destroy(state->paint);
+    plutovg_font_face_destroy(state->font_face);
     plutovg_array_destroy(state->stroke.dash.array);
     plutovg_span_buffer_destroy(&state->clip_spans);
     free(state);
