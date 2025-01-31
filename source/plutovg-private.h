@@ -13,9 +13,9 @@ struct plutovg_surface {
 
 struct plutovg_path {
     int ref_count;
-    int num_curves;
-    int num_contours;
     int num_points;
+    int num_contours;
+    int num_curves;
     plutovg_point_t start_point;
     struct {
         plutovg_path_element_t* data;
