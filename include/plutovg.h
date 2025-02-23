@@ -969,6 +969,27 @@ PLUTOVG_API void plutovg_color_init_rgba32(plutovg_color_t* color, unsigned int 
 PLUTOVG_API void plutovg_color_init_argb32(plutovg_color_t* color, unsigned int value);
 
 /**
+ * @brief Initializes a color with the specified HSL color values.
+ *
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param h Hue component in degrees (0 to 360).
+ * @param s Saturation component (0 to 1).
+ * @param l Lightness component (0 to 1).
+ */
+PLUTOVG_API void plutovg_color_init_hsl(plutovg_color_t* color, float h, float s, float l);
+
+/**
+ * @brief Initializes a color with the specified HSLA color values.
+ *
+ * @param color A pointer to a `plutovg_color_t` object.
+ * @param h Hue component in degrees (0 to 360).
+ * @param s Saturation component (0 to 1).
+ * @param l Lightness component (0 to 1).
+ * @param a Alpha component (0 to 1).
+ */
+PLUTOVG_API void plutovg_color_init_hsla(plutovg_color_t* color, float h, float s, float l, float a);
+
+/**
  * @brief Converts a color to a 32-bit unsigned RGBA value.
  * 
  * @param color A pointer to a `plutovg_color_t` object.

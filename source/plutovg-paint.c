@@ -44,6 +44,29 @@ void plutovg_color_init_argb32(plutovg_color_t* color, unsigned int value)
     plutovg_color_init_rgba8(color, r, g, b, a);
 }
 
+void plutovg_color_init_hsl(plutovg_color_t* color, float h, float s, float l)
+{
+    plutovg_color_init_hsla(color, h, s, l, 1.f);
+}
+
+static inline float hsl_component(float h, float s, float l, float n)
+{
+    const float k = fmodf(n + h / 30.f, 12.f);
+    const float a = s * plutovg_min(l, 1.f - l);
+    return l - a * plutovg_max(-1.f, plutovg_min(1.f, plutovg_min(k - 3.f, 9.f - k)));
+}
+
+void plutovg_color_init_hsla(plutovg_color_t* color, float h, float s, float l, float a)
+{
+    h = fmodf(h, 360.f);
+    if(h < 0.f) { h += 360.f; }
+
+    float r = hsl_component(h, s, l, 0);
+    float g = hsl_component(h, s, l, 8);
+    float b = hsl_component(h, s, l, 4);
+    plutovg_color_init_rgba(color, r, g, b, a);
+}
+
 unsigned int plutovg_color_to_rgba32(const plutovg_color_t* color)
 {
     uint32_t r = lroundf(color->r * 255);
