@@ -382,10 +382,10 @@ void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, c
 {
     if(matrix == NULL) {
         plutovg_array_append(path->elements, source->elements);
-        path->num_curves += source->num_curves;
-        path->num_contours += source->num_contours;
-        path->num_points += source->num_points;
         path->start_point = source->start_point;
+        path->num_points += source->num_points;
+        path->num_contours += source->num_contours;
+        path->num_curves += source->num_curves;
         return;
     }
 
@@ -622,8 +622,8 @@ plutovg_path_t* plutovg_path_clone(const plutovg_path_t* path)
     plutovg_path_t* clone = plutovg_path_create();
     plutovg_array_append(clone->elements, path->elements);
     clone->start_point = path->start_point;
-    clone->num_contours = path->num_contours;
     clone->num_points = path->num_points;
+    clone->num_contours = path->num_contours;
     clone->num_curves = path->num_curves;
     return clone;
 }

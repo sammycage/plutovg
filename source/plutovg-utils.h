@@ -54,11 +54,6 @@
 #define plutovg_array_clear(array) ((array).size = 0)
 #define plutovg_array_destroy(array) free((array).data)
 
-static inline uint32_t plutovg_div255(uint32_t x)
-{
-    return (((x) + ((x) >> 8) + 0x80) >> 8);
-}
-
 static inline uint32_t plutovg_premultiply_argb(uint32_t color)
 {
     uint32_t a = plutovg_alpha(color);
@@ -66,9 +61,9 @@ static inline uint32_t plutovg_premultiply_argb(uint32_t color)
     uint32_t g = plutovg_green(color);
     uint32_t b = plutovg_blue(color);
     if(a != 255) {
-        r = plutovg_div255(r * a);
-        g = plutovg_div255(g * a);
-        b = plutovg_div255(b * a);
+        r = (r * a) / 255;
+        g = (g * a) / 255;
+        b = (b * a) / 255;
     }
 
     return (a << 24) | (r << 16) | (g << 8) | (b);
@@ -77,8 +72,8 @@ static inline uint32_t plutovg_premultiply_argb(uint32_t color)
 static inline bool plutovg_parse_number(const char** begin, const char* end, float* number)
 {
     const char* it = *begin;
-    float fraction = 0;
     float integer = 0;
+    float fraction = 0;
     float exponent = 0;
     int sign = 1;
     int expsign = 1;

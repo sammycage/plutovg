@@ -135,7 +135,7 @@ void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plu
             span->x = x;
             span->len = len;
             span->y = a_spans->y;
-            span->coverage = plutovg_div255(a_spans->coverage * b_spans->coverage);
+            span->coverage = (a_spans->coverage * b_spans->coverage) / 255;
             span_buffer->spans.size += 1;
         }
 

@@ -12,6 +12,7 @@ const char* plutovg_version_string(void)
 }
 
 #define PLUTOVG_DEFAULT_STROKE_STYLE ((plutovg_stroke_style_t){1.f, PLUTOVG_LINE_CAP_BUTT, PLUTOVG_LINE_JOIN_MITER, 10.f})
+
 static plutovg_state_t* plutovg_state_create(void)
 {
     plutovg_state_t* state = malloc(sizeof(plutovg_state_t));
