@@ -122,27 +122,25 @@ static int color_entry_compare(const void* a, const void* b)
     return strcmp(name, entry->name);
 }
 
-static bool parse_rgb_component(const char** begin, const char* end, int* component)
+static bool parse_rgb_component(const char** begin, const char* end, float* component)
 {
     float value = 0;
     if(!plutovg_parse_number(begin, end, &value))
         return false;
     if(plutovg_skip_delim(begin, end, '%'))
         value *= 2.55f;
-    value = plutovg_clamp(value, 0.f, 255.f);
-    *component = lroundf(value);
+    *component = plutovg_clamp(value, 0.f, 255.f) / 255.f;
     return true;
 }
 
-static bool parse_alpha_component(const char** begin, const char* end, int* component)
+static bool parse_alpha_component(const char** begin, const char* end, float* component)
 {
     float value = 0;
     if(!plutovg_parse_number(begin, end, &value))
         return false;
     if(plutovg_skip_delim(begin, end, '%'))
         value /= 100.f;
-    value = plutovg_clamp(value, 0.f, 1.f);
-    *component = lroundf(value * 255.f);
+    *component = plutovg_clamp(value, 0.f, 1.f);
     return true;
 }
 
@@ -190,7 +188,7 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
         } else if(strcmp(name, "rgb") == 0 || strcmp(name, "rgba") == 0) {
             if(!plutovg_skip_ws_and_delim(&it, end, '('))
                 return 0;
-            int r, g, b, a = 255;
+            float r, g, b, a = 1.f;
             if(!parse_rgb_component(&it, end, &r)
                 || !plutovg_skip_ws_and_comma(&it, end)
                 || !parse_rgb_component(&it, end, &g)
@@ -207,7 +205,28 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
             plutovg_skip_ws(&it, end);
             if(!plutovg_skip_delim(&it, end, ')'))
                 return 0;
-            plutovg_color_init_rgba8(color, r, g, b, a);
+            plutovg_color_init_rgba(color, r, g, b, a);
+        } else if(strcmp(name, "hsl") == 0 || strcmp(name, "hsla") == 0) {
+            if(!plutovg_skip_ws_and_delim(&it, end, '('))
+                return 0;
+            float h, s, l, a = 1.f;
+            if(!plutovg_parse_number(&it, end, &h)
+                || !plutovg_skip_ws_and_comma(&it, end)
+                || !parse_alpha_component(&it, end, &s)
+                || !plutovg_skip_ws_and_comma(&it, end)
+                || !parse_alpha_component(&it, end, &l)) {
+                return 0;
+            }
+
+            if(plutovg_skip_ws_and_comma(&it, end)
+                && !parse_alpha_component(&it, end, &a)) {
+                return 0;
+            }
+
+            plutovg_skip_ws(&it, end);
+            if(!plutovg_skip_delim(&it, end, ')'))
+                return 0;
+            plutovg_color_init_hsla(color, h, s, l, a);
         } else {
             static const color_entry_t colormap[] = {
                 {"aliceblue", 0xF0F8FF},
