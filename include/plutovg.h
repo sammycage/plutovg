@@ -1435,6 +1435,8 @@ PLUTOVG_API void plutovg_canvas_restore(plutovg_canvas_t* canvas);
 /**
  * @brief Sets the current paint to a solid color.
  *
+ * If not set, the default paint is opaque black color.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param r The red component (0 to 1).
  * @param g The green component (0 to 1).
@@ -1444,6 +1446,8 @@ PLUTOVG_API void plutovg_canvas_set_rgb(plutovg_canvas_t* canvas, float r, float
 
 /**
  * @brief Sets the current paint to a solid color.
+ *
+ * If not set, the default paint is opaque black color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param r The red component (0 to 1).
@@ -1456,6 +1460,8 @@ PLUTOVG_API void plutovg_canvas_set_rgba(plutovg_canvas_t* canvas, float r, floa
 /**
  * @brief Sets the current paint to a solid color.
  *
+ * If not set, the default paint is opaque black color.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param color A pointer to a `plutovg_color_t` object.
  */
@@ -1463,6 +1469,8 @@ PLUTOVG_API void plutovg_canvas_set_color(plutovg_canvas_t* canvas, const plutov
 
 /**
  * @brief Sets the current paint to a linear gradient.
+ *
+ * If not set, the default paint is opaque black color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param x1 The x coordinate of the start point.
@@ -1479,6 +1487,8 @@ PLUTOVG_API void plutovg_canvas_set_linear_gradient(plutovg_canvas_t* canvas, fl
 
 /**
  * @brief Sets the current paint to a radial gradient.
+ *
+ * If not set, the default paint is opaque black color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param cx The x coordinate of the center.
@@ -1498,6 +1508,8 @@ PLUTOVG_API void plutovg_canvas_set_radial_gradient(plutovg_canvas_t* canvas, fl
 /**
  * @brief Sets the current paint to a texture.
  *
+ * If not set, the default paint is opaque black color.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param surface The texture surface.
  * @param type The texture type (plain or tiled).
@@ -1509,6 +1521,8 @@ PLUTOVG_API void plutovg_canvas_set_texture(plutovg_canvas_t* canvas, plutovg_su
 /**
  * @brief Sets the current paint.
  *
+ * If not set, the default paint is opaque black color.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param paint The paint to be used for subsequent drawing operations.
  */
@@ -1516,6 +1530,8 @@ PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_pain
 
 /**
  * @brief Retrieves the current paint.
+ *
+ * If not set, the default paint is opaque black color.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param color A pointer to a `plutovg_color_t` object where the current color will be stored.
@@ -1526,6 +1542,8 @@ PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* ca
 /**
  * @brief Sets the font face and size for text rendering on the canvas.
  *
+ * If not set, the default font face is `NULL`, and the default face size is 12.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param face A pointer to a `plutovg_font_face_t` object representing the font face to use.
  * @param size The size of the font, in pixels. This determines the height of the rendered text.
@@ -1535,6 +1553,8 @@ PLUTOVG_API void plutovg_canvas_set_font(plutovg_canvas_t* canvas, plutovg_font_
 /**
  * @brief Sets the font face for text rendering on the canvas.
  *
+ * If not set, the default font face is `NULL`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param face A pointer to a `plutovg_font_face_t` object representing the font face to use.
  */
@@ -1542,6 +1562,8 @@ PLUTOVG_API void plutovg_canvas_set_font_face(plutovg_canvas_t* canvas, plutovg_
 
 /**
  * @brief Retrieves the current font face used for text rendering on the canvas.
+ *
+ * If not set, the default font face is `NULL`.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return A pointer to a `plutovg_font_face_t` object representing the current font face.
@@ -1551,6 +1573,8 @@ PLUTOVG_API plutovg_font_face_t* plutovg_canvas_get_font_face(const plutovg_canv
 /**
  * @brief Sets the font size for text rendering on the canvas.
  *
+ * If not set, the default font size is 12.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param size The size of the font, in pixels. This value defines the height of the rendered text.
  */
@@ -1559,6 +1583,8 @@ PLUTOVG_API void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float si
 /**
  * @brief Retrieves the current font size used for text rendering on the canvas.
  *
+ * If not set, the default font size is 12.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current font size, in pixels. This value represents the height of the rendered text.
  */
@@ -1566,6 +1592,9 @@ PLUTOVG_API float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas);
 
 /**
  * @brief Sets the fill rule.
+ *
+ * If not set, the default fill rule is `PLUTOVG_FILL_RULE_NON_ZERO`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param winding The fill rule.
  */
@@ -1573,6 +1602,9 @@ PLUTOVG_API void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_
 
 /**
  * @brief Retrieves the current fill rule.
+ *
+ * If not set, the default fill rule is `PLUTOVG_FILL_RULE_NON_ZERO`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current fill rule.
  */
@@ -1580,6 +1612,9 @@ PLUTOVG_API plutovg_fill_rule_t plutovg_canvas_get_fill_rule(const plutovg_canva
 
 /**
  * @brief Sets the compositing operator.
+ *
+ * If not set, the default compositing operator is `PLUTOVG_OPERATOR_SRC_OVER`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param op The compositing operator.
  */
@@ -1587,6 +1622,9 @@ PLUTOVG_API void plutovg_canvas_set_operator(plutovg_canvas_t* canvas, plutovg_o
 
 /**
  * @brief Retrieves the current compositing operator.
+ *
+ * If not set, the default compositing operator is `PLUTOVG_OPERATOR_SRC_OVER`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current compositing operator.
  */
@@ -1594,6 +1632,9 @@ PLUTOVG_API plutovg_operator_t plutovg_canvas_get_operator(const plutovg_canvas_
 
 /**
  * @brief Sets the global opacity.
+ *
+ * If not set, the default global opacity is 1.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param opacity The opacity value (0 to 1).
  */
@@ -1601,6 +1642,9 @@ PLUTOVG_API void plutovg_canvas_set_opacity(plutovg_canvas_t* canvas, float opac
 
 /**
  * @brief Retrieves the current global opacity.
+ *
+ * If not set, the default global opacity is 1.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current opacity value.
  */
@@ -1608,6 +1652,9 @@ PLUTOVG_API float plutovg_canvas_get_opacity(const plutovg_canvas_t* canvas);
 
 /**
  * @brief Sets the line width.
+ *
+ * If not set, the default line width is 1.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param line_width The width of the stroke.
  */
@@ -1615,6 +1662,9 @@ PLUTOVG_API void plutovg_canvas_set_line_width(plutovg_canvas_t* canvas, float l
 
 /**
  * @brief Retrieves the current line width.
+ *
+ * If not set, the default line width is 1.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current line width.
  */
@@ -1622,6 +1672,9 @@ PLUTOVG_API float plutovg_canvas_get_line_width(const plutovg_canvas_t* canvas);
 
 /**
  * @brief Sets the line cap style.
+ *
+ * If not set, the default line cap is `PLUTOVG_LINE_CAP_BUTT`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param line_cap The line cap style.
  */
@@ -1629,6 +1682,9 @@ PLUTOVG_API void plutovg_canvas_set_line_cap(plutovg_canvas_t* canvas, plutovg_l
 
 /**
  * @brief Retrieves the current line cap style.
+ *
+ * If not set, the default line cap is `PLUTOVG_LINE_CAP_BUTT`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current line cap style.
  */
@@ -1636,6 +1692,9 @@ PLUTOVG_API plutovg_line_cap_t plutovg_canvas_get_line_cap(const plutovg_canvas_
 
 /**
  * @brief Sets the line join style.
+ *
+ * If not set, the default line join is `PLUTOVG_LINE_JOIN_MITER`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param line_join The line join style.
  */
@@ -1643,6 +1702,9 @@ PLUTOVG_API void plutovg_canvas_set_line_join(plutovg_canvas_t* canvas, plutovg_
 
 /**
  * @brief Retrieves the current line join style.
+ *
+ * If not set, the default line join is `PLUTOVG_LINE_JOIN_MITER`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current line join style.
  */
@@ -1650,6 +1712,9 @@ PLUTOVG_API plutovg_line_join_t plutovg_canvas_get_line_join(const plutovg_canva
 
 /**
  * @brief Sets the miter limit.
+ *
+ * If not set, the default miter limit is 10.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param miter_limit The miter limit value.
  */
@@ -1657,6 +1722,9 @@ PLUTOVG_API void plutovg_canvas_set_miter_limit(plutovg_canvas_t* canvas, float 
 
 /**
  * @brief Retrieves the current miter limit.
+ *
+ * If not set, the default miter limit is 10.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current miter limit value.
  */
@@ -1664,6 +1732,9 @@ PLUTOVG_API float plutovg_canvas_get_miter_limit(const plutovg_canvas_t* canvas)
 
 /**
  * @brief Sets the dash pattern.
+ *
+ * If not set, the default dash offset is 0, and the default dash array is `NULL`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param offset The dash offset.
  * @param dashes Array of dash lengths.
@@ -1673,6 +1744,9 @@ PLUTOVG_API void plutovg_canvas_set_dash(plutovg_canvas_t* canvas, float offset,
 
 /**
  * @brief Sets the dash offset.
+ *
+ * If not set, the default dash offset is 0.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param offset The dash offset.
  */
@@ -1680,6 +1754,9 @@ PLUTOVG_API void plutovg_canvas_set_dash_offset(plutovg_canvas_t* canvas, float 
 
 /**
  * @brief Retrieves the current dash offset.
+ *
+ * If not set, the default dash offset is 0.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @return The current dash offset.
  */
@@ -1687,6 +1764,9 @@ PLUTOVG_API float plutovg_canvas_get_dash_offset(const plutovg_canvas_t* canvas)
 
 /**
  * @brief Sets the dash pattern.
+ *
+ * If not set, the default dash array is `NULL`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param dashes Array of dash lengths.
  * @param ndashes Number of dash lengths.
@@ -1695,6 +1775,9 @@ PLUTOVG_API void plutovg_canvas_set_dash_array(plutovg_canvas_t* canvas, const f
 
 /**
  * @brief Retrieves the current dash pattern.
+ *
+ * If not set, the default dash array is `NULL`.
+ *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
  * @param dashes Pointer to store the dash array.
  * @return The number of dash lengths.
