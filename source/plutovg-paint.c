@@ -96,22 +96,16 @@ static inline uint8_t hex_digit(uint8_t c)
     return 0;
 }
 
-static inline uint8_t hex_expand(uint8_t c)
-{
-    uint8_t h = hex_digit(c);
-    return (h << 4) | h;
-}
-
-static inline uint8_t hex_combine(uint8_t c1, uint8_t c2)
+static inline uint8_t hex_byte(uint8_t c1, uint8_t c2)
 {
     uint8_t h1 = hex_digit(c1);
     uint8_t h2 = hex_digit(c2);
     return (h1 << 4) | h2;
 }
 
-#define MAX_NAME 24
+#define MAX_NAME 20
 typedef struct {
-    char name[MAX_NAME];
+    const char* name;
     uint32_t value;
 } color_entry_t;
 
@@ -158,18 +152,18 @@ int plutovg_color_parse(plutovg_color_t* color, const char* data, int length)
             ++it;
         int count = it - begin;
         if(count == 3 || count == 4) {
-            r = hex_expand(begin[0]);
-            g = hex_expand(begin[1]);
-            b = hex_expand(begin[2]);
+            r = hex_byte(begin[0], begin[0]);
+            g = hex_byte(begin[1], begin[1]);
+            b = hex_byte(begin[2], begin[2]);
             if(count == 4) {
-                a = hex_expand(begin[3]);
+                a = hex_byte(begin[3], begin[3]);
             }
         } else if(count == 6 || count == 8) {
-            r = hex_combine(begin[0], begin[1]);
-            g = hex_combine(begin[2], begin[3]);
-            b = hex_combine(begin[4], begin[5]);
+            r = hex_byte(begin[0], begin[1]);
+            g = hex_byte(begin[2], begin[3]);
+            b = hex_byte(begin[4], begin[5]);
             if(count == 8) {
-                a = hex_combine(begin[6], begin[7]);
+                a = hex_byte(begin[6], begin[7]);
             }
         } else {
             return 0;
