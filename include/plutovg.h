@@ -1129,9 +1129,10 @@ PLUTOVG_API int plutovg_surface_get_height(const plutovg_surface_t* surface);
 PLUTOVG_API int plutovg_surface_get_stride(const plutovg_surface_t* surface);
 
 /**
- * @brief plutovg_surface_clear
- * @param surface
- * @param color
+ * @brief Clears the entire surface with the specified color.
+ *
+ * @param surface Pointer to the target surface.
+ * @param color Pointer to the color used for clearing.
  */
 PLUTOVG_API void plutovg_surface_clear(plutovg_surface_t* surface, const plutovg_color_t* color);
 
