@@ -101,6 +101,7 @@ typedef struct plutovg_point {
 } plutovg_point_t;
 
 #define PLUTOVG_MAKE_POINT(x, y) ((plutovg_point_t){x, y})
+#define PLUTOVG_EMPTY_POINT PLUTOVG_MAKE_POINT(0, 0)
 
 /**
  * @brief A structure representing a rectangle in 2D space.
@@ -113,6 +114,7 @@ typedef struct plutovg_rect {
 } plutovg_rect_t;
 
 #define PLUTOVG_MAKE_RECT(x, y, w, h) ((plutovg_rect_t){x, y, w, h})
+#define PLUTOVG_EMPTY_RECT PLUTOVG_MAKE_RECT(0, 0, 0, 0)
 
 /**
  * @brief A structure representing a 2D transformation matrix.
@@ -127,7 +129,6 @@ typedef struct plutovg_matrix {
 } plutovg_matrix_t;
 
 #define PLUTOVG_MAKE_MATRIX(a, b, c, d, e, f) ((plutovg_matrix_t){a, b, c, d, e, f})
-
 #define PLUTOVG_MAKE_SCALE(x, y) PLUTOVG_MAKE_MATRIX(x, 0, 0, y, 0, 0)
 #define PLUTOVG_MAKE_TRANSLATE(x, y) PLUTOVG_MAKE_MATRIX(1, 0, 0, 1, x, y)
 #define PLUTOVG_IDENTITY_MATRIX PLUTOVG_MAKE_MATRIX(1, 0, 0, 1, 0, 0)

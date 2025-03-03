@@ -42,7 +42,7 @@ plutovg_path_t* plutovg_path_create(void)
     path->num_points = 0;
     path->num_contours = 0;
     path->num_curves = 0;
-    path->start_point = PLUTOVG_MAKE_POINT(0, 0);
+    path->start_point = PLUTOVG_EMPTY_POINT;
     plutovg_array_init(path->elements);
     return path;
 }
@@ -244,7 +244,7 @@ void plutovg_path_reserve(plutovg_path_t* path, int count)
 void plutovg_path_reset(plutovg_path_t* path)
 {
     plutovg_array_clear(path->elements);
-    path->start_point = PLUTOVG_MAKE_POINT(0, 0);
+    path->start_point = PLUTOVG_EMPTY_POINT;
     path->num_points = 0;
     path->num_contours = 0;
     path->num_curves = 0;
@@ -611,7 +611,7 @@ void plutovg_path_traverse_dashed(const plutovg_path_t* path, float offset, cons
     dasher.phase = dasher.start_phase;
     dasher.index = dasher.start_index;
     dasher.toggle = dasher.start_toggle;
-    dasher.current_point = PLUTOVG_MAKE_POINT(0, 0);
+    dasher.current_point = PLUTOVG_EMPTY_POINT;
     dasher.traverse_func = traverse_func;
     dasher.closure = closure;
     plutovg_path_traverse_flatten(path, dash_traverse_func, &dasher);
