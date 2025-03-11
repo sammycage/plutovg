@@ -91,9 +91,7 @@ static inline uint8_t hex_digit(uint8_t c)
         return c - '0';
     if(c >= 'a' && c <= 'f')
         return 10 + c - 'a';
-    if(c >= 'A' && c <= 'F')
-        return 10 + c - 'A';
-    return 0;
+    return 10 + c - 'A';
 }
 
 static inline uint8_t hex_byte(uint8_t c1, uint8_t c2)

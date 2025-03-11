@@ -8,14 +8,12 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "plutovg-stb-truetype.h"
 
-static int plutovg_text_iterator_length(const void* data, int length, plutovg_text_encoding_t encoding)
+static int plutovg_text_iterator_length(const void* data, plutovg_text_encoding_t encoding)
 {
-    if(length != -1)
-        return length;
-    length = 0;
+    int length = 0;
     switch(encoding) {
-    case PLUTOVG_TEXT_ENCODING_UTF8:
-    case PLUTOVG_TEXT_ENCODING_LATIN1: {
+    case PLUTOVG_TEXT_ENCODING_LATIN1:
+    case PLUTOVG_TEXT_ENCODING_UTF8: {
         const uint8_t* text = data;
         while(*text++)
             length++;
@@ -39,8 +37,10 @@ static int plutovg_text_iterator_length(const void* data, int length, plutovg_te
 
 void plutovg_text_iterator_init(plutovg_text_iterator_t* it, const void* text, int length, plutovg_text_encoding_t encoding)
 {
+    if(length == -1)
+        length = plutovg_text_iterator_length(text, encoding);
     it->text = text;
-    it->length = plutovg_text_iterator_length(text, length, encoding);
+    it->length = length;
     it->encoding = encoding;
     it->index = 0;
 }
@@ -54,7 +54,11 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
 {
     plutovg_codepoint_t codepoint = 0;
     switch(it->encoding) {
-    case PLUTOVG_TEXT_ENCODING_UTF8: {
+    case PLUTOVG_TEXT_ENCODING_LATIN1: {
+        const uint8_t* text = it->text;
+        codepoint = text[it->index++];
+        break;
+    } case PLUTOVG_TEXT_ENCODING_UTF8: {
         static const uint8_t trailing[256] = {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -71,19 +75,16 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
         };
 
         const uint8_t* text = it->text;
-        int trailing_bytes = trailing[text[it->index]];
-        if(it->index + trailing_bytes >= it->length)
-            trailing_bytes = 0;
-        switch(trailing_bytes) {
-        case 5: codepoint += text[it->index++]; codepoint <<= 6;
-        case 4: codepoint += text[it->index++]; codepoint <<= 6;
-        case 3: codepoint += text[it->index++]; codepoint <<= 6;
-        case 2: codepoint += text[it->index++]; codepoint <<= 6;
-        case 1: codepoint += text[it->index++]; codepoint <<= 6;
-        case 0: codepoint += text[it->index++];
+        uint8_t trailing_offset = trailing[text[it->index]];
+        uint32_t offset_value = offsets[trailing_offset];
+        while(it->index < it->length - 1 && trailing_offset > 0) {
+            codepoint += text[it->index++];
+            codepoint <<= 6;
+            trailing_offset--;
         }
 
-        codepoint -= offsets[trailing_bytes];
+        codepoint += text[it->index++];
+        codepoint -= offset_value;
         break;
     } case PLUTOVG_TEXT_ENCODING_UTF16: {
         const uint16_t* text = it->text;
@@ -98,10 +99,6 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
         break;
     } case PLUTOVG_TEXT_ENCODING_UTF32: {
         const uint32_t* text = it->text;
-        codepoint = text[it->index++];
-        break;
-    } case PLUTOVG_TEXT_ENCODING_LATIN1: {
-        const uint8_t* text = it->text;
         codepoint = text[it->index++];
         break;
     } default:

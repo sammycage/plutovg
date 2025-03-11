@@ -730,10 +730,10 @@ PLUTOVG_API bool plutovg_path_parse(plutovg_path_t* path, const char* data, int 
  * @brief Text encodings used for converting text data to code points.
  */
 typedef enum plutovg_text_encoding {
+    PLUTOVG_TEXT_ENCODING_LATIN1, ///< Latin-1 encoding
     PLUTOVG_TEXT_ENCODING_UTF8, ///< UTF-8 encoding
     PLUTOVG_TEXT_ENCODING_UTF16, ///< UTF-16 encoding
-    PLUTOVG_TEXT_ENCODING_UTF32, ///< UTF-32 encoding
-    PLUTOVG_TEXT_ENCODING_LATIN1 ///< Latin-1 encoding
+    PLUTOVG_TEXT_ENCODING_UTF32 ///< UTF-32 encoding
 } plutovg_text_encoding_t;
 
 /**
