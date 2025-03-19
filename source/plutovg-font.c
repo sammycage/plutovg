@@ -77,7 +77,7 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
         const uint8_t* text = it->text;
         uint8_t trailing_offset = trailing[text[it->index]];
         uint32_t offset_value = offsets[trailing_offset];
-        while(it->index < it->length - 1 && trailing_offset > 0) {
+        while(trailing_offset > 0 && it->index < it->length - 1) {
             codepoint += text[it->index++];
             codepoint <<= 6;
             trailing_offset--;
