@@ -63,6 +63,8 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(plutovg PUBLIC PLUTOVG_BUILD_STATIC)
 endif()
 
+include(GNUInstallDirs)
+
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/plutovgConfig.cmake.in"
@@ -75,7 +77,6 @@ write_basic_package_version_file(plutovgConfigVersion.cmake
     COMPATIBILITY SameMajorVersion
 )
 
-include(GNUInstallDirs)
 install(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/plutovg.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/plutovg
