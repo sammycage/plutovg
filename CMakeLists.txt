@@ -105,6 +105,27 @@ export(EXPORT plutovgTargets
     NAMESPACE plutovg::
 )
 
+file(RELATIVE_PATH pc_prefix_relative "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" "${CMAKE_INSTALL_PREFIX}")
+set(pc_libs_private "")
+if(MATH_LIBRARY)
+    string(APPEND pc_libs_private " -lm")
+endif()
+string(CONFIGURE [[
+prefix=${pcfiledir}/@pc_prefix_relative@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+
+Name: PlutoVG
+Description: Tiny 2D vector graphics library in C
+Version: @PROJECT_VERSION@
+
+Cflags: "-I${includedir}/plutovg"
+Libs: "-L${libdir}" -lplutovg
+Libs.private:@pc_libs_private@
+]] pkgconfig @ONLY)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/plutovg.pc" "${pkgconfig}")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/plutovg.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
 option(PLUTOVG_BUILD_EXAMPLES "Build examples" ON)
 if(PLUTOVG_BUILD_EXAMPLES)
     add_subdirectory(examples)
