@@ -21,10 +21,6 @@ if math_dep.found()
     plutovg_deps += [math_dep]
 endif
 
-if get_option('default_library') == 'static'
-    plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
-endif
-
 version_parts = meson.project_version().split('.')
 configure_file(
     input: 'include/plutovg.h.in',
@@ -35,6 +31,15 @@ configure_file(
         'plutovg_VERSION_PATCH': version_parts[2],
     }
 )
+
+if get_option('default_library') == 'static'
+    plutovg_compile_args += ['-DPLUTOVG_BUILD_STATIC']
+    plutovg_libtype = 'STATIC'
+    plutovg_libext = 'a'
+else
+    plutovg_libtype = 'SHARED'
+    plutovg_libext = 'so.' + version_parts[0]
+endif
 
 plutovg_sources = [
     'source/plutovg-blend.c',
@@ -66,7 +71,7 @@ plutovg_dep = declare_dependency(
 )
 
 meson.override_dependency('plutovg', plutovg_dep)
-install_headers(meson.build_root() / 'plutovg.h', subdir: 'plutovg/include')
+install_headers(meson.build_root() / 'plutovg.h', subdir: 'plutovg')
 
 if not get_option('examples').disabled()
     subdir('examples')
@@ -78,4 +83,30 @@ pkgmod.generate(plutovg_lib,
     description: 'Tiny 2D vector graphics library',
     filebase: 'plutovg',
     subdirs: 'plutovg'
+)
+
+cmake = import('cmake')
+cmake.write_basic_package_version_file(
+    name: 'plutovg',
+    version: meson.project_version(),
+    compatibility: 'SameMajorVersion'
+)
+cmake.configure_package_config_file(
+    name: 'plutovg',
+    input: 'cmake/plutovgConfig.cmake.in',
+    configuration: configuration_data()
+)
+
+configure_file(
+    input: 'cmake/plutovgTargets.cmake.in',
+    output: 'plutovgTargets.cmake',
+    configuration: {
+        'INCDIR': get_option('includedir'),
+        'LIBDIR': get_option('libdir'),
+        'LIBEXT': plutovg_libext,
+        'LIBTYPE': plutovg_libtype,
+    }
+)
+install_data(meson.build_root() / 'plutovgTargets.cmake',
+    install_dir: get_option('libdir') / 'cmake' / 'plutovg'
 )
