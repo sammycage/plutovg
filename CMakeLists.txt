@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(PLUTOVG_VERSION_MAJOR 1)
-set(PLUTOVG_VERSION_MINOR 0)
-set(PLUTOVG_VERSION_MICRO 0)
+file(STRINGS "version.txt" PLUTOVG_VERSION)
 
-project(plutovg LANGUAGES C VERSION ${PLUTOVG_VERSION_MAJOR}.${PLUTOVG_VERSION_MINOR}.${PLUTOVG_VERSION_MICRO})
+project(plutovg LANGUAGES C VERSION ${PLUTOVG_VERSION})
+
+configure_file(${CMAKE_SOURCE_DIR}/include/plutovg.h.in ${CMAKE_BINARY_DIR}/include/plutovg.h @ONLY)
 
 set(plutovg_sources
     source/plutovg-blend.c
@@ -21,7 +21,7 @@ set(plutovg_sources
 )
 
 set(plutovg_headers
-    include/plutovg.h
+    ${CMAKE_BINARY_DIR}/include/plutovg.h
     source/plutovg-private.h
     source/plutovg-utils.h
     source/plutovg-ft-math.h
@@ -37,19 +37,19 @@ add_library(plutovg ${plutovg_sources} ${plutovg_headers})
 add_library(plutovg::plutovg ALIAS plutovg)
 
 set_target_properties(plutovg PROPERTIES
-    SOVERSION ${PLUTOVG_VERSION_MAJOR}
+    SOVERSION ${plutovg_VERSION_MAJOR}
     C_VISIBILITY_PRESET hidden
     C_STANDARD_REQUIRED ON
     C_STANDARD 99
 )
 
 target_include_directories(plutovg PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/source
 )
 
 target_include_directories(plutovg PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include/plutovg>
 )
 
@@ -78,7 +78,7 @@ write_basic_package_version_file(plutovgConfigVersion.cmake
 )
 
 install(FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/plutovg.h
+    ${CMAKE_BINARY_DIR}/include/plutovg.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/plutovg
 )
 
