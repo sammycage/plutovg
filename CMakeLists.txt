@@ -111,9 +111,15 @@ file(RELATIVE_PATH plutovg_pc_prefix_relative
     "${CMAKE_INSTALL_PREFIX}"
 )
 
+set(plutovg_pc_cflags "")
 set(plutovg_pc_libs_private "")
+
 if(MATH_LIBRARY)
     string(APPEND plutovg_pc_libs_private " -lm")
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+    string(APPEND plutovg_pc_cflags " -DPLUTOVG_BUILD_STATIC")
 endif()
 
 string(CONFIGURE [[
@@ -125,7 +131,7 @@ Name: PlutoVG
 Description: Tiny 2D vector graphics library in C
 Version: @PROJECT_VERSION@
 
-Cflags: -I${includedir}/plutovg
+Cflags: -I${includedir}/plutovg@plutovg_pc_cflags@
 Libs: -L${libdir} -lplutovg
 Libs.private:@plutovg_pc_libs_private@
 ]] plutovg_pc @ONLY)
