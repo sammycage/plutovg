@@ -36,6 +36,9 @@ set(plutovg_headers
 add_library(plutovg ${plutovg_sources} ${plutovg_headers})
 add_library(plutovg::plutovg ALIAS plutovg)
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 set_target_properties(plutovg PROPERTIES
     SOVERSION ${PLUTOVG_VERSION_MAJOR}
     C_VISIBILITY_PRESET hidden
@@ -50,7 +53,7 @@ target_include_directories(plutovg PRIVATE
 
 target_include_directories(plutovg PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include/plutovg>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/plutovg>
 )
 
 find_library(MATH_LIBRARY m)
@@ -63,9 +66,6 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(plutovg PUBLIC PLUTOVG_BUILD_STATIC)
 endif()
 
-include(GNUInstallDirs)
-
-include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/plutovgConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/plutovgConfig.cmake"
