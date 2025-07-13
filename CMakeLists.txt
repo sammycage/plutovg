@@ -43,7 +43,7 @@ set_target_properties(plutovg PROPERTIES
     SOVERSION ${PLUTOVG_VERSION_MAJOR}
     C_VISIBILITY_PRESET hidden
     C_STANDARD_REQUIRED ON
-    C_STANDARD 99
+    C_STANDARD 11
 )
 
 target_include_directories(plutovg PRIVATE
