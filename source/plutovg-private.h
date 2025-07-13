@@ -3,7 +3,18 @@
 
 #include "plutovg.h"
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
+#if defined(_MSC_VER)
+
+#include <intrin.h>
+
+typedef long plutovg_ref_count_t;
+
+#define plutovg_init_ref_count(ob) ((ob)->ref_count = 1)
+#define plutovg_increment_ref_count(ob) InterlockedIncrement(&(ob)->ref_count)
+#define plutovg_decrement_ref_count(ob) (InterlockedDecrement(&(ob)->ref_count) == 0)
+#define plutovg_get_ref_count(ob) ((ob) ? _InterlockedOr((long*)&(ob)->ref_count, 0) : 0)
+
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
 
 #include <stdatomic.h>
 
@@ -13,17 +24,6 @@ typedef atomic_int plutovg_ref_count_t;
 #define plutovg_increment_ref_count(ob) atomic_fetch_add(&(ob)->ref_count, 1)
 #define plutovg_decrement_ref_count(ob) (atomic_fetch_sub(&(ob)->ref_count, 1) == 1)
 #define plutovg_get_ref_count(ob) ((ob) ? atomic_load(&(ob)->ref_count) : 0)
-
-#elif defined(_WIN32)
-
-#include <windows.h>
-
-typedef volatile LONG plutovg_ref_count_t;
-
-#define plutovg_init_ref_count(ob) ((ob)->ref_count = 1)
-#define plutovg_increment_ref_count(ob) InterlockedIncrement(&(ob)->ref_count)
-#define plutovg_decrement_ref_count(ob) (InterlockedDecrement(&(ob)->ref_count) == 0)
-#define plutovg_get_ref_count(ob) ((ob) ? InterlockedCompareExchange(&(ob)->ref_count, 0, 0) : 0)
 
 #else
 
