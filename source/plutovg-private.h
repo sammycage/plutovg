@@ -5,7 +5,7 @@
 
 #if defined(_MSC_VER)
 
-#include <intrin.h>
+#include <windows.h>
 
 typedef long plutovg_ref_count_t;
 
