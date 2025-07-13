@@ -108,18 +108,7 @@ plutovg_codepoint_t plutovg_text_iterator_next(plutovg_text_iterator_t* it)
     return codepoint;
 }
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
-
-#include <threads.h>
-
-typedef mtx_t plutovg_mutex_t;
-
-#define plutovg_mutex_init(mutex) mtx_init(mutex, mtx_plain)
-#define plutovg_mutex_lock(mutex) mtx_lock(mutex)
-#define plutovg_mutex_unlock(mutex) mtx_unlock(mutex)
-#define plutovg_mutex_destroy(mutex) mtx_destroy(mutex)
-
-#elif defined(_WIN32)
+#if defined(_WIN32)
 
 #include <windows.h>
 
@@ -129,6 +118,17 @@ typedef CRITICAL_SECTION plutovg_mutex_t;
 #define plutovg_mutex_lock(mutex) EnterCriticalSection(mutex)
 #define plutovg_mutex_unlock(mutex) LeaveCriticalSection(mutex)
 #define plutovg_mutex_destroy(mutex) DeleteCriticalSection(mutex)
+
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
+
+#include <threads.h>
+
+typedef mtx_t plutovg_mutex_t;
+
+#define plutovg_mutex_init(mutex) mtx_init(mutex, mtx_plain)
+#define plutovg_mutex_lock(mutex) mtx_lock(mutex)
+#define plutovg_mutex_unlock(mutex) mtx_unlock(mutex)
+#define plutovg_mutex_destroy(mutex) mtx_destroy(mutex)
 
 #else
 
