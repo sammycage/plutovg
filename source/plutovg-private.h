@@ -3,7 +3,7 @@
 
 #include "plutovg.h"
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 
 #include <windows.h>
 
