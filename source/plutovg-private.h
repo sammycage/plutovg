@@ -7,12 +7,12 @@
 
 #include <windows.h>
 
-typedef long plutovg_ref_count_t;
+typedef LONG plutovg_ref_count_t;
 
 #define plutovg_init_ref_count(ob) ((ob)->ref_count = 1)
 #define plutovg_increment_ref_count(ob) InterlockedIncrement(&(ob)->ref_count)
 #define plutovg_decrement_ref_count(ob) (InterlockedDecrement(&(ob)->ref_count) == 0)
-#define plutovg_get_ref_count(ob) ((ob) ? InterlockedOr((long*)&(ob)->ref_count, 0) : 0)
+#define plutovg_get_ref_count(ob) ((ob) ? InterlockedCompareExchange((LONG*)&(ob)->ref_count, 0, 0) : 0)
 
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
 
