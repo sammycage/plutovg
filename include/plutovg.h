@@ -50,7 +50,7 @@ extern "C" {
 #endif
 
 #define PLUTOVG_VERSION_MAJOR 1
-#define PLUTOVG_VERSION_MINOR 1
+#define PLUTOVG_VERSION_MINOR 2
 #define PLUTOVG_VERSION_MICRO 0
 
 #define PLUTOVG_VERSION_ENCODE(major, minor, micro) (((major) * 10000) + ((minor) * 100) + ((micro) * 1))
