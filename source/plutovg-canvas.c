@@ -467,33 +467,19 @@ plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas)
     return canvas->path;
 }
 
-void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
+void plutovg_canvas_fill_extents(plutovg_canvas_t *canvas, plutovg_rect_t* extents)
 {
-    plutovg_path_extents(canvas->path, extents, true);
-    plutovg_canvas_map_rect(canvas, extents, extents);
+    plutovg_rasterize(&canvas->fill_spans, canvas->path, &canvas->state->matrix, NULL, NULL, canvas->state->winding);
+    plutovg_span_buffer_extents(&canvas->fill_spans, extents);
 }
 
-void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
+void plutovg_canvas_stroke_extents(plutovg_canvas_t *canvas, plutovg_rect_t* extents)
 {
-    plutovg_stroke_data_t* stroke = &canvas->state->stroke;
-    float cap_limit = stroke->style.width / 2.f;
-    if(stroke->style.cap == PLUTOVG_LINE_CAP_SQUARE)
-        cap_limit *= PLUTOVG_SQRT2;
-    float join_limit = stroke->style.width / 2.f;
-    if(stroke->style.join == PLUTOVG_LINE_JOIN_MITER) {
-        join_limit *= stroke->style.miter_limit;
-    }
-
-    float delta = plutovg_max(cap_limit, join_limit);
-    plutovg_path_extents(canvas->path, extents, true);
-    extents->x -= delta;
-    extents->y -= delta;
-    extents->w += delta * 2.f;
-    extents->h += delta * 2.f;
-    plutovg_canvas_map_rect(canvas, extents, extents);
+    plutovg_rasterize(&canvas->fill_spans, canvas->path, &canvas->state->matrix, NULL, &canvas->state->stroke, PLUTOVG_FILL_RULE_NON_ZERO);
+    plutovg_span_buffer_extents(&canvas->fill_spans, extents);
 }
 
-void plutovg_canvas_clip_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents)
+void plutovg_canvas_clip_extents(plutovg_canvas_t* canvas, plutovg_rect_t* extents)
 {
     if(canvas->state->clipping) {
         plutovg_span_buffer_extents(&canvas->state->clip_spans, extents);

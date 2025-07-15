@@ -2069,28 +2069,46 @@ PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas
 PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas);
 
 /**
- * @brief Gets the bounding box of the filled region.
+ * @brief Computes the bounding box of the area that would be affected by a fill operation.
+ *
+ * Computes an axis-aligned bounding box in user space that encloses the area
+ * which would be affected by a fill operation (`plutovg_canvas_fill()`) given the current path,
+ * fill rule, and transformation state.
+ * 
+ * @note Clipping and surface dimensions are not considered in this calculation.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param extents The bounding box of the filled region.
+ * @param extents A pointer to a `plutovg_rect_t` structure that receives the bounding box.
  */
-PLUTOVG_API void plutovg_canvas_fill_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_canvas_fill_extents(plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
 /**
- * @brief Gets the bounding box of the stroked region.
+ * @brief Computes the bounding box of the area that would be affected by a stroke operation.
+ *
+ * Computes an axis-aligned bounding box in user space that encloses the area
+ * which would be affected by a stroke operation (`plutovg_canvas_stroke()`) given the current path,
+ * stroke width, joins, caps, miter limit, dash pattern, and transformation state.
+ *
+ * @note Clipping and surface dimensions are not considered in this calculation.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param extents The bounding box of the stroked region.
+ * @param extents A pointer to a `plutovg_rect_t` structure that receives the bounding box.
  */
-PLUTOVG_API void plutovg_canvas_stroke_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_canvas_stroke_extents(plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
 /**
- * @brief Gets the bounding box of the clipped region.
+ * @brief Gets the bounding box of the current clipping region.
+ *
+ * Computes an axis-aligned bounding box in user space that encloses the currently active
+ * clipping region on the canvas.
+ *
+ * If no clip is applied, the returned rectangle covers the entire canvas area,
+ * starting at `(0, 0)` with width and height equal to the canvas dimensions.
  *
  * @param canvas A pointer to a `plutovg_canvas_t` object.
- * @param extents The bounding box of the clipped region.
+ * @param extents A pointer to a `plutovg_rect_t` structure that receives the bounding box.
  */
-PLUTOVG_API void plutovg_canvas_clip_extents(const plutovg_canvas_t* canvas, plutovg_rect_t* extents);
+PLUTOVG_API void plutovg_canvas_clip_extents(plutovg_canvas_t* canvas, plutovg_rect_t* extents);
 
 /**
  * @brief A drawing operator that fills the current path according to the current fill rule.
