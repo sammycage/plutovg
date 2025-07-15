@@ -2069,6 +2069,54 @@ PLUTOVG_API void plutovg_canvas_get_current_point(const plutovg_canvas_t* canvas
 PLUTOVG_API plutovg_path_t* plutovg_canvas_get_path(const plutovg_canvas_t* canvas);
 
 /**
+ * @brief Tests whether a point lies within the current fill region.
+ *
+ * Determines whether the point at coordinates `(x, y)` falls within the area
+ * that would be filled by a `plutovg_canvas_fill()` operation, given the current path,
+ * fill rule, and transformation state.
+ *
+ * @note Clipping and surface dimensions are not considered in this test.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param x The X coordinate of the point, in user space.
+ * @param y The Y coordinate of the point, in user space.
+ * @return `true` if the point is within the fill region, `false` otherwise.
+ */
+PLUTOVG_API bool plutovg_canvas_fill_contains(plutovg_canvas_t* canvas, float x, float y);
+
+/**
+ * @brief Tests whether a point lies within the current stroke region.
+ *
+ * Determines whether the point at coordinates `(x, y)` falls within the area
+ * that would be stroked by a `plutovg_canvas_stroke()` operation, given the current path,
+ * stroke width, joins, caps, miter limit, dash pattern, and transformation state.
+ *
+ * @note Clipping and surface dimensions are not considered in this test.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param x The X coordinate of the point, in user space.
+ * @param y The Y coordinate of the point, in user space.
+ * @return `true` if the point is within the stroke region, `false` otherwise.
+ */
+PLUTOVG_API bool plutovg_canvas_stroke_contains(plutovg_canvas_t* canvas, float x, float y);
+
+/**
+ * @brief Tests whether a point lies within the current clipping region.
+ *
+ * Determines whether the point at coordinates `(x, y)` falls within the active clipping
+ * region on the canvas.
+ *
+ * If no clipping is applied, the default clipping region covers the entire canvas
+ * area starting at `(0, 0)` with width and height equal to the canvas dimensions.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param x The X coordinate of the point, in user space.
+ * @param y The Y coordinate of the point, in user space.
+ * @return `true` if the point is within the clipping region, `false` otherwise.
+ */
+PLUTOVG_API bool plutovg_canvas_clip_contains(plutovg_canvas_t* canvas, float x, float y);
+
+/**
  * @brief Computes the bounding box of the area that would be affected by a fill operation.
  *
  * Computes an axis-aligned bounding box in user space that encloses the area

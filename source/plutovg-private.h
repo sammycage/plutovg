@@ -168,6 +168,7 @@ void plutovg_span_buffer_init_rect(plutovg_span_buffer_t* span_buffer, int x, in
 void plutovg_span_buffer_reset(plutovg_span_buffer_t* span_buffer);
 void plutovg_span_buffer_destroy(plutovg_span_buffer_t* span_buffer);
 void plutovg_span_buffer_copy(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* source);
+bool plutovg_span_buffer_contains(const plutovg_span_buffer_t* span_buffer, float x, float y);
 void plutovg_span_buffer_extents(plutovg_span_buffer_t* span_buffer, plutovg_rect_t* extents);
 void plutovg_span_buffer_intersect(plutovg_span_buffer_t* span_buffer, const plutovg_span_buffer_t* a, const plutovg_span_buffer_t* b);
 
