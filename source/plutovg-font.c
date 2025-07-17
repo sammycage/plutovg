@@ -142,9 +142,9 @@ typedef int plutovg_mutex_t;
 #endif
 
 typedef struct plutovg_glyph {
+    plutovg_codepoint_t codepoint;
     stbtt_vertex* vertices;
     int nvertices;
-    plutovg_codepoint_t codepoint;
     int index;
     int advance_width;
     int left_side_bearing;
@@ -208,7 +208,7 @@ static void plutovg_glyph_cache_finish(plutovg_glyph_cache_t* cache, plutovg_fon
     plutovg_mutex_unlock(&face->mutex);
 }
 
-#define GLYPH_INIT_CACHE_SIZE 128
+#define GLYPH_INIT_CACHE_CAPACITY 128
 
 static plutovg_glyph_t* plutovg_glyph_cache_get(plutovg_glyph_cache_t* cache, plutovg_font_face_t* face, plutovg_codepoint_t codepoint)
 {
@@ -216,8 +216,8 @@ static plutovg_glyph_t* plutovg_glyph_cache_get(plutovg_glyph_cache_t* cache, pl
 
     if(cache->glyphs == NULL) {
         assert(cache->size == 0);
-        cache->glyphs = calloc(GLYPH_INIT_CACHE_SIZE, sizeof(plutovg_glyph_t*));
-        cache->capacity = GLYPH_INIT_CACHE_SIZE;
+        cache->glyphs = calloc(GLYPH_INIT_CACHE_CAPACITY, sizeof(plutovg_glyph_t*));
+        cache->capacity = GLYPH_INIT_CACHE_CAPACITY;
     }
 
     size_t index = codepoint & (cache->capacity - 1);
@@ -245,13 +245,13 @@ static plutovg_glyph_t* plutovg_glyph_cache_get(plutovg_glyph_cache_t* cache, pl
             plutovg_glyph_t** newglyphs = calloc(newcapacity, sizeof(plutovg_glyph_t*));
 
             for(size_t i = 0; i < cache->capacity; ++i) {
-                plutovg_glyph_t* g = cache->glyphs[i];
-                while(g) {
-                    plutovg_glyph_t* next = g->next;
-                    size_t newindex = g->codepoint & (newcapacity - 1);
-                    g->next = newglyphs[newindex];
-                    newglyphs[newindex] = g;
-                    g = next;
+                plutovg_glyph_t* entry = cache->glyphs[i];
+                while(entry) {
+                    plutovg_glyph_t* next = entry->next;
+                    size_t newindex = entry->codepoint & (newcapacity - 1);
+                    entry->next = newglyphs[newindex];
+                    newglyphs[newindex] = entry;
+                    entry = next;
                 }
             }
 
