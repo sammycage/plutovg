@@ -208,7 +208,7 @@ static void plutovg_glyph_cache_finish(plutovg_glyph_cache_t* cache, plutovg_fon
     plutovg_mutex_unlock(&face->mutex);
 }
 
-#define GLYPH_INIT_CACHE_CAPACITY 128
+#define GLYPH_CACHE_INIT_CAPACITY 128
 
 static plutovg_glyph_t* plutovg_glyph_cache_get(plutovg_glyph_cache_t* cache, plutovg_font_face_t* face, plutovg_codepoint_t codepoint)
 {
@@ -216,8 +216,8 @@ static plutovg_glyph_t* plutovg_glyph_cache_get(plutovg_glyph_cache_t* cache, pl
 
     if(cache->glyphs == NULL) {
         assert(cache->size == 0);
-        cache->glyphs = calloc(GLYPH_INIT_CACHE_CAPACITY, sizeof(plutovg_glyph_t*));
-        cache->capacity = GLYPH_INIT_CACHE_CAPACITY;
+        cache->glyphs = calloc(GLYPH_CACHE_INIT_CAPACITY, sizeof(plutovg_glyph_t*));
+        cache->capacity = GLYPH_CACHE_INIT_CAPACITY;
     }
 
     size_t index = codepoint & (cache->capacity - 1);
@@ -505,3 +505,438 @@ float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, cons
 
     return total_advance_width;
 }
+
+typedef struct plutovg_font_face_entry {
+    plutovg_font_face_t* face;
+    char* family;
+    char* filename;
+    int ttcindex;
+    bool bold;
+    bool italic;
+    struct plutovg_font_face_entry* next;
+} plutovg_font_face_entry_t;
+
+struct plutovg_font_face_cache {
+    plutovg_ref_count_t ref_count;
+    plutovg_mutex_t mutex;
+    plutovg_font_face_entry_t** entries;
+    int size;
+    int capacity;
+    bool is_sorted;
+};
+
+plutovg_font_face_cache_t* plutovg_font_face_cache_create(void)
+{
+    plutovg_font_face_cache_t* cache = malloc(sizeof(plutovg_font_face_cache_t));
+    plutovg_init_reference(cache);
+    plutovg_mutex_init(&cache->mutex);
+    cache->entries = NULL;
+    cache->size = 0;
+    cache->capacity = 0;
+    cache->is_sorted = false;
+    return cache;
+}
+
+plutovg_font_face_cache_t* plutovg_font_face_cache_reference(plutovg_font_face_cache_t* cache)
+{
+    plutovg_increment_reference(cache);
+    return cache;
+}
+
+void plutovg_font_face_cache_destroy(plutovg_font_face_cache_t* cache)
+{
+    if(plutovg_destroy_reference(cache)) {
+        plutovg_mutex_lock(&cache->mutex);
+        for(int i = 0; i < cache->size; ++i) {
+            plutovg_font_face_entry_t* entry = cache->entries[i];
+            do {
+                plutovg_font_face_entry_t* next = entry->next;
+                free(entry);
+                entry = next;
+            } while(entry);
+        }
+
+        plutovg_mutex_lock(&cache->mutex);
+        plutovg_mutex_destroy(&cache->mutex);
+        free(cache);
+    }
+}
+
+int plutovg_font_face_cache_reference_count(const plutovg_font_face_cache_t* cache)
+{
+    return plutovg_get_reference_count(cache);
+}
+
+static void plutovg_font_face_cache_add_entry(plutovg_font_face_cache_t* cache, plutovg_font_face_entry_t* entry)
+{
+    plutovg_mutex_lock(&cache->mutex);
+    for(int i = 0; i < cache->size; ++i) {
+        if(strcmp(entry->family, cache->entries[i]->family) == 0) {
+            entry->next = cache->entries[i];
+            cache->entries[i] = entry;
+            goto unlock;
+        }
+    }
+
+    if(cache->size >= cache->capacity) {
+        cache->capacity = cache->capacity == 0 ? 8 : cache->capacity << 2;
+        cache->entries = realloc(cache->entries, cache->capacity * sizeof(plutovg_font_face_entry_t*));
+    }
+
+    entry->next = NULL;
+    cache->entries[cache->size++] = entry;
+    cache->is_sorted = false;
+
+unlock:
+    plutovg_mutex_unlock(&cache->mutex);
+}
+
+void plutovg_font_face_cache_add(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, plutovg_font_face_t* face)
+{
+    if(family == NULL) family = "";
+    size_t family_length = strlen(family) + 1;
+
+    plutovg_font_face_entry_t* entry = malloc(family_length + sizeof(plutovg_font_face_entry_t));
+    entry->face = plutovg_font_face_reference(face);
+    entry->family = (char*)(entry + 1);
+    memcpy(entry->family, family, family_length);
+
+    entry->filename = NULL;
+    entry->ttcindex = 0;
+    entry->bold = bold;
+    entry->italic = italic;
+
+    plutovg_font_face_cache_add_entry(cache, entry);
+}
+
+static plutovg_font_face_entry_t* plutovg_font_face_entry_select(plutovg_font_face_entry_t* a, plutovg_font_face_entry_t* b, bool bold, bool italic)
+{
+    int a_score = (bold == a->bold) + (italic == a->italic);
+    int b_score = (bold == b->bold) + (italic == b->italic);
+    return a_score > b_score ? a : b;
+}
+
+static int plutovg_font_face_entry_compare(const void* a, const void* b)
+{
+    const plutovg_font_face_entry_t* a_entry = *(const plutovg_font_face_entry_t**)a;
+    const plutovg_font_face_entry_t* b_entry = *(const plutovg_font_face_entry_t**)b;
+    return strcmp(a_entry->family, b_entry->family);
+}
+
+plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic)
+{
+    plutovg_mutex_lock(&cache->mutex);
+
+    if(!cache->is_sorted) {
+        qsort(cache->entries, cache->size, sizeof(cache->entries[0]), plutovg_font_face_entry_compare);
+        cache->is_sorted = true;
+    }
+
+    plutovg_font_face_entry_t entry_key;
+    entry_key.family = (char*)(family);
+
+    plutovg_font_face_entry_t* entry_key_ptr = &entry_key;
+    plutovg_font_face_entry_t** entry_result = bsearch(
+        &entry_key_ptr,
+        cache->entries,
+        cache->size,
+        sizeof(cache->entries[0]),
+        plutovg_font_face_entry_compare
+    );
+
+    plutovg_font_face_t* face = NULL;
+    if(entry_result) {
+        plutovg_font_face_entry_t* selected = *entry_result;
+        plutovg_font_face_entry_t* entry = selected->next;
+        while(entry) {
+            selected = plutovg_font_face_entry_select(selected, entry, bold, italic);
+            entry = entry->next;
+        }
+
+        if(selected->filename && selected->face == NULL)
+            selected->face = plutovg_font_face_load_from_file(selected->filename, selected->ttcindex);
+        face = selected->face;
+    }
+
+    plutovg_mutex_unlock(&cache->mutex);
+    return face;
+}
+
+#ifdef PLUTOVG_ENABLE_FONT_CACHE_LOAD
+
+#include <ctype.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
+
+#include <sys/mman.h>
+#include <sys/stat.h>
+#endif
+
+#ifdef _WIN32
+
+static void* plutovg_mmap(const char* filename, long* length)
+{
+    HANDLE file = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if(file == INVALID_HANDLE_VALUE)
+        return NULL;
+    DWORD size = GetFileSize(file, NULL);
+    if(size == INVALID_FILE_SIZE) {
+        CloseHandle(file);
+        return NULL;
+    }
+
+    HANDLE mapping = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
+    if(mapping == NULL) {
+        CloseHandle(file);
+        return NULL;
+    }
+
+    void* data = MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, 0);
+    CloseHandle(mapping);
+    CloseHandle(file);
+
+    if(data == NULL)
+        return NULL;
+    *length = size;
+    return data;
+}
+
+static void plutovg_unmap(void* data, long length)
+{
+    UnmapViewOfFile(data);
+}
+
+#else
+
+static void* plutovg_mmap(const char* filename, long* length)
+{
+    int fd = open(filename, O_RDONLY);
+    if(fd < 0)
+        return NULL;
+    struct stat st;
+    if(fstat(fd, &st) < 0) {
+        close(fd);
+        return NULL;
+    }
+
+    if(st.st_size == 0) {
+        close(fd);
+        return NULL;
+    }
+
+    void* data = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+
+    if(data == MAP_FAILED)
+        return NULL;
+    *length = st.st_size;
+    return data;
+}
+
+static void plutovg_unmap(void* data, long length)
+{
+    munmap(data, length);
+}
+
+#endif // _WIN32
+
+int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename)
+{
+    long length;
+    uint8_t* data = plutovg_mmap(filename, &length);
+    if(data == NULL) {
+        return 0;
+    }
+
+    int num_faces = 0;
+
+    int num_fonts = stbtt_GetNumberOfFonts(data);
+    for(int index = 0; index < num_fonts; ++index) {
+        int offset = stbtt_GetFontOffsetForIndex(data, index);
+        if(offset == -1 || !stbtt__isfont(data + offset)) {
+            continue;
+        }
+
+        stbtt_uint32 nm = stbtt__find_table(data, offset, "name");
+        stbtt_int32 nm_count = ttUSHORT(data + nm + 2);
+
+        const uint8_t* family_name = NULL;
+        size_t family_length = 0;
+        for(stbtt_int32 i = 0; i < nm_count; ++i) {
+            stbtt_uint32 loc = nm + 6 + 12 * i;
+            if(ttUSHORT(data + loc + 6) != 1) {
+                continue;
+            }
+
+            stbtt_int32 platform = ttUSHORT(data + loc + 0);
+            stbtt_int32 encoding = ttUSHORT(data + loc + 2);
+            if(platform == 0 || (platform == 3 && encoding == 1) || (platform == 3 && encoding == 10)) {
+                family_name = data + nm + ttUSHORT(data + nm + 4) + ttUSHORT(data + loc + 10);
+                family_length = ttUSHORT(data + loc + 8);
+                break;
+            }
+        }
+
+        if(family_length == 0)
+            continue;
+        size_t name_length = family_length / 2 + 1;
+        size_t filename_length = strlen(filename) + 1;
+
+        plutovg_font_face_entry_t* entry = malloc(name_length + filename_length + sizeof(plutovg_font_face_entry_t));
+        entry->family = (char*)(entry + 1);
+        entry->filename = entry->family + name_length;
+        memcpy(entry->filename, filename, filename_length);
+
+        int family_index = 0;
+        while(family_length) {
+            entry->family[family_index++] = family_name[0] * 256 + family_name[1];
+            family_name += 2;
+            family_length -= 2;
+        }
+
+        entry->family[family_index] = 0;
+
+        entry->face = NULL;
+        entry->bold = false;
+        entry->italic = false;
+        entry->ttcindex = index;
+
+        stbtt_uint32 hd = stbtt__find_table(data, offset, "head");
+        stbtt_uint16 style = ttUSHORT(data + hd + 44);
+        if(style & 0x1)
+            entry->bold = true;
+        if(style & 0x2) {
+            entry->italic = true;
+        }
+
+        plutovg_font_face_cache_add_entry(cache, entry);
+        num_faces++;
+    }
+
+    plutovg_unmap(data, length);
+    return num_faces;
+}
+
+static bool plutovg_font_face_supports_file(const char* filename)
+{
+    const char* extension = strrchr(filename, '.');
+    if(extension) {
+        char ext[4];
+        size_t length = strlen(extension);
+        if(length <= sizeof(ext)) {
+            for(size_t i = 0; i < length; ++i)
+                ext[i] = tolower(extension[i]);
+            return strcmp(ext, ".ttf") == 0
+                || strcmp(ext, ".otf") == 0
+                || strcmp(ext, ".ttc") == 0
+                || strcmp(ext, ".otc") == 0;
+        }
+    }
+
+    return false;
+}
+
+#ifdef _WIN32
+
+int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname)
+{
+    char search_path[MAX_PATH];
+    snprintf(search_path, sizeof(search_path), "%s\\*", dirname);
+
+    WIN32_FIND_DATAA find_data;
+    HANDLE handle = FindFirstFileA(search_path, &find_data);
+    if(handle == INVALID_HANDLE_VALUE) {
+        return 0;
+    }
+
+    int num_faces = 0;
+
+    do {
+        const char* name = find_data.cFileName;
+        if(strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+            continue;
+        char path[MAX_PATH];
+        snprintf(path, sizeof(path), "%s\\%s", dirname, name);
+
+        if(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            num_faces += plutovg_font_face_cache_load_dir(cache, path);
+        } else if(plutovg_font_face_supports_file(path)) {
+            num_faces += plutovg_font_face_cache_load_file(cache, path);
+        }
+    } while(FindNextFileA(handle, &find_data));
+
+    FindClose(handle);
+    return num_faces;
+}
+
+#else
+
+int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname)
+{
+    DIR* dir = opendir(dirname);
+    if(dir == NULL) {
+        return 0;
+    }
+
+    int num_faces = 0;
+
+    struct dirent* entry;
+    while((entry = readdir(dir)) != NULL) {
+        if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "%s/%s", dirname, entry->d_name);
+
+        struct stat st;
+        if(stat(path, &st) == -1)
+            continue;
+        if(S_ISDIR(st.st_mode)) {
+            num_faces += plutovg_font_face_cache_load_dir(cache, path);
+        } else if(S_ISREG(st.st_mode) && plutovg_font_face_supports_file(path)) {
+            num_faces += plutovg_font_face_cache_load_file(cache, path);
+        }
+    }
+
+    closedir(dir);
+    return num_faces;
+}
+
+#endif // _WIN32
+
+int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
+{
+    int num_faces = 0;
+#if defined(_WIN32)
+    num_faces += plutovg_font_face_cache_load_dir(cache, "C:\\Windows\\Fonts\\");
+#elif defined(__APPLE__)
+    num_faces += plutovg_font_face_cache_load_dir(cache, "/Library/Fonts");
+    num_faces += plutovg_font_face_cache_load_dir(cache, "/System/Library/Fonts");
+#elif defined(__linux__)
+    num_faces += plutovg_font_face_cache_load_dir(cache, "/usr/share/fonts/");
+    num_faces += plutovg_font_face_cache_load_dir(cache, "/usr/local/share/fonts/");
+#endif
+    return num_faces;
+}
+
+#else
+
+int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename)
+{
+    return 0;
+}
+
+int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname)
+{
+    return 0;
+}
+
+int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
+{
+    return 0;
+}
+
+#endif // PLUTOVG_ENABLE_FONT_CACHE_LOAD

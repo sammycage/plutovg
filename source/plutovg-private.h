@@ -10,7 +10,7 @@
 typedef LONG plutovg_ref_count_t;
 
 #define plutovg_init_reference(ob) ((ob)->ref_count = 1)
-#define plutovg_increment_reference(ob) (ob && InterlockedIncrement(&(ob)->ref_count))
+#define plutovg_increment_reference(ob) (void)(ob && InterlockedIncrement(&(ob)->ref_count))
 #define plutovg_destroy_reference(ob) (ob && InterlockedDecrement(&(ob)->ref_count) == 0)
 #define plutovg_get_reference_count(ob) ((ob) ? InterlockedCompareExchange((LONG*)&(ob)->ref_count, 0, 0) : 0)
 
@@ -21,7 +21,7 @@ typedef LONG plutovg_ref_count_t;
 typedef atomic_int plutovg_ref_count_t;
 
 #define plutovg_init_reference(ob) atomic_init(&(ob)->ref_count, 1)
-#define plutovg_increment_reference(ob) (ob && atomic_fetch_add(&(ob)->ref_count, 1))
+#define plutovg_increment_reference(ob) (void)(ob && atomic_fetch_add(&(ob)->ref_count, 1))
 #define plutovg_destroy_reference(ob) (ob && atomic_fetch_sub(&(ob)->ref_count, 1) == 1)
 #define plutovg_get_reference_count(ob) ((ob) ? atomic_load(&(ob)->ref_count) : 0)
 
@@ -30,7 +30,7 @@ typedef atomic_int plutovg_ref_count_t;
 typedef int plutovg_ref_count_t;
 
 #define plutovg_init_reference(ob) ((ob)->ref_count = 1)
-#define plutovg_increment_reference(ob) (ob && ++(ob)->ref_count)
+#define plutovg_increment_reference(ob) (void)(ob && ++(ob)->ref_count)
 #define plutovg_destroy_reference(ob) (ob && --(ob)->ref_count == 0)
 #define plutovg_get_reference_count(ob) ((ob) ? (ob)->ref_count : 0)
 

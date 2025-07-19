@@ -893,6 +893,20 @@ PLUTOVG_API float plutovg_font_face_traverse_glyph_path(plutovg_font_face_t* fac
  */
 PLUTOVG_API float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
+typedef struct plutovg_font_face_cache plutovg_font_face_cache_t;
+
+PLUTOVG_API plutovg_font_face_cache_t* plutovg_font_face_cache_create(void);
+PLUTOVG_API plutovg_font_face_cache_t* plutovg_font_face_cache_reference(plutovg_font_face_cache_t* cache);
+PLUTOVG_API void plutovg_font_face_cache_destroy(plutovg_font_face_cache_t* cache);
+PLUTOVG_API int plutovg_font_face_cache_reference_count(const plutovg_font_face_cache_t* cache);
+PLUTOVG_API void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache);
+PLUTOVG_API void plutovg_font_face_cache_add(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, plutovg_font_face_t* face);
+PLUTOVG_API plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic);
+
+PLUTOVG_API int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename);
+PLUTOVG_API int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname);
+PLUTOVG_API int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache);
+
 /**
  * @brief Represents a color with red, green, blue, and alpha components.
  */

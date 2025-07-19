@@ -66,6 +66,12 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(plutovg PUBLIC PLUTOVG_BUILD_STATIC)
 endif()
 
+option(PLUTOVG_ENABLE_FONT_CACHE_LOAD "Enable loading of font face cache from files and system directories" ON)
+
+if(PLUTOVG_ENABLE_FONT_CACHE_LOAD)
+    target_compile_definitions(plutovg PRIVATE PLUTOVG_ENABLE_FONT_CACHE_LOAD)
+endif()
+
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/plutovgConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/plutovgConfig.cmake"
