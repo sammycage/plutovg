@@ -860,7 +860,7 @@ int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const cha
         const char* name = find_data.cFileName;
         if(strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
             continue;
-        char path[MAX_PATH];
+        char path[MAX_PATH * 2];
         snprintf(path, sizeof(path), "%s\\%s", dirname, name);
 
         if(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
