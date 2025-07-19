@@ -9,10 +9,10 @@
 
 typedef LONG plutovg_ref_count_t;
 
-#define plutovg_init_ref_count(ob) ((ob)->ref_count = 1)
-#define plutovg_increment_ref_count(ob) InterlockedIncrement(&(ob)->ref_count)
-#define plutovg_decrement_ref_count(ob) (InterlockedDecrement(&(ob)->ref_count) == 0)
-#define plutovg_get_ref_count(ob) ((ob) ? InterlockedCompareExchange((LONG*)&(ob)->ref_count, 0, 0) : 0)
+#define plutovg_init_reference(ob) ((ob)->ref_count = 1)
+#define plutovg_increment_reference(ob) (ob && InterlockedIncrement(&(ob)->ref_count))
+#define plutovg_destroy_reference(ob) (ob && InterlockedDecrement(&(ob)->ref_count) == 0)
+#define plutovg_get_reference_count(ob) ((ob) ? InterlockedCompareExchange((LONG*)&(ob)->ref_count, 0, 0) : 0)
 
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__)
 
@@ -20,19 +20,19 @@ typedef LONG plutovg_ref_count_t;
 
 typedef atomic_int plutovg_ref_count_t;
 
-#define plutovg_init_ref_count(ob) atomic_init(&(ob)->ref_count, 1)
-#define plutovg_increment_ref_count(ob) atomic_fetch_add(&(ob)->ref_count, 1)
-#define plutovg_decrement_ref_count(ob) (atomic_fetch_sub(&(ob)->ref_count, 1) == 1)
-#define plutovg_get_ref_count(ob) ((ob) ? atomic_load(&(ob)->ref_count) : 0)
+#define plutovg_init_reference(ob) atomic_init(&(ob)->ref_count, 1)
+#define plutovg_increment_reference(ob) (ob && atomic_fetch_add(&(ob)->ref_count, 1))
+#define plutovg_destroy_reference(ob) (ob && atomic_fetch_sub(&(ob)->ref_count, 1) == 1)
+#define plutovg_get_reference_count(ob) ((ob) ? atomic_load(&(ob)->ref_count) : 0)
 
 #else
 
 typedef int plutovg_ref_count_t;
 
-#define plutovg_init_ref_count(ob) ((ob)->ref_count = 1)
-#define plutovg_increment_ref_count(ob) (++(ob)->ref_count)
-#define plutovg_decrement_ref_count(ob) (--(ob)->ref_count == 0)
-#define plutovg_get_ref_count(ob) ((ob) ? (ob)->ref_count : 0)
+#define plutovg_init_reference(ob) ((ob)->ref_count = 1)
+#define plutovg_increment_reference(ob) (ob && ++(ob)->ref_count)
+#define plutovg_destroy_reference(ob) (ob && --(ob)->ref_count == 0)
+#define plutovg_get_reference_count(ob) ((ob) ? (ob)->ref_count : 0)
 
 #endif
 

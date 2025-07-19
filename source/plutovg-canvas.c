@@ -82,7 +82,7 @@ static void plutovg_state_destroy(plutovg_state_t* state)
 plutovg_canvas_t* plutovg_canvas_create(plutovg_surface_t* surface)
 {
     plutovg_canvas_t* canvas = malloc(sizeof(plutovg_canvas_t));
-    plutovg_init_ref_count(canvas);
+    plutovg_init_reference(canvas);
     canvas->surface = plutovg_surface_reference(surface);
     canvas->path = plutovg_path_create();
     canvas->state = plutovg_state_create();
@@ -95,17 +95,13 @@ plutovg_canvas_t* plutovg_canvas_create(plutovg_surface_t* surface)
 
 plutovg_canvas_t* plutovg_canvas_reference(plutovg_canvas_t* canvas)
 {
-    if(canvas == NULL)
-        return NULL;
-    plutovg_increment_ref_count(canvas);
+    plutovg_increment_reference(canvas);
     return canvas;
 }
 
 void plutovg_canvas_destroy(plutovg_canvas_t* canvas)
 {
-    if(canvas == NULL)
-        return;
-    if(plutovg_decrement_ref_count(canvas)) {
+    if(plutovg_destroy_reference(canvas)) {
         while(canvas->state) {
             plutovg_state_t* state = canvas->state;
             canvas->state = state->next;
@@ -128,7 +124,7 @@ void plutovg_canvas_destroy(plutovg_canvas_t* canvas)
 
 int plutovg_canvas_get_reference_count(const plutovg_canvas_t* canvas)
 {
-    return plutovg_get_ref_count(canvas);
+    return plutovg_get_reference_count(canvas);
 }
 
 plutovg_surface_t* plutovg_canvas_get_surface(const plutovg_canvas_t* canvas)

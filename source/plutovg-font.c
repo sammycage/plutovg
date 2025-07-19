@@ -308,7 +308,7 @@ plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned
     }
 
     plutovg_font_face_t* face = malloc(sizeof(plutovg_font_face_t));
-    plutovg_init_ref_count(face);
+    plutovg_init_reference(face);
     face->info = info;
     stbtt_GetFontVMetrics(&face->info, &face->ascent, &face->descent, &face->line_gap);
     stbtt_GetFontBoundingBox(&face->info, &face->x1, &face->y1, &face->x2, &face->y2);
@@ -321,17 +321,13 @@ plutovg_font_face_t* plutovg_font_face_load_from_data(const void* data, unsigned
 
 plutovg_font_face_t* plutovg_font_face_reference(plutovg_font_face_t* face)
 {
-    if(face == NULL)
-        return NULL;
-    plutovg_increment_ref_count(face);
+    plutovg_increment_reference(face);
     return face;
 }
 
 void plutovg_font_face_destroy(plutovg_font_face_t* face)
 {
-    if(face == NULL)
-        return;
-    if(plutovg_decrement_ref_count(face)) {
+    if(plutovg_destroy_reference(face)) {
         plutovg_glyph_cache_finish(&face->cache, face);
         plutovg_mutex_destroy(&face->mutex);
         if(face->destroy_func)
@@ -342,7 +338,7 @@ void plutovg_font_face_destroy(plutovg_font_face_t* face)
 
 int plutovg_font_face_get_reference_count(const plutovg_font_face_t* face)
 {
-    return plutovg_get_ref_count(face);
+    return plutovg_get_reference_count(face);
 }
 
 static float plutovg_font_face_get_scale(const plutovg_font_face_t* face, float size)
