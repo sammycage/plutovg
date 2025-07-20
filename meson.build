@@ -16,8 +16,8 @@ plutovg_c_args += cc.get_supported_arguments(
     '-Wno-unused-function'
 )
 
-if not get_option('font-face-cache-load').disabled()
-    plutovg_c_args += ['-DPLUTOVG_ENABLE_FONT_CACHE_LOAD']
+if get_option('font-face-cache-load').disabled()
+    plutovg_c_args += ['-DPLUTOVG_DISABLE_FONT_CACHE_LOAD']
 endif
 
 if get_option('default_library') == 'static'
