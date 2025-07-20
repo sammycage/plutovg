@@ -662,9 +662,10 @@ plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cach
     return face;
 }
 
-#ifdef PLUTOVG_ENABLE_FONT_CACHE_LOAD
+#ifndef PLUTOVG_DISABLE_FONT_CACHE_LOAD
 
 #include <ctype.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -940,4 +941,4 @@ int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
     return 0;
 }
 
-#endif // PLUTOVG_ENABLE_FONT_CACHE_LOAD
+#endif // PLUTOVG_DISABLE_FONT_CACHE_LOAD
