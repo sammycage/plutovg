@@ -1559,6 +1559,10 @@ PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_pain
  */
 PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas, plutovg_color_t* color);
 
+PLUTOVG_API void plutovg_canvas_set_font_face_cache(plutovg_canvas_t* canvas, plutovg_font_face_cache_t* cache);
+PLUTOVG_API plutovg_font_face_cache_t* plutovg_canvas_get_font_face_cache(const plutovg_canvas_t* canvas);
+PLUTOVG_API bool plutovg_canvas_select_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic);
+
 /**
  * @brief Sets the font face and size for text rendering on the canvas.
  *

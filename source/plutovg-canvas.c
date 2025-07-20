@@ -206,6 +206,29 @@ plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas, plutov
     return canvas->state->paint;
 }
 
+void plutovg_canvas_set_font_face_cache(plutovg_canvas_t* canvas, plutovg_font_face_cache_t* cache)
+{
+    cache = plutovg_font_face_cache_reference(cache);
+    plutovg_font_face_cache_destroy(canvas->face_cache);
+    canvas->face_cache = cache;
+}
+
+plutovg_font_face_cache_t* plutovg_canvas_get_font_face_cache(const plutovg_canvas_t* canvas)
+{
+    return canvas->face_cache;
+}
+
+bool plutovg_canvas_select_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic)
+{
+    if(canvas->face_cache == NULL)
+        return false;
+    plutovg_font_face_t* face = plutovg_font_face_cache_get(canvas->face_cache, family, bold, italic);
+    if(face == NULL)
+        return false;
+    plutovg_canvas_set_font_face(canvas, face);
+    return true;
+}
+
 void plutovg_canvas_set_font(plutovg_canvas_t* canvas, plutovg_font_face_t* face, float size)
 {
     plutovg_canvas_set_font_face(canvas, face);

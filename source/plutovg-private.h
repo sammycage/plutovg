@@ -158,6 +158,7 @@ struct plutovg_canvas {
     plutovg_path_t* path;
     plutovg_state_t* state;
     plutovg_state_t* freed_state;
+    plutovg_font_face_cache_t* face_cache;
     plutovg_rect_t clip_rect;
     plutovg_span_buffer_t clip_spans;
     plutovg_span_buffer_t fill_spans;
