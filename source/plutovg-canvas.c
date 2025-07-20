@@ -218,6 +218,20 @@ plutovg_font_face_cache_t* plutovg_canvas_get_font_face_cache(const plutovg_canv
     return canvas->face_cache;
 }
 
+void plutovg_canvas_add_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic, plutovg_font_face_t* face)
+{
+    if(canvas->face_cache == NULL)
+        canvas->face_cache = plutovg_font_face_cache_create();
+    plutovg_font_face_cache_add(canvas->face_cache, family, bold, italic, face);
+}
+
+bool plutovg_canvas_add_font_file(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic, const char* filename, int ttcindex)
+{
+    if(canvas->face_cache == NULL)
+        canvas->face_cache = plutovg_font_face_cache_create();
+    return plutovg_font_face_cache_add_file(canvas->face_cache, family, bold, italic, filename, ttcindex);
+}
+
 bool plutovg_canvas_select_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic)
 {
     if(canvas->face_cache == NULL)

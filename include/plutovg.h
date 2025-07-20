@@ -1561,6 +1561,8 @@ PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* ca
 
 PLUTOVG_API void plutovg_canvas_set_font_face_cache(plutovg_canvas_t* canvas, plutovg_font_face_cache_t* cache);
 PLUTOVG_API plutovg_font_face_cache_t* plutovg_canvas_get_font_face_cache(const plutovg_canvas_t* canvas);
+PLUTOVG_API void plutovg_canvas_add_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic, plutovg_font_face_t* face);
+PLUTOVG_API bool plutovg_canvas_add_font_file(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic, const char* filename, int ttcindex);
 PLUTOVG_API bool plutovg_canvas_select_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic);
 
 /**
