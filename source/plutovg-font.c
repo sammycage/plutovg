@@ -546,17 +546,7 @@ plutovg_font_face_cache_t* plutovg_font_face_cache_reference(plutovg_font_face_c
 void plutovg_font_face_cache_destroy(plutovg_font_face_cache_t* cache)
 {
     if(plutovg_destroy_reference(cache)) {
-        plutovg_mutex_lock(&cache->mutex);
-        for(int i = 0; i < cache->size; ++i) {
-            plutovg_font_face_entry_t* entry = cache->entries[i];
-            do {
-                plutovg_font_face_entry_t* next = entry->next;
-                free(entry);
-                entry = next;
-            } while(entry);
-        }
-
-        plutovg_mutex_lock(&cache->mutex);
+        plutovg_font_face_cache_reset(cache);
         plutovg_mutex_destroy(&cache->mutex);
         free(cache);
     }
@@ -567,9 +557,31 @@ int plutovg_font_face_cache_reference_count(const plutovg_font_face_cache_t* cac
     return plutovg_get_reference_count(cache);
 }
 
+void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache)
+{
+    plutovg_mutex_lock(&cache->mutex);
+
+    for(int i = 0; i < cache->size; ++i) {
+        plutovg_font_face_entry_t* entry = cache->entries[i];
+        do {
+            plutovg_font_face_entry_t* next = entry->next;
+            free(entry);
+            entry = next;
+        } while(entry);
+    }
+
+    free(cache->entries);
+    cache->entries = NULL;
+    cache->size = 0;
+    cache->capacity = 0;
+
+    plutovg_mutex_lock(&cache->mutex);
+}
+
 static void plutovg_font_face_cache_add_entry(plutovg_font_face_cache_t* cache, plutovg_font_face_entry_t* entry)
 {
     plutovg_mutex_lock(&cache->mutex);
+
     for(int i = 0; i < cache->size; ++i) {
         if(strcmp(entry->family, cache->entries[i]->family) == 0) {
             entry->next = cache->entries[i];
