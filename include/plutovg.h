@@ -901,6 +901,7 @@ PLUTOVG_API void plutovg_font_face_cache_destroy(plutovg_font_face_cache_t* cach
 PLUTOVG_API int plutovg_font_face_cache_reference_count(const plutovg_font_face_cache_t* cache);
 PLUTOVG_API void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache);
 PLUTOVG_API void plutovg_font_face_cache_add(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, plutovg_font_face_t* face);
+PLUTOVG_API bool plutovg_font_face_cache_add_file(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, const char* filename, int ttcindex);
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic);
 
 PLUTOVG_API int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename);

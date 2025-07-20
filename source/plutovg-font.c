@@ -622,6 +622,16 @@ void plutovg_font_face_cache_add(plutovg_font_face_cache_t* cache, const char* f
     plutovg_font_face_cache_add_entry(cache, entry);
 }
 
+bool plutovg_font_face_cache_add_file(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, const char* filename, int ttcindex)
+{
+    plutovg_font_face_t* face = plutovg_font_face_load_from_file(filename, ttcindex);
+    if(face == NULL)
+        return false;
+    plutovg_font_face_cache_add(cache, family, bold, italic, face);
+    plutovg_font_face_destroy(face);
+    return true;
+}
+
 static plutovg_font_face_entry_t* plutovg_font_face_entry_select(plutovg_font_face_entry_t* a, plutovg_font_face_entry_t* b, bool bold, bool italic)
 {
     int a_score = (bold == a->bold) + (italic == a->italic);
