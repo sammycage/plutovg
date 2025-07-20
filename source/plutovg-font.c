@@ -574,6 +574,7 @@ void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache)
     cache->entries = NULL;
     cache->size = 0;
     cache->capacity = 0;
+    cache->is_sorted = false;
 
     plutovg_mutex_lock(&cache->mutex);
 }
@@ -639,7 +640,7 @@ plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cach
 {
     plutovg_mutex_lock(&cache->mutex);
 
-    if(!cache->is_sorted) {
+    if(!cache->is_sorted && cache->size > 0) {
         qsort(cache->entries, cache->size, sizeof(cache->entries[0]), plutovg_font_face_entry_compare);
         cache->is_sorted = true;
     }
