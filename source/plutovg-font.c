@@ -662,7 +662,7 @@ plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cach
         plutovg_font_face_entry_t* selected = *entry_result;
         plutovg_font_face_entry_t* entry = selected->next;
         while(entry) {
-            selected = plutovg_font_face_entry_select(selected, entry, bold, italic);
+            selected = plutovg_font_face_entry_select(entry, selected, bold, italic);
             entry = entry->next;
         }
 
@@ -785,11 +785,12 @@ int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const ch
         size_t family_length = 0;
         for(stbtt_int32 i = 0; i < nm_count; ++i) {
             stbtt_uint32 loc = nm + 6 + 12 * i;
-            if(ttUSHORT(data + loc + 6) != 1) {
-                continue;
-            }
+            stbtt_int32 nm_id = ttUSHORT(data + loc + 6);
 
             family_length = ttUSHORT(data + loc + 8);
+            if(family_length == 0 || nm_id != 1) {
+                continue;
+            }
 
             stbtt_int32 platform = ttUSHORT(data + loc + 0);
             stbtt_int32 encoding = ttUSHORT(data + loc + 2);
@@ -970,7 +971,7 @@ int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
 {
     int num_faces = 0;
 #if defined(_WIN32)
-    num_faces += plutovg_font_face_cache_load_dir(cache, "C:\\Windows\\Fonts\\");
+    num_faces += plutovg_font_face_cache_load_dir(cache, "C:\\Windows\\Fonts");
 #elif defined(__APPLE__)
     num_faces += plutovg_font_face_cache_load_dir(cache, "/Library/Fonts");
     num_faces += plutovg_font_face_cache_load_dir(cache, "/System/Library/Fonts");
