@@ -1042,17 +1042,17 @@ int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
 
 int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename)
 {
-    return 0;
+    return -1;
 }
 
 int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname)
 {
-    return 0;
+    return -1;
 }
 
 int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
 {
-    return 0;
+    return -1;
 }
 
 #endif // PLUTOVG_DISABLE_FONT_CACHE_LOAD
