@@ -772,7 +772,7 @@ static void plutovg_unmap(void* data, long length)
 int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename)
 {
     long length;
-    uint8_t* data = plutovg_mmap(filename, &length);
+    stbtt_uint8* data = plutovg_mmap(filename, &length);
     if(data == NULL) {
         return 0;
     }
@@ -787,25 +787,25 @@ int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const ch
         }
 
         stbtt_uint32 nm = stbtt__find_table(data, offset, "name");
-        stbtt_int32 nm_count = ttUSHORT(data + nm + 2);
+        stbtt_uint16 nm_count = ttUSHORT(data + nm + 2);
 
-        const uint8_t* unicode_family_name = NULL;
-        const uint8_t* roman_family_name = NULL;
+        const stbtt_uint8* unicode_family_name = NULL;
+        const stbtt_uint8* roman_family_name = NULL;
 
         size_t family_length = 0;
         for(stbtt_int32 i = 0; i < nm_count; ++i) {
             stbtt_uint32 loc = nm + 6 + 12 * i;
-            stbtt_int32 nm_id = ttUSHORT(data + loc + 6);
+            stbtt_uint16 nm_id = ttUSHORT(data + loc + 6);
 
             family_length = ttUSHORT(data + loc + 8);
             if(family_length == 0 || nm_id != 1) {
                 continue;
             }
 
-            stbtt_int32 platform = ttUSHORT(data + loc + 0);
-            stbtt_int32 encoding = ttUSHORT(data + loc + 2);
+            stbtt_uint16 platform = ttUSHORT(data + loc + 0);
+            stbtt_uint16 encoding = ttUSHORT(data + loc + 2);
 
-            const uint8_t* family_name = data + nm + ttUSHORT(data + nm + 4) + ttUSHORT(data + loc + 10);
+            const stbtt_uint8* family_name = data + nm + ttUSHORT(data + nm + 4) + ttUSHORT(data + loc + 10);
             if(platform == 1 && encoding == 0) {
                 roman_family_name = family_name;
                 continue;
@@ -820,7 +820,7 @@ int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const ch
         if(unicode_family_name == NULL && roman_family_name == NULL)
             continue;
         size_t filename_length = strlen(filename) + 1;
-        size_t max_family_length = (unicode_family_name ? 3 * (family_length / 2) : family_length) + 1;
+        size_t max_family_length = (unicode_family_name ? 3 * (family_length / 2) : family_length * 3) + 1;
 
         plutovg_font_face_entry_t* entry = malloc(max_family_length + filename_length + sizeof(plutovg_font_face_entry_t));
         entry->family = (char*)(entry + 1);
@@ -829,7 +829,7 @@ int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const ch
 
         size_t family_index = 0;
         if(unicode_family_name) {
-            const uint8_t* family_name = unicode_family_name;
+            const stbtt_uint8* family_name = unicode_family_name;
             while(family_length) {
                 stbtt_uint16 ch = family_name[0] * 256 + family_name[1];
                 if(ch < 0x80) {
