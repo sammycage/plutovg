@@ -893,19 +893,111 @@ PLUTOVG_API float plutovg_font_face_traverse_glyph_path(plutovg_font_face_t* fac
  */
 PLUTOVG_API float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
+/**
+ * @brief Represents a cache of loaded font faces.
+ */
 typedef struct plutovg_font_face_cache plutovg_font_face_cache_t;
 
+/**
+ * @brief Create a new, empty font‐face cache.
+ *
+ * @return Pointer to a newly allocated `plutovg_font_face_cache_t` object.
+ */
 PLUTOVG_API plutovg_font_face_cache_t* plutovg_font_face_cache_create(void);
+
+/**
+ * @brief Increments the reference count of a font‐face cache.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @return A pointer to the same `plutovg_font_face_cache_t` object with an incremented reference count.
+ */
 PLUTOVG_API plutovg_font_face_cache_t* plutovg_font_face_cache_reference(plutovg_font_face_cache_t* cache);
+
+/**
+ * @brief Decrement the reference count of a font‐face cache and destroy it when it reaches zero.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object to release.
+ */
 PLUTOVG_API void plutovg_font_face_cache_destroy(plutovg_font_face_cache_t* cache);
+
+/**
+ * @brief Retrieve the current reference count of a font‐face cache.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @return The current reference count, or 0 if cache is NULL.
+ */
 PLUTOVG_API int plutovg_font_face_cache_reference_count(const plutovg_font_face_cache_t* cache);
+
+/**
+ * @brief Remove all entries from a font‐face cache.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object to reset.
+ */
 PLUTOVG_API void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache);
+
+/**
+ * @brief Add a font face to the cache with the specified family and style.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @param family The font family name.
+ * @param bold Whether the font is bold.
+ * @param italic Whether the font is italic.
+ * @param face A pointer to the `plutovg_font_face_t` to add. The cache increments its reference count.
+ */
 PLUTOVG_API void plutovg_font_face_cache_add(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, plutovg_font_face_t* face);
+
+/**
+ * @brief Load a font face from a file and add it to the cache with the specified family and style.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @param family The font family name to associate with the face.
+ * @param bold Whether the font is bold.
+ * @param italic Whether the font is italic.
+ * @param filename Path to the font file.
+ * @param ttcindex Index of the face in a TrueType collection (use 0 for non-TTC fonts).
+ * @return `true` on success, `false` if the file could not be loaded.
+ */
 PLUTOVG_API bool plutovg_font_face_cache_add_file(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic, const char* filename, int ttcindex);
+
+/**
+ * @brief Retrieve a font face from the cache by family and style.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @param family The font family name.
+ * @param bold Whether the font is bold.
+ * @param italic Whether the font is italic.
+ * @return A pointer to the matching `plutovg_font_face_t` object, or NULL if not found. The returned face is owned by the cache and must not be destroyed by the caller.
+ */
 PLUTOVG_API plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cache, const char* family, bool bold, bool italic);
 
+/**
+ * @brief Load all font faces from a file and add them to the cache.
+ *
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @param filename Path to the font file (TrueType, OpenType, or font collection).
+ * @return The number of faces successfully loaded, or a negative value on failure.
+ */
 PLUTOVG_API int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename);
+
+/**
+ * @brief Load all font faces from files in a directory recursively and add them to the cache.
+ * 
+ * This scans the specified directory recursively and loads all supported font files.
+ * 
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @param dirname Path to the directory containing font files.
+ * @return The number of faces successfully loaded, or a negative value on failure.
+ */
 PLUTOVG_API int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname);
+
+/**
+ * @brief Load all available system font faces and add them to the cache.
+ *
+ * This scans standard system font directories recursively and loads all supported font files.
+ * 
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object.
+ * @return The number of faces successfully loaded, or a negative value on failure.
+ */
 PLUTOVG_API int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache);
 
 /**
@@ -1559,10 +1651,55 @@ PLUTOVG_API void plutovg_canvas_set_paint(plutovg_canvas_t* canvas, plutovg_pain
  */
 PLUTOVG_API plutovg_paint_t* plutovg_canvas_get_paint(const plutovg_canvas_t* canvas, plutovg_color_t* color);
 
+/**
+ * @brief Assigns a font-face cache to the canvas for font management.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param cache A pointer to a `plutovg_font_face_cache_t` object, or NULL to unset the current cache.
+ */
 PLUTOVG_API void plutovg_canvas_set_font_face_cache(plutovg_canvas_t* canvas, plutovg_font_face_cache_t* cache);
+
+/**
+ * @brief Returns the font-face cache associated with the canvas.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @return A pointer to the associated `plutovg_font_face_cache_t` object, or NULL if none is set.
+ */
 PLUTOVG_API plutovg_font_face_cache_t* plutovg_canvas_get_font_face_cache(const plutovg_canvas_t* canvas);
+
+/**
+ * @brief Add a font face to the canvas using the specified family and style.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param family The font family name to associate with the face.
+ * @param bold Whether the font is bold.
+ * @param italic Whether the font is italic.
+ * @param face A pointer to the `plutovg_font_face_t` object to add.
+ */
 PLUTOVG_API void plutovg_canvas_add_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic, plutovg_font_face_t* face);
+
+/**
+ * @brief Load a font face from a file and add it to the canvas using the specified family and style.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param family The font family name to associate with the face.
+ * @param bold Whether the font is bold.
+ * @param italic Whether the font is italic.
+ * @param filename Path to the font file.
+ * @param ttcindex Index within a TrueType Collection (use 0 for regular font files).
+ * @return `true` on success, or `false` if the font could not be loaded.
+ */
 PLUTOVG_API bool plutovg_canvas_add_font_file(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic, const char* filename, int ttcindex);
+
+/**
+ * @brief Selects and sets the current font face on the canvas.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param family The font family name to select.
+ * @param bold Whether to match a bold variant.
+ * @param italic Whether to match an italic variant.
+ * @return `true` if a matching font was found and set, `false` otherwise.
+ */
 PLUTOVG_API bool plutovg_canvas_select_font_face(plutovg_canvas_t* canvas, const char* family, bool bold, bool italic);
 
 /**
