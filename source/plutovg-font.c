@@ -796,9 +796,7 @@ int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const ch
         for(stbtt_int32 i = 0; i < nm_count; ++i) {
             stbtt_uint32 loc = nm + 6 + 12 * i;
             stbtt_uint16 nm_id = ttUSHORT(data + loc + 6);
-
-            family_length = ttUSHORT(data + loc + 8);
-            if(family_length == 0 || nm_id != 1) {
+            if(nm_id != 1) {
                 continue;
             }
 
@@ -807,11 +805,13 @@ int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const ch
 
             const stbtt_uint8* family_name = data + nm + ttUSHORT(data + nm + 4) + ttUSHORT(data + loc + 10);
             if(platform == 1 && encoding == 0) {
+                family_length = ttUSHORT(data + loc + 8);
                 roman_family_name = family_name;
                 continue;
             }
 
             if(platform == 0 || (platform == 3 && encoding == 1) || (platform == 3 && encoding == 10)) {
+                family_length = ttUSHORT(data + loc + 8);
                 unicode_family_name = family_name;
                 break;
             }
