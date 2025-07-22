@@ -87,6 +87,7 @@ plutovg_canvas_t* plutovg_canvas_create(plutovg_surface_t* surface)
     canvas->path = plutovg_path_create();
     canvas->state = plutovg_state_create();
     canvas->freed_state = NULL;
+    canvas->face_cache = NULL;
     canvas->clip_rect = PLUTOVG_MAKE_RECT(0, 0, surface->width, surface->height);
     plutovg_span_buffer_init(&canvas->clip_spans);
     plutovg_span_buffer_init(&canvas->fill_spans);
