@@ -4,5 +4,5 @@ option('tests', type : 'feature', value : 'auto')
 option('font-face-cache-load',
 	type : 'feature',
     value : 'auto',
-    description : 'Enable loading of font face cache from files and system font directories'
+    description : 'Enable loading font face cache from files and directories'
 )
