@@ -565,6 +565,7 @@ void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache)
         plutovg_font_face_entry_t* entry = cache->entries[i];
         do {
             plutovg_font_face_entry_t* next = entry->next;
+            plutovg_font_face_destroy(entry->face);
             free(entry);
             entry = next;
         } while(entry);
