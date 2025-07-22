@@ -975,7 +975,7 @@ PLUTOVG_API plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_c
  *
  * @param cache A pointer to a `plutovg_font_face_cache_t` object.
  * @param filename Path to the font file (TrueType, OpenType, or font collection).
- * @return The number of faces successfully loaded, or a negative value on failure.
+ * @return The number of faces successfully loaded, or `-1` if font face cache loading is disabled.
  */
 PLUTOVG_API int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cache, const char* filename);
 
@@ -986,7 +986,7 @@ PLUTOVG_API int plutovg_font_face_cache_load_file(plutovg_font_face_cache_t* cac
  * 
  * @param cache A pointer to a `plutovg_font_face_cache_t` object.
  * @param dirname Path to the directory containing font files.
- * @return The number of faces successfully loaded, or a negative value on failure.
+ * @return The number of faces successfully loaded, or `-1` if font face cache loading is disabled.
  */
 PLUTOVG_API int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cache, const char* dirname);
 
@@ -996,7 +996,7 @@ PLUTOVG_API int plutovg_font_face_cache_load_dir(plutovg_font_face_cache_t* cach
  * This scans standard system font directories recursively and loads all supported font files.
  * 
  * @param cache A pointer to a `plutovg_font_face_cache_t` object.
- * @return The number of faces successfully loaded, or a negative value on failure.
+ * @return The number of faces successfully loaded, or `-1` if font face cache loading is disabled.
  */
 PLUTOVG_API int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache);
 
