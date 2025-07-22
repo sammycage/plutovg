@@ -577,7 +577,7 @@ void plutovg_font_face_cache_reset(plutovg_font_face_cache_t* cache)
     cache->capacity = 0;
     cache->is_sorted = false;
 
-    plutovg_mutex_lock(&cache->mutex);
+    plutovg_mutex_unlock(&cache->mutex);
 }
 
 static void plutovg_font_face_cache_add_entry(plutovg_font_face_cache_t* cache, plutovg_font_face_entry_t* entry)
