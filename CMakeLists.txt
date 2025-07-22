@@ -66,10 +66,9 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(plutovg PUBLIC PLUTOVG_BUILD_STATIC)
 endif()
 
-option(PLUTOVG_DISABLE_FONT_CACHE_LOAD "Disable loading of font face cache from files and system directories" OFF)
-
-if(PLUTOVG_DISABLE_FONT_CACHE_LOAD)
-    target_compile_definitions(plutovg PRIVATE PLUTOVG_DISABLE_FONT_CACHE_LOAD)
+option(PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD "Disable loading of font face cache from files and system directories" OFF)
+if(PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD)
+    target_compile_definitions(plutovg PRIVATE PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD)
 endif()
 
 configure_package_config_file(

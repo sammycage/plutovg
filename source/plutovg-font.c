@@ -685,7 +685,7 @@ plutovg_font_face_t* plutovg_font_face_cache_get(plutovg_font_face_cache_t* cach
     return face;
 }
 
-#ifndef PLUTOVG_DISABLE_FONT_CACHE_LOAD
+#ifndef PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD
 
 #include <ctype.h>
 
@@ -1056,4 +1056,4 @@ int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
     return -1;
 }
 
-#endif // PLUTOVG_DISABLE_FONT_CACHE_LOAD
+#endif // PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD
