@@ -941,15 +941,16 @@ static bool plutovg_font_face_supports_file(const char* filename)
 {
     const char* extension = strrchr(filename, '.');
     if(extension) {
-        char ext[4];
+        char ext[5];
         size_t length = strlen(extension);
-        if(length == sizeof(ext)) {
+        if(length == 4) {
             for(size_t i = 0; i < length; ++i)
                 ext[i] = tolower(extension[i]);
-            return strncmp(ext, ".ttf", 4) == 0
-                || strncmp(ext, ".otf", 4) == 0
-                || strncmp(ext, ".ttc", 4) == 0
-                || strncmp(ext, ".otc", 4) == 0;
+            ext[length] = '\0';
+            return strcmp(ext, ".ttf") == 0
+                || strcmp(ext, ".otf") == 0
+                || strcmp(ext, ".ttc") == 0
+                || strcmp(ext, ".otc") == 0;
         }
     }
 
