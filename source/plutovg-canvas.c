@@ -114,6 +114,7 @@ void plutovg_canvas_destroy(plutovg_canvas_t* canvas)
             plutovg_state_destroy(state);
         }
 
+        plutovg_font_face_cache_destroy(canvas->face_cache);
         plutovg_span_buffer_destroy(&canvas->fill_spans);
         plutovg_span_buffer_destroy(&canvas->clip_spans);
         plutovg_surface_destroy(canvas->surface);
