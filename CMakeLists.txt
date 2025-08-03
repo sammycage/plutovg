@@ -61,6 +61,10 @@ if(MATH_LIBRARY)
     target_link_libraries(plutovg PRIVATE m)
 endif()
 
+if(LINUX) 
+    target_link_libraries(plutovg PRIVATE pthread)
+endif()
+
 target_compile_definitions(plutovg PRIVATE PLUTOVG_BUILD)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(plutovg PUBLIC PLUTOVG_BUILD_STATIC)
