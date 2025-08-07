@@ -71,6 +71,10 @@ if(PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD)
     target_compile_definitions(plutovg PRIVATE PLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD)
 endif()
 
+if(MSVC OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+    target_compile_definitions(plutovg PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
+
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/plutovgConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/plutovgConfig.cmake"
