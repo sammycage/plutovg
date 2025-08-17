@@ -1034,8 +1034,8 @@ int plutovg_font_face_cache_load_sys(plutovg_font_face_cache_t* cache)
     num_faces += plutovg_font_face_cache_load_dir(cache, "/Library/Fonts");
     num_faces += plutovg_font_face_cache_load_dir(cache, "/System/Library/Fonts");
 #elif defined(__linux__)
-    num_faces += plutovg_font_face_cache_load_dir(cache, "/usr/share/fonts/");
-    num_faces += plutovg_font_face_cache_load_dir(cache, "/usr/local/share/fonts/");
+    num_faces += plutovg_font_face_cache_load_dir(cache, "/usr/share/fonts");
+    num_faces += plutovg_font_face_cache_load_dir(cache, "/usr/local/share/fonts");
 #endif
     return num_faces;
 }
