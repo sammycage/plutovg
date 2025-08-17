@@ -30,6 +30,11 @@ if math_dep.found()
     plutovg_deps += [math_dep]
 endif
 
+threads_dep = dependency('threads', required: false)
+if threads_dep.found()
+    plutovg_deps += [threads_dep]
+endif
+
 plutovg_sources = [
     'source/plutovg-blend.c',
     'source/plutovg-canvas.c',

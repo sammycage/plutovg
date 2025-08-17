@@ -61,12 +61,9 @@ if(MATH_LIBRARY)
     target_link_libraries(plutovg PRIVATE m)
 endif()
 
-if(LINUX) 
-    target_link_libraries(plutovg PRIVATE pthread)
-endif()
-
-if(BSD)
-    target_link_libraries(plutovg PRIVATE stdthreads)
+find_package(Threads)
+if(Threads_FOUND)
+    target_link_libraries(plutovg PRIVATE Threads::Threads)
 endif()
 
 target_compile_definitions(plutovg PRIVATE PLUTOVG_BUILD)
@@ -131,12 +128,8 @@ if(MATH_LIBRARY)
     string(APPEND plutovg_pc_libs_private " -lm")
 endif()
 
-if(LINUX)
-    string(APPEND plutovg_pc_libs_private " -lpthread")
-endif()
-
-if(BSD)
-    string(APPEND plutovg_pc_libs_private " -lstdthreads")
+if(Threads_FOUND AND CMAKE_THREAD_LIBS_INIT)
+    string(APPEND plutovg_pc_libs_private " ${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
