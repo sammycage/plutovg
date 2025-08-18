@@ -16,6 +16,10 @@ plutovg_c_args += cc.get_supported_arguments(
     '-Wno-unused-function'
 )
 
+if cc.get_id() == 'msvc' or cc.get_id() == 'clang' or cc.get_id() == 'clang-cl'
+    plutovg_c_args += ['-D_CRT_SECURE_NO_WARNINGS']
+endif
+
 if get_option('font-face-cache-load').disabled()
     plutovg_c_args += ['-DPLUTOVG_DISABLE_FONT_FACE_CACHE_LOAD']
 endif
