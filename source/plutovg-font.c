@@ -119,7 +119,7 @@ typedef CRITICAL_SECTION plutovg_mutex_t;
 #define plutovg_mutex_unlock(mutex) LeaveCriticalSection(mutex)
 #define plutovg_mutex_destroy(mutex) DeleteCriticalSection(mutex)
 
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && defined(HAVE_THREADS_H) && !defined(__STDC_NO_THREADS__)
 
 #include <threads.h>
 

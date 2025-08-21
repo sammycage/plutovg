@@ -38,6 +38,7 @@ add_library(plutovg::plutovg ALIAS plutovg)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CheckIncludeFile)
 
 set_target_properties(plutovg PROPERTIES
     SOVERSION ${PLUTOVG_VERSION_MAJOR}
@@ -61,6 +62,10 @@ if(MATH_LIBRARY)
     target_link_libraries(plutovg PRIVATE m)
 endif()
 
+check_include_file("threads.h" HAVE_THREADS_H)
+if(HAVE_THREADS_H)
+    target_compile_definitions(plutovg PRIVATE HAVE_THREADS_H)
+endif()
 find_package(Threads)
 if(Threads_FOUND)
     target_link_libraries(plutovg PRIVATE Threads::Threads)

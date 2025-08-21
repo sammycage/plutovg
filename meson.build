@@ -34,6 +34,9 @@ threads_dep = dependency('threads', required: false)
 if threads_dep.found()
     plutovg_deps += [threads_dep]
 endif
+if cc.check_header('threads.h')
+    plutovg_c_args += ['-DHAVE_THREADS_H']
+endif
 
 plutovg_sources = [
     'source/plutovg-blend.c',
