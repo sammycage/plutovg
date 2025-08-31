@@ -34,6 +34,10 @@ threads_dep = dependency('threads', required: false)
 if threads_dep.found()
     plutovg_deps += [threads_dep]
 endif
+stdthreads_dep = cc.find_library('stdthreads', required: false)
+if stdthreads_dep.found()
+    plutovg_deps += [stdthreads_dep]
+endif
 if cc.check_header('threads.h')
     plutovg_c_args += ['-DHAVE_THREADS_H']
 endif
