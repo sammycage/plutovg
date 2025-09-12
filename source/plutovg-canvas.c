@@ -752,11 +752,11 @@ void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, plutovg_codepoint_t 
     }
 }
 
-float plutovg_canvas_text_extents_chars_width(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents, float char_width_multiplier)
+float plutovg_canvas_text_extents_chars_width(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float char_width_multiplier, plutovg_rect_t* extents)
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f && char_width_multiplier >= 0.f) {
-        return plutovg_font_face_text_extents_chars_width(state->font_face, state->font_size, text, length, encoding, extents, char_width_multiplier);
+        return plutovg_font_face_text_extents_chars_width(state->font_face, state->font_size, text, length, encoding, char_width_multiplier, extents);
     }
 
     if(extents) {
@@ -771,5 +771,5 @@ float plutovg_canvas_text_extents_chars_width(plutovg_canvas_t* canvas, const vo
 
 float plutovg_canvas_text_extents(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents)
 {
-    return plutovg_canvas_text_extents_chars_width(canvas, text, length, encoding, extents, 1.0f);
+    return plutovg_canvas_text_extents_chars_width(canvas, text, length, encoding, 1.0f, extents);
 }

@@ -458,7 +458,7 @@ float plutovg_font_face_traverse_glyph_path(plutovg_font_face_t* face, float siz
     return glyph->advance_width * scale;
 }
 
-float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents, float char_width_multiplier)
+float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, float char_width_multiplier, plutovg_rect_t* extents)
 {
     plutovg_text_iterator_t it;
     plutovg_text_iterator_init(&it, text, length, encoding);
@@ -508,7 +508,7 @@ float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, floa
 
 float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents)
 {
-  return plutovg_font_face_text_extents_chars_width(face, size, text, length, encoding, extents, 1.0f);
+  return plutovg_font_face_text_extents_chars_width(face, size, text, length, encoding, 1.0f, extents);
 }
 
 typedef struct plutovg_font_face_entry {
