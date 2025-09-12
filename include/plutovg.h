@@ -893,6 +893,21 @@ PLUTOVG_API float plutovg_font_face_traverse_glyph_path(plutovg_font_face_t* fac
  */
 PLUTOVG_API float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
 
+
+/**
+ * @brief Computes the bounding box of a text string and its advance width with chars width multiplier.
+ *
+ * @param face A pointer to a `plutovg_font_face_t` object.
+ * @param size The font size in pixels.
+ * @param text Pointer to the text data.
+ * @param length Length of the text data, or -1 if null-terminated.
+ * @param encoding Encoding of the text data.
+ * @param extents Pointer to a `plutovg_rect_t` object to store the bounding box of the text.
+ * @param char_width_multiplier Width multiplier for each drawn char, 0.5f - 50%, 1.0f - 100%, 2.0f - 200%, etc.
+ * @return The total advance width of the text.
+ */
+PLUTOVG_API float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents, float char_width_multiplier);
+
 /**
  * @brief Represents a cache of loaded font faces.
  */
@@ -2480,6 +2495,21 @@ PLUTOVG_API float plutovg_canvas_add_text(plutovg_canvas_t* canvas, const void* 
 PLUTOVG_API float plutovg_canvas_fill_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
 
 /**
+ * @brief Fills a text at the specified origin with char width multiplier.
+ *
+ * @note The current path will be cleared by this operation.
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param x The x-coordinate of the origin.
+ * @param y The y-coordinate of the origin.
+ * @param char_width_multiplier Width multiplier for each drawn char, 0.5f - 50%, 1.0f - 100%, 2.0f - 200%, etc.
+ * @return The total advance width of the text.
+ */
+PLUTOVG_API float plutovg_canvas_fill_text_chars_width(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y, float char_width_multiplier);
+
+/**
  * @brief Strokes a text at the specified origin.
  *
  * @note The current path will be cleared by this operation.
@@ -2540,6 +2570,19 @@ PLUTOVG_API void plutovg_canvas_glyph_metrics(plutovg_canvas_t* canvas, plutovg_
  * @return The total advance width of the text.
  */
 PLUTOVG_API float plutovg_canvas_text_extents(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents);
+
+/**
+ * @brief Retrieves the extents of a text.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param extents The bounding box of the text.
+ * @param char_width_multiplier Width multiplier for each drawn char, 0.5f - 50%, 1.0f - 100%, 2.0f - 200%, etc.
+ * @return The total advance width of the text.
+ */
+PLUTOVG_API float plutovg_canvas_text_extents_chars_width(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents, float char_width_multiplier);
 
 #ifdef __cplusplus
 }
