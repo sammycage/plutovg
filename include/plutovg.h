@@ -2481,6 +2481,20 @@ PLUTOVG_API float plutovg_canvas_add_glyph(plutovg_canvas_t* canvas, plutovg_cod
 PLUTOVG_API float plutovg_canvas_add_text(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y);
 
 /**
+ * @brief Adds text to the current path at the specified origin with char width multiplier.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @param text The text data.
+ * @param length The length of the text data, or -1 if null-terminated.
+ * @param encoding The encoding of the text data.
+ * @param x The x-coordinate of the origin.
+ * @param y The y-coordinate of the origin.
+ * @param char_width_multiplier Width multiplier for each drawn char, 0.5f - 50%, 1.0f - 100%, 2.0f - 200%, etc.
+ * @return The total advance width of the text.
+ */
+PLUTOVG_API float plutovg_canvas_add_text_chars_width(plutovg_canvas_t* canvas, const void* text, int length, plutovg_text_encoding_t encoding, float x, float y, float char_width_multiplier);
+
+/**
  * @brief Fills a text at the specified origin.
  *
  * @note The current path will be cleared by this operation.
