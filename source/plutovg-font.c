@@ -458,19 +458,20 @@ float plutovg_font_face_traverse_glyph_path(plutovg_font_face_t* face, float siz
     return glyph->advance_width * scale;
 }
 
-float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, float char_width_multiplier, plutovg_rect_t* extents)
+float plutovg_font_face_tracking_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, float tracking, float width_scaling, plutovg_rect_t* extents)
 {
     plutovg_text_iterator_t it;
     plutovg_text_iterator_init(&it, text, length, encoding);
     plutovg_rect_t* text_extents = NULL;
     float total_advance_width = 0.f;
+    float tracking_width = tracking * size / 1000.0f;
     while(plutovg_text_iterator_has_next(&it)) {
         plutovg_codepoint_t codepoint = plutovg_text_iterator_next(&it);
 
         float advance_width;
         if(extents == NULL) {
             plutovg_font_face_get_glyph_metrics(face, size, codepoint, &advance_width, NULL, NULL);
-            total_advance_width += advance_width * char_width_multiplier;
+            total_advance_width += advance_width * width_scaling + tracking_width;
             continue;
         }
 
@@ -478,7 +479,7 @@ float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, floa
         plutovg_font_face_get_glyph_metrics(face, size, codepoint, &advance_width, NULL, &glyph_extents);
 
         glyph_extents.x += total_advance_width;
-        total_advance_width += advance_width * char_width_multiplier;
+        total_advance_width += advance_width * width_scaling + tracking_width;
         if(text_extents == NULL) {
             text_extents = extents;
             *text_extents = glyph_extents;
@@ -508,7 +509,7 @@ float plutovg_font_face_text_extents_chars_width(plutovg_font_face_t* face, floa
 
 float plutovg_font_face_text_extents(plutovg_font_face_t* face, float size, const void* text, int length, plutovg_text_encoding_t encoding, plutovg_rect_t* extents)
 {
-  return plutovg_font_face_text_extents_chars_width(face, size, text, length, encoding, 1.0f, extents);
+  return plutovg_font_face_tracking_text_extents(face, size, text, length, encoding, 0.0f, 1.0f, extents);
 }
 
 typedef struct plutovg_font_face_entry {
