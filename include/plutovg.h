@@ -1792,6 +1792,27 @@ PLUTOVG_API void plutovg_canvas_set_font_width_scaling(plutovg_canvas_t* canvas,
 PLUTOVG_API float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas);
 
 /**
+ * @brief Retrieves the current font typographic tracking value for text rendering on the canvas.
+ *
+ * If not set, the default tracking value is 0.
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @return The current tracking absolute value of the font, in em/1000 units. This value characterizes the uniform spacing between letters.
+ *         Positive value increases letter-spacing, negative value decreases it.
+ */
+PLUTOVG_API float plutovg_canvas_get_font_tracking(const plutovg_canvas_t* canvas);
+
+/**
+ * @brief Retrieves the current font width scaling value for text rendering on the canvas.
+ *
+ * If not set, the default font width scaling value is 1 (100%).
+ *
+ * @param canvas A pointer to a `plutovg_canvas_t` object.
+ * @return The current width scaling value of the font, 1.0f means 100%.
+ */
+PLUTOVG_API float plutovg_canvas_get_font_width_scaling(const plutovg_canvas_t* canvas);
+
+/**
  * @brief Sets the fill rule.
  *
  * If not set, the default fill rule is `PLUTOVG_FILL_RULE_NON_ZERO`.

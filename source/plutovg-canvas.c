@@ -285,6 +285,16 @@ float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas)
     return canvas->state->font_size;
 }
 
+float plutovg_canvas_get_font_tracking(const plutovg_canvas_t* canvas)
+{
+    return canvas->state->font_tracking;
+}
+
+float plutovg_canvas_get_font_width_scaling(const plutovg_canvas_t* canvas)
+{
+    return canvas->state->font_width_scaling;
+}
+
 void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_fill_rule_t winding)
 {
     canvas->state->winding = winding;
