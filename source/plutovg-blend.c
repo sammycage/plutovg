@@ -55,11 +55,12 @@ static inline uint32_t premultiply_color_with_opacity(const plutovg_color_t* col
     return (alpha << 24) | (pr << 16) | (pg << 8) | (pb);
 }
 
-static inline uint32_t INTERPOLATE_PIXEL(uint32_t x, uint32_t a, uint32_t y, uint32_t b)
+static inline uint32_t INTERPOLATE_PIXEL_255(uint32_t x, uint32_t a, uint32_t y, uint32_t b)
 {
     uint32_t t = (x & 0xff00ff) * a + (y & 0xff00ff) * b;
     t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
     t &= 0xff00ff;
+
     x = ((x >> 8) & 0xff00ff) * a + ((y >> 8) & 0xff00ff) * b;
     x = (x + ((x >> 8) & 0xff00ff) + 0x800080);
     x &= 0xff00ff00;
@@ -72,6 +73,7 @@ static inline uint32_t BYTE_MUL(uint32_t x, uint32_t a)
     uint32_t t = (x & 0xff00ff) * a;
     t = (t + ((t >> 8) & 0xff00ff) + 0x800080) >> 8;
     t &= 0xff00ff;
+
     x = ((x >> 8) & 0xff00ff) * a;
     x = (x + ((x >> 8) & 0xff00ff) + 0x800080);
     x &= 0xff00ff00;
@@ -346,7 +348,7 @@ static void composition_solid_source_in(uint32_t* dest, int length, uint32_t col
         uint32_t cia = 255 - const_alpha;
         for(int i = 0; i < length; i++) {
             uint32_t d = dest[i];
-            dest[i] = INTERPOLATE_PIXEL(color, plutovg_alpha(d), d, cia);
+            dest[i] = INTERPOLATE_PIXEL_255(color, plutovg_alpha(d), d, cia);
         }
     }
 }
@@ -372,7 +374,7 @@ static void composition_solid_source_out(uint32_t* dest, int length, uint32_t co
         uint32_t cia = 255 - const_alpha;
         for(int i = 0; i < length; i++) {
             uint32_t d = dest[i];
-            dest[i] = INTERPOLATE_PIXEL(color, plutovg_alpha(~d), d, cia);
+            dest[i] = INTERPOLATE_PIXEL_255(color, plutovg_alpha(~d), d, cia);
         }
     }
 }
@@ -394,7 +396,7 @@ static void composition_solid_source_atop(uint32_t* dest, int length, uint32_t c
     uint32_t sia = plutovg_alpha(~color);
     for(int i = 0; i < length; i++) {
         uint32_t d = dest[i];
-        dest[i] = INTERPOLATE_PIXEL(color, plutovg_alpha(d), d, sia);
+        dest[i] = INTERPOLATE_PIXEL_255(color, plutovg_alpha(d), d, sia);
     }
 }
 
@@ -408,7 +410,7 @@ static void composition_solid_destination_atop(uint32_t* dest, int length, uint3
 
     for(int i = 0; i < length; i++) {
         uint32_t d = dest[i];
-        dest[i] = INTERPOLATE_PIXEL(d, a, color, plutovg_alpha(~d));
+        dest[i] = INTERPOLATE_PIXEL_255(d, a, color, plutovg_alpha(~d));
     }
 }
 
@@ -419,7 +421,7 @@ static void composition_solid_xor(uint32_t* dest, int length, uint32_t color, ui
     uint32_t sia = plutovg_alpha(~color);
     for(int i = 0; i < length; i++) {
         uint32_t d = dest[i];
-        dest[i] = INTERPOLATE_PIXEL(color, plutovg_alpha(~d), d, sia);
+        dest[i] = INTERPOLATE_PIXEL_255(color, plutovg_alpha(~d), d, sia);
     }
 }
 
@@ -459,7 +461,7 @@ static void composition_source(uint32_t* dest, int length, const uint32_t* src, 
     } else {
         uint32_t ialpha = 255 - const_alpha;
         for(int i = 0; i < length; i++) {
-            dest[i] = INTERPOLATE_PIXEL(src[i], const_alpha, dest[i], ialpha);
+            dest[i] = INTERPOLATE_PIXEL_255(src[i], const_alpha, dest[i], ialpha);
         }
     }
 }
@@ -475,7 +477,7 @@ static void composition_source_over(uint32_t* dest, int length, const uint32_t* 
             uint32_t s = src[i];
             if(s >= 0xff000000) {
                 dest[i] = s;
-            } else if (s != 0) {
+            } else if(s != 0) {
                 dest[i] = s + BYTE_MUL(dest[i], plutovg_alpha(~s));
             }
         }
@@ -514,7 +516,7 @@ static void composition_source_in(uint32_t* dest, int length, const uint32_t* sr
         for(int i = 0; i < length; i++) {
             uint32_t d = dest[i];
             uint32_t s = BYTE_MUL(src[i], const_alpha);
-            dest[i] = INTERPOLATE_PIXEL(s, plutovg_alpha(d), d, cia);
+            dest[i] = INTERPOLATE_PIXEL_255(s, plutovg_alpha(d), d, cia);
         }
     }
 }
@@ -545,7 +547,7 @@ static void composition_source_out(uint32_t* dest, int length, const uint32_t* s
         for(int i = 0; i < length; i++) {
             uint32_t s = BYTE_MUL(src[i], const_alpha);
             uint32_t d = dest[i];
-            dest[i] = INTERPOLATE_PIXEL(s, plutovg_alpha(~d), d, cia);
+            dest[i] = INTERPOLATE_PIXEL_255(s, plutovg_alpha(~d), d, cia);
         }
     }
 }
@@ -571,13 +573,13 @@ static void composition_source_atop(uint32_t* dest, int length, const uint32_t* 
         for(int i = 0; i < length; i++) {
             uint32_t s = src[i];
             uint32_t d = dest[i];
-            dest[i] = INTERPOLATE_PIXEL(s, plutovg_alpha(d), d, plutovg_alpha(~s));
+            dest[i] = INTERPOLATE_PIXEL_255(s, plutovg_alpha(d), d, plutovg_alpha(~s));
         }
     } else {
         for(int i = 0; i < length; i++) {
             uint32_t s = BYTE_MUL(src[i], const_alpha);
             uint32_t d = dest[i];
-            dest[i] = INTERPOLATE_PIXEL(s, plutovg_alpha(d), d, plutovg_alpha(~s));
+            dest[i] = INTERPOLATE_PIXEL_255(s, plutovg_alpha(d), d, plutovg_alpha(~s));
         }
     }
 }
@@ -588,7 +590,7 @@ static void composition_destination_atop(uint32_t* dest, int length, const uint3
         for(int i = 0; i < length; i++) {
             uint32_t s = src[i];
             uint32_t d = dest[i];
-            dest[i] = INTERPOLATE_PIXEL(d, plutovg_alpha(s), s, plutovg_alpha(~d));
+            dest[i] = INTERPOLATE_PIXEL_255(d, plutovg_alpha(s), s, plutovg_alpha(~d));
         }
     } else {
         uint32_t cia = 255 - const_alpha;
@@ -596,7 +598,7 @@ static void composition_destination_atop(uint32_t* dest, int length, const uint3
             uint32_t s = BYTE_MUL(src[i], const_alpha);
             uint32_t d = dest[i];
             uint32_t a = plutovg_alpha(s) + cia;
-            dest[i] = INTERPOLATE_PIXEL(d, a, s, plutovg_alpha(~d));
+            dest[i] = INTERPOLATE_PIXEL_255(d, a, s, plutovg_alpha(~d));
         }
     }
 }
@@ -607,13 +609,13 @@ static void composition_xor(uint32_t* dest, int length, const uint32_t* src, uin
         for(int i = 0; i < length; i++) {
             uint32_t d = dest[i];
             uint32_t s = src[i];
-            dest[i] = INTERPOLATE_PIXEL(s, plutovg_alpha(~d), d, plutovg_alpha(~s));
+            dest[i] = INTERPOLATE_PIXEL_255(s, plutovg_alpha(~d), d, plutovg_alpha(~s));
         }
     } else {
         for(int i = 0; i < length; i++) {
             uint32_t d = dest[i];
             uint32_t s = BYTE_MUL(src[i], const_alpha);
-            dest[i] = INTERPOLATE_PIXEL(s, plutovg_alpha(~d), d, plutovg_alpha(~s));
+            dest[i] = INTERPOLATE_PIXEL_255(s, plutovg_alpha(~d), d, plutovg_alpha(~s));
         }
     }
 }
@@ -965,7 +967,7 @@ static void plutovg_blend_gradient(plutovg_canvas_t* canvas, const plutovg_gradi
             t = (fpos - curr->offset) * delta;
             dist = (uint32_t)(255 * t);
             idist = 255 - dist;
-            data.colortable[pos] = INTERPOLATE_PIXEL(curr_color, idist, next_color, dist);
+            data.colortable[pos] = INTERPOLATE_PIXEL_255(curr_color, idist, next_color, dist);
             ++pos;
             fpos += incr;
         }
