@@ -27,6 +27,8 @@ static plutovg_state_t* plutovg_state_create(void)
     state->winding = PLUTOVG_FILL_RULE_NON_ZERO;
     state->op = PLUTOVG_OPERATOR_SRC_OVER;
     state->font_size = 12.f;
+    state->font_tracking = 0.0f;
+    state->font_width_scaling = 1.0f;
     state->opacity = 1.f;
     state->clipping = false;
     state->next = NULL;
@@ -268,9 +270,29 @@ void plutovg_canvas_set_font_size(plutovg_canvas_t* canvas, float size)
     canvas->state->font_size = size;
 }
 
+void plutovg_canvas_set_font_tracking(plutovg_canvas_t* canvas, float tracking)
+{
+    canvas->state->font_tracking = tracking;
+}
+
+void plutovg_canvas_set_font_width_scaling(plutovg_canvas_t* canvas, float width_scaling)
+{
+    canvas->state->font_width_scaling = width_scaling;
+}
+
 float plutovg_canvas_get_font_size(const plutovg_canvas_t* canvas)
 {
     return canvas->state->font_size;
+}
+
+float plutovg_canvas_get_font_tracking(const plutovg_canvas_t* canvas)
+{
+    return canvas->state->font_tracking;
+}
+
+float plutovg_canvas_get_font_width_scaling(const plutovg_canvas_t* canvas)
+{
+    return canvas->state->font_width_scaling;
 }
 
 void plutovg_canvas_set_fill_rule(plutovg_canvas_t* canvas, plutovg_fill_rule_t winding)
@@ -672,9 +694,11 @@ float plutovg_canvas_add_text(plutovg_canvas_t* canvas, const void* text, int le
     plutovg_text_iterator_t it;
     plutovg_text_iterator_init(&it, text, length, encoding);
     float advance_width = 0.f;
+    float tracking_width = state->font_tracking * state->font_size / 1000.0f;
     while(plutovg_text_iterator_has_next(&it)) {
-        plutovg_codepoint_t codepoint = plutovg_text_iterator_next(&it);
-        advance_width += plutovg_font_face_get_glyph_path(state->font_face, state->font_size, x + advance_width, y, codepoint, canvas->path);
+      plutovg_codepoint_t codepoint = plutovg_text_iterator_next(&it);
+      float char_width = plutovg_font_face_get_glyph_path(state->font_face, state->font_size, x + advance_width, y, codepoint, canvas->path);
+      advance_width += (char_width * state->font_width_scaling) + tracking_width;
     }
 
     return advance_width;
@@ -745,14 +769,14 @@ float plutovg_canvas_text_extents(plutovg_canvas_t* canvas, const void* text, in
 {
     plutovg_state_t* state = canvas->state;
     if(state->font_face && state->font_size > 0.f) {
-        return plutovg_font_face_text_extents(state->font_face, state->font_size, text, length, encoding, extents);
+      return plutovg_font_face_tracking_text_extents(state->font_face, state->font_size, text, length, encoding, state->font_tracking, state->font_width_scaling, extents);
     }
 
     if(extents) {
-        extents->x = 0.f;
-        extents->y = 0.f;
-        extents->w = 0.f;
-        extents->h = 0.f;
+      extents->x = 0.f;
+      extents->y = 0.f;
+      extents->w = 0.f;
+      extents->h = 0.f;
     }
 
     return 0.f;
