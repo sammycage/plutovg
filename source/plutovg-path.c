@@ -370,6 +370,8 @@ void plutovg_path_transform(plutovg_path_t* path, const plutovg_matrix_t* matrix
             break;
         }
     }
+    if(path->elements.size > 0)
+        plutovg_matrix_map_point(matrix, &path->start_point, &path->start_point);
 }
 
 void plutovg_path_add_path(plutovg_path_t* path, const plutovg_path_t* source, const plutovg_matrix_t* matrix)
