@@ -267,6 +267,8 @@ static plutovg_glyph_t* plutovg_glyph_cache_get(plutovg_glyph_cache_t* cache, pl
 
 plutovg_font_face_t* plutovg_font_face_load_from_file(const char* filename, int ttcindex)
 {
+    if(!plutovg_is_regular_file(filename))
+        return NULL;
     FILE* fp = fopen(filename, "rb");
     if(fp == NULL) {
         return NULL;
