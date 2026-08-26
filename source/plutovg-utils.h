@@ -8,6 +8,11 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <sys/stat.h>
+
+#ifndef S_ISREG
+#define S_ISREG(mode) (((mode) & S_IFMT) == S_IFREG)
+#endif
 
 #define PLUTOVG_IS_NUM(c) ((c) >= '0' && (c) <= '9')
 #define PLUTOVG_IS_ALPHA(c) (((c) >= 'a' && (c) <= 'z') || ((c) >= 'A' && (c) <= 'Z'))
@@ -53,6 +58,13 @@
 #define plutovg_array_append(array, other) plutovg_array_append_data(array, (other).data, (other).size)
 #define plutovg_array_clear(array) ((array).size = 0)
 #define plutovg_array_destroy(array) free((array).data)
+
+/* Opening a FIFO blocks until a writer appears; directories, devices and sockets are never input. */
+static inline bool plutovg_is_regular_file(const char* filename)
+{
+    struct stat st;
+    return stat(filename, &st) == 0 && S_ISREG(st.st_mode);
+}
 
 static inline uint32_t plutovg_premultiply_argb(uint32_t color)
 {
