@@ -1,6 +1,8 @@
 #include "plutovg-private.h"
 #include "plutovg-utils.h"
 
+#include <limits.h>
+
 #ifndef PLUTOVG_DISABLE_IMAGE_WRITE
 #define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -17,6 +19,8 @@ static plutovg_surface_t* plutovg_surface_create_uninitialized(size_t width, siz
     if(width <= 0 || height <= 0 || width >= kMaxSize || height >= kMaxSize)
         return NULL;
     const size_t size = width * height * 4;
+    if(size > INT_MAX) // row offsets (y * stride) and the size are computed as int
+        return NULL;
     plutovg_surface_t* surface = malloc(size + sizeof(plutovg_surface_t));
     if(surface == NULL)
         return NULL;
