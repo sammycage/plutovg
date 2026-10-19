@@ -192,7 +192,17 @@ static inline uint32_t gradient_pixel_fixed(const gradient_data_t* gradient, int
 
 static inline uint32_t gradient_pixel(const gradient_data_t* gradient, float pos)
 {
-    int ipos = (int)(pos * (COLOR_TABLE_SIZE - 1) + 0.5f);
+    /* Degenerate gradient geometry yields NaN or out-of-range positions,
+     * and converting those to int is undefined. Saturate at a multiple of
+     * the table size (keeps the repeat/reflect phase) and map NaN to the
+     * start. */
+    float fpos = pos * (COLOR_TABLE_SIZE - 1) + 0.5f;
+    const float limit = (float)(COLOR_TABLE_SIZE << 20);
+    if(!(fpos > -limit))
+        fpos = isnan(fpos) ? 0.f : -limit;
+    else if(fpos > limit)
+        fpos = limit;
+    int ipos = (int)fpos;
     return gradient->colortable[gradient_clamp(gradient, ipos)];
 }
 
@@ -212,11 +222,19 @@ static void fetch_linear_gradient(uint32_t* buffer, const linear_gradient_values
         inc *= (COLOR_TABLE_SIZE - 1);
     }
 
+    /* The fixed-point paths below convert t to int, so they need t itself
+     * in range, not only the end of the run; otherwise fall back to
+     * gradient_pixel(). */
+    const float fixed_limit = (float)(INT_MAX >> (FIXPT_BITS + 1));
+    const bool t_fixed_ok = t < fixed_limit && t > -fixed_limit;
     const uint32_t* end = buffer + length;
     if(inc > -1e-5f && inc < 1e-5f) {
-        plutovg_memfill32(buffer, length, gradient_pixel_fixed(gradient, (int)(t * FIXPT_SIZE)));
+        if(t_fixed_ok)
+            plutovg_memfill32(buffer, length, gradient_pixel_fixed(gradient, (int)(t * FIXPT_SIZE)));
+        else
+            plutovg_memfill32(buffer, length, gradient_pixel(gradient, t / COLOR_TABLE_SIZE));
     } else {
-        if(t + inc * length < (float)(INT_MAX >> (FIXPT_BITS + 1)) && t + inc * length > (float)(INT_MIN >> (FIXPT_BITS + 1))) {
+        if(t_fixed_ok && t + inc * length < (float)(INT_MAX >> (FIXPT_BITS + 1)) && t + inc * length > (float)(INT_MIN >> (FIXPT_BITS + 1))) {
             int t_fixed = (int)(t * FIXPT_SIZE);
             int inc_fixed = (int)(inc * FIXPT_SIZE);
             while(buffer < end) {

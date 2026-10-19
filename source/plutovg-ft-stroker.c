@@ -568,6 +568,11 @@ Fail:
 static void ft_stroke_border_export(PVG_FT_StrokeBorder border,
                                     PVG_FT_Outline*     outline)
 {
+    /* an empty border has never allocated points, and memcpy() with a
+     * NULL source is undefined even for a zero length */
+    if (border->num_points == 0)
+        return;
+
     /* copy point locations */
     memcpy(outline->points + outline->n_points, border->points,
            border->num_points * sizeof(PVG_FT_Vector));
