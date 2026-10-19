@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <float.h>
+#include <limits.h>
 #include <math.h>
 
 #define PLUTOVG_IS_NUM(c) ((c) >= '0' && (c) <= '9')
@@ -30,21 +31,47 @@
         (array).capacity = 0; \
     } while(0)
 
+/*
+ * On failure the old buffer is freed and the array is left empty, so callers
+ * that need the existing contents must check the result.
+ */
+static inline bool plutovg_array_reserve(void* data, int* size, int* capacity, int count, size_t element_size)
+{
+    if(count <= *capacity - *size)
+        return true;
+
+    void* olddata;
+    void* newdata = NULL;
+    memcpy(&olddata, data, sizeof(olddata));
+    int newcapacity = *capacity == 0 ? 8 : *capacity;
+    if(count <= INT_MAX - *size) {
+        int required = *size + count;
+        while(newcapacity < required)
+            newcapacity = newcapacity > INT_MAX / 2 ? required : newcapacity * 2;
+        if((size_t)newcapacity <= SIZE_MAX / element_size) {
+            newdata = realloc(olddata, (size_t)newcapacity * element_size);
+        }
+    }
+
+    if(newdata == NULL) {
+        free(olddata);
+        memcpy(data, &newdata, sizeof(newdata));
+        *size = 0;
+        *capacity = 0;
+        return false;
+    }
+
+    memcpy(data, &newdata, sizeof(newdata));
+    *capacity = newcapacity;
+    return true;
+}
+
 #define plutovg_array_ensure(array, count) \
-    do { \
-        if((array).size + (count) > (array).capacity) { \
-            int capacity = (array).size + (count); \
-            int newcapacity = (array).capacity == 0 ? 8 : (array).capacity; \
-            while(newcapacity < capacity) { newcapacity *= 2; } \
-            (array).data = realloc((array).data, newcapacity * sizeof((array).data[0])); \
-            (array).capacity = newcapacity; \
-        } \
-    } while(0)
+    plutovg_array_reserve(&(array).data, &(array).size, &(array).capacity, (count), sizeof((array).data[0]))
 
 #define plutovg_array_append_data(array, newdata, count) \
     do { \
-        if(newdata && count > 0) { \
-            plutovg_array_ensure(array, count); \
+        if(newdata && count > 0 && plutovg_array_ensure(array, count)) { \
             memcpy((array).data + (array).size, newdata, (count) * sizeof((newdata)[0])); \
             (array).size += count; \
         } \
