@@ -259,9 +259,9 @@ void plutovg_convert_argb_to_rgba(unsigned char* dst, const unsigned char* src, 
                 uint32_t g = (pixel >> 8) & 0xFF;
                 uint32_t b = (pixel >> 0) & 0xFF;
                 if(a != 255) {
-                    r = (r * 255) / a;
-                    g = (g * 255) / a;
-                    b = (b * 255) / a;
+                    r = (r * 255 + a / 2) / a;
+                    g = (g * 255 + a / 2) / a;
+                    b = (b * 255 + a / 2) / a;
                 }
 
                 *dst_row++ = r;
@@ -287,9 +287,9 @@ void plutovg_convert_rgba_to_argb(unsigned char* dst, const unsigned char* src, 
                 uint32_t g = src_row[4 * x + 1];
                 uint32_t b = src_row[4 * x + 2];
                 if(a != 255) {
-                    r = (r * a) / 255;
-                    g = (g * a) / 255;
-                    b = (b * a) / 255;
+                    r = (r * a + 127) / 255;
+                    g = (g * a + 127) / 255;
+                    b = (b * a + 127) / 255;
                 }
 
                 dst_row[x] = (a << 24) | (r << 16) | (g << 8) | b;
