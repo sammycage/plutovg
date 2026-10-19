@@ -181,6 +181,11 @@ void plutovg_path_arc_to(plutovg_path_t* path, float rx, float ry, float angle, 
         th_arc += PLUTOVG_TWO_PI;
     else if(th_arc > 0.f && !sweep_flag)
         th_arc -= PLUTOVG_TWO_PI;
+    if(!isfinite(th_arc)) {
+        plutovg_path_line_to(path, x, y);
+        return;
+    }
+
     plutovg_matrix_init_rotate(&matrix, angle);
     plutovg_matrix_scale(&matrix, rx, ry);
     int segments = (int)(ceilf(fabsf(th_arc / (PLUTOVG_HALF_PI + 0.001f))));
@@ -316,6 +321,8 @@ void plutovg_path_add_arc(plutovg_path_t* path, float cx, float cy, float r, flo
         da += PLUTOVG_TWO_PI * (ccw ? -1 : 1);
     }
 
+    if(isnan(da))
+        return;
     int seg_n = (int)(ceilf(fabsf(da) / PLUTOVG_HALF_PI));
     if(seg_n == 0)
         return;
