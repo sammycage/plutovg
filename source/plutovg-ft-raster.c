@@ -628,8 +628,34 @@ PVG_FT_END_STMNT
       p    = ONE_PIXEL * dx;
       PVG_FT_DIV_MOD( TCoord, p, dy, lift, rem );
 
-      do
+      /* Every band decomposes the whole outline again, and rows outside */
+      /* the band only touch invalid cells.  Jump to the band's first    */
+      /* row by advancing the stepper in closed form, and stop once the  */
+      /* edge leaves the band.  The recorded cells are unchanged.  The   */
+      /* jump is taken only while dy fits in 31 bits, which keeps the    */
+      /* 64-bit product below from overflowing.                          */
+      if ( dy <= 0x7FFFFFFFL &&
+           ( incr > 0 ? ey1 < ras.min_ey : ey1 >= ras.max_ey ) )
       {
+        TCoord        ey3 = incr > 0 ? ras.min_ey : ras.max_ey - 1;
+        PVG_FT_Int64  n   = (PVG_FT_Int64)( ey3 - ey1 ) * incr;
+        PVG_FT_Int64  q   = (PVG_FT_Int64)rem * n + mod;
+
+
+        x   += (TPos)( lift * n + q / dy );
+        mod  = (TCoord)( q % dy );
+        ey1  = ey3;
+        gray_set_cell( RAS_VAR_ TRUNC( x ), ey1 );
+      }
+
+      while ( ey1 != ey2 )
+      {
+        if ( incr > 0 ? ey1 >= ras.max_ey : ey1 < ras.min_ey )
+        {
+          gray_set_cell( RAS_VAR_ TRUNC( to_x ), ey2 );
+          return;
+        }
+
         delta = lift;
         mod  += rem;
         if ( mod >= (TCoord)dy )
@@ -646,7 +672,7 @@ PVG_FT_END_STMNT
 
         ey1 += incr;
         gray_set_cell( RAS_VAR_ TRUNC( x ), ey1 );
-      } while ( ey1 != ey2 );
+      }
     }
 
     gray_render_scanline( RAS_VAR_ ey1,
