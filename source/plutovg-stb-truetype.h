@@ -1768,7 +1768,8 @@ static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index, s
                num_vertices = stbtt__close_shape(vertices, num_vertices, was_off, start_off, sx,sy,scx,scy,cx,cy);
 
             // now start the new one
-            start_off = !(flags & 1);
+            // (a contour of a single off-curve point has no next point: start on that point)
+            start_off = !(flags & 1) && i < ttUSHORT(endPtsOfContours+j*2);
             if (start_off) {
                // if we start off with an off-curve point, then when we need to find a point on the curve
                // where we can start, and we need to save some state for when we wraparound.
