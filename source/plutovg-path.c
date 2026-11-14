@@ -904,9 +904,8 @@ bool plutovg_path_parse(plutovg_path_t* path, const char* data, int length)
             current_x = values[3];
             current_y = values[4];
         } else if(command == 'Z' || command == 'z') {
-            if(last_command == 'Z' || last_command == 'z')
-                return false;
-            plutovg_path_close(path);
+            if(last_command != 'Z' && last_command != 'z')
+                plutovg_path_close(path); // a repeated closepath is valid and changes nothing
             current_x = start_x;
             current_y = start_y;
         } else {
