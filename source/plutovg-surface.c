@@ -58,6 +58,8 @@ static plutovg_surface_t* plutovg_surface_load_from_image(stbi_uc* image, int wi
 
 plutovg_surface_t* plutovg_surface_load_from_image_file(const char* filename)
 {
+    if(!plutovg_is_regular_file(filename))
+        return NULL;
     int width, height, channels;
     stbi_uc* image = stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
     if(image == NULL)
